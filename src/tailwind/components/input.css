@@ -1,0 +1,29 @@
+.input-wrapper {
+  @apply inline-flex h-full w-full flex-1 rounded-lg;
+  /* چیدمان کلی */
+}
+
+
+.input-main {
+  @apply flex w-full items-center gap-2 rounded-lg border border-inherit overflow-hidden;
+}
+
+/* حذف radius سمت چپ */
+.input-main.no-radius-left {
+  @apply rounded-l-none;
+}
+
+/* حذف radius سمت راست */
+.input-main.no-radius-right {
+  @apply rounded-r-none;
+}
+
+.input-main .input-textbox {
+  @apply w-full flex-1 shrink font-normal text-primary-text outline-none placeholder:text-d-body2 placeholder:text-gray-500 md:placeholder:text-d-body1 md:placeholder:text-gray-600 disabled:text-gray-500 disabled:placeholder:text-gray-600;
+  /* Textbox تمام عرض باقی‌مانده را بگیرد */
+}
+
+
+.input-disabled {
+  @apply cursor-not-allowed bg-gray-200;
+}

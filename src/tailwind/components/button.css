@@ -1,0 +1,17 @@
+.btn-class {
+  @apply inline-flex items-center justify-center gap-x-1.5 bg-[#000] rounded-lg font-medium transition-all duration-200 focus:outline-none;
+
+
+  &-outlined {
+    @apply border bg-transparent;
+
+    &:disabled {
+      @apply cursor-not-allowed border-disabled/50 bg-white text-disabled/80;
+    }
+  }
+
+  &-text {
+    @apply bg-transparent;
+
+  }
+}
