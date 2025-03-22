@@ -1,85 +1,78 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useMemo, useCallback, useEffect } from "react"
-import { ChevronDown, ChevronUp, Filter, Settings, X, ChevronLeft, ChevronRight } from "lucide-react"
-import { useFetchusePurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances"
-
-// Define the Application type based on the API response
-type Application = {
-  id: string
-  [key: string]: string | number // Dynamic fields
-}
-
-// Define column configuration
-type ColumnDef = {
-  id: string
-  header: string
-  accessorKey: string
-  sortable: boolean
-  filterable: boolean
-  cell?: (value: any, row: Application) => React.ReactNode
-}
+import { AnimatePresence } from "motion/react";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { ITabelRow, TColumnDef } from "@/types/purchased-insurances";
+import {
+  ChevronDown,
+  ChevronUp,
+  Filter,
+  Settings,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { useFetchusePurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances";
 
 export function DynamicApplicationsList() {
-
   const { data: apiResponse, isFetching } = useFetchusePurchasedInsurances();
 
-  // State for API data
   const [apiData, setApiData] = useState<{
-    columns: string[]
-    data: Application[]
+    columns: string[];
+    data: ITabelRow[];
   }>({
-    columns : [],
-    data : []
-  })
+    columns: [],
+    data: [],
+  });
 
-  // State for sorting
-  const [sorting, setSorting] = useState<{ column: string | null; direction: "asc" | "desc" }>({
+  const [sorting, setSorting] = useState<{
+    column: string | null;
+    direction: "asc" | "desc";
+  }>({
     column: null,
     direction: "asc",
-  })
+  });
 
-  // State for filtering
-  const [filters, setFilters] = useState<Record<string, string>>({})
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(
+    apiData.columns
+  );
+  const [showColumnCustomizer, setShowColumnCustomizer] = useState(false);
 
-  // State for visible columns
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(apiData.columns)
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [activeFilterColumn, setActiveFilterColumn] = useState<string | null>(
+    null
+  );
+  const [filterValue, setFilterValue] = useState("");
 
-  // State for column customization modal
-  const [showColumnCustomizer, setShowColumnCustomizer] = useState(false)
-
-  // State for filter modal
-  const [showFilterModal, setShowFilterModal] = useState(false)
-  const [activeFilterColumn, setActiveFilterColumn] = useState<string | null>(null)
-  const [filterValue, setFilterValue] = useState("")
-
-  // FEATURE: Pagination for table
-  // State for pagination
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(5)
-  const pageSizeOptions = [5, 10, 20, 50]
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const pageSizeOptions = [5, 10, 20, 50];
 
   useEffect(() => {
     if (apiResponse) {
+      //----------------------------------------------------------------------
+      //-----------------status do not exist in api res so i add fake status
+      const status = ["Pending", "Approved", "Rejected", "In Review"];
+      apiResponse.columns.push("Status");
+      apiResponse.data.map((item: any, index) => (item.Status = status[index<=3?index:1]));
+      //----------------------------------------------------------------------
       setApiData({
         columns: apiResponse.columns,
-        data: apiResponse.data
+        data: apiResponse.data,
       });
       setVisibleColumns(apiResponse.columns);
     }
   }, [apiResponse]);
-  
-  // Update visible columns when API data changes
-  useEffect(() => {
-    setVisibleColumns(apiData.columns)
-  }, [apiData.columns])
 
-  // Generate column definitions from API data
-  const columns = useMemo<ColumnDef[]>(() => {
+  useEffect(() => {
+    setVisibleColumns(apiData.columns);
+  }, [apiData.columns]);
+
+  const columns = useMemo<TColumnDef[]>(() => {
     return apiData.columns.map((column) => {
-      // Special rendering for Status column
       if (column === "Status") {
         return {
           id: column,
@@ -89,167 +82,154 @@ export function DynamicApplicationsList() {
           filterable: true,
           cell: (value, row) => {
             const statusStyles: Record<string, string> = {
-              Pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-              Approved: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-              Rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-              "In Review": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-            }
+              Pending:
+                "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+              Approved:
+                "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+              Rejected:
+                "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+              "In Review":
+                "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+            };
 
             const style =
-              statusStyles[value as string] || "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+              statusStyles[value as string] ||
+              "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
 
-            return <span className={`px-2 py-1 rounded-full text-xs font-medium ${style}`}>{value}</span>
+            return (
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium ${style}`}
+              >
+                {value}
+              </span>
+            );
           },
-        }
+        };
       }
 
-      // Default column definition
       return {
         id: column,
         header: column,
         accessorKey: column,
         sortable: true,
         filterable: true,
-      }
-    })
-  }, [apiData.columns])
+      };
+    });
+  }, [apiData.columns]);
 
-  // Handle sorting
   const handleSort = useCallback((column: string) => {
     setSorting((prev) => ({
       column,
-      direction: prev.column === column && prev.direction === "asc" ? "desc" : "asc",
-    }))
-  }, [])
+      direction:
+        prev.column === column && prev.direction === "asc" ? "desc" : "asc",
+    }));
+  }, []);
 
-  // Handle filtering
   const handleFilter = useCallback((column: string, value: string) => {
     setFilters((prev) => ({
       ...prev,
       [column]: value,
-    }))
-    setShowFilterModal(false)
-    setActiveFilterColumn(null)
-    setFilterValue("")
+    }));
+    setShowFilterModal(false);
+    setActiveFilterColumn(null);
+    setFilterValue("");
 
-    // FEATURE: Pagination for table
-    // Reset to first page when filtering
-    setCurrentPage(1)
-  }, [])
+    setCurrentPage(1);
+  }, []);
 
-  // Handle removing a filter
   const handleRemoveFilter = useCallback((column: string) => {
     setFilters((prev) => {
-      const newFilters = { ...prev }
-      delete newFilters[column]
-      return newFilters
-    })
+      const newFilters = { ...prev };
+      delete newFilters[column];
+      return newFilters;
+    });
 
-    // FEATURE: Pagination for table
-    // Reset to first page when removing a filter
-    setCurrentPage(1)
-  }, [])
+    setCurrentPage(1);
+  }, []);
 
-
-  // Handle toggling column visibility
   const handleToggleColumn = useCallback((columnId: string) => {
-    setVisibleColumns((prev) => (prev.includes(columnId) ? prev.filter((id) => id !== columnId) : [...prev, columnId]))
-  }, [])
+    setVisibleColumns((prev) =>
+      prev.includes(columnId)
+        ? prev.filter((id) => id !== columnId)
+        : [...prev, columnId]
+    );
+  }, []);
 
-  // Apply sorting and filtering
   const filteredData = useMemo(() => {
-    // First apply filters
-    let result = [...apiData.data]
+    let result = [...apiData.data];
 
     Object.entries(filters).forEach(([column, value]) => {
       result = result.filter((row) => {
-        const cellValue = String(row[column] || "").toLowerCase()
-        return cellValue.includes(value.toLowerCase())
-      })
-    })
+        const cellValue = String(row[column] || "").toLowerCase();
+        return cellValue.includes(value.toLowerCase());
+      });
+    });
 
-    // Then apply sorting
     if (sorting.column) {
       result.sort((a, b) => {
-        const aValue = a[sorting.column as string]
-        const bValue = b[sorting.column as string]
+        const aValue = a[sorting.column as string];
+        const bValue = b[sorting.column as string];
 
-        if (aValue === undefined) return sorting.direction === "asc" ? -1 : 1
-        if (bValue === undefined) return sorting.direction === "asc" ? 1 : -1
+        if (aValue === undefined) return sorting.direction === "asc" ? -1 : 1;
+        if (bValue === undefined) return sorting.direction === "asc" ? 1 : -1;
 
-        // Handle numeric values
         if (typeof aValue === "number" && typeof bValue === "number") {
-          return sorting.direction === "asc" ? aValue - bValue : bValue - aValue
+          return sorting.direction === "asc"
+            ? aValue - bValue
+            : bValue - aValue;
         }
 
-        // Handle string values
         if (typeof aValue === "string" && typeof bValue === "string") {
-          return sorting.direction === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+          return sorting.direction === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
         }
 
-        // Fallback for mixed types
-        const aString = String(aValue)
-        const bString = String(bValue)
+        const aString = String(aValue);
+        const bString = String(bValue);
 
-        return sorting.direction === "asc" ? aString.localeCompare(bString) : bString.localeCompare(aString)
-      })
+        return sorting.direction === "asc"
+          ? aString.localeCompare(bString)
+          : bString.localeCompare(aString);
+      });
     }
 
-    return result
-  }, [apiData.data, filters, sorting])
+    return result;
+  }, [apiData.data, filters, sorting]);
 
-  // FEATURE: Pagination for table
-  // Calculate total pages
-  const totalPages = Math.ceil(filteredData.length / pageSize)
+  const totalPages = Math.ceil(filteredData.length / pageSize);
 
-  // FEATURE: Pagination for table
-  // Get data for current page
   const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize
-    return filteredData.slice(startIndex, startIndex + pageSize)
-  }, [filteredData, currentPage, pageSize])
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredData.slice(startIndex, startIndex + pageSize);
+  }, [filteredData, currentPage, pageSize]);
 
-  // FEATURE: Pagination for table
-  // Handle page change
   const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page)
-  }, [])
+    setCurrentPage(page);
+  }, []);
 
-  // FEATURE: Pagination for table
-  // Handle page size change
-  const handlePageSizeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newPageSize = Number(e.target.value)
-    setPageSize(newPageSize)
-    setCurrentPage(1) // Reset to first page when changing page size
-  }, [])
+  const handlePageSizeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newPageSize = Number(e.target.value);
+      setPageSize(newPageSize);
+      setCurrentPage(1);
+    },
+    []
+  );
 
-  // Get visible columns
   const visibleColumnDefs = useMemo(() => {
-    return columns.filter((column) => visibleColumns.includes(column.id))
-  }, [columns, visibleColumns])
+    return columns.filter((column) => visibleColumns.includes(column.id));
+  }, [columns, visibleColumns]);
 
-  // Fetch data from API (simulated)
-  useEffect(() => {
-    // In a real application, you would fetch data from an API here
-    // For now, we'll use the sample data
-    // Example of how you would fetch data:
-    // async function fetchData() {
-    //   try {
-    //     const response = await fetch('/api/applications')
-    //     const data = await response.json()
-    //     setApiData(data)
-    //   } catch (error) {
-    //     console.error('Error fetching data:', error)
-    //   }
-    // }
-    //
-    // fetchData()
-  }, [])
+
+  // if(!!!apiData.data) return <div> No applications found</div>
 
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Applications ({filteredData.length})</h2>
+        <h2 className="text-xl font-semibold">
+          Applications ({filteredData.length})
+        </h2>
         <div className="flex space-x-2">
           <button
             onClick={() => setShowFilterModal(true)}
@@ -268,7 +248,6 @@ export function DynamicApplicationsList() {
         </div>
       </div>
 
-      {/* Active filters */}
       {Object.keys(filters).length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {Object.entries(filters).map(([column, value]) => (
@@ -288,24 +267,32 @@ export function DynamicApplicationsList() {
               </button>
             </div>
           ))}
-          <button onClick={() => setFilters({})} className="text-sm text-primary hover:underline">
+          <button
+            onClick={() => setFilters({})}
+            className="text-sm text-primary hover:underline"
+          >
             Clear all
           </button>
         </div>
       )}
 
-      {/* Table */}
       <div className="border border-border rounded-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted">
               <tr>
-                {visibleColumnDefs.map((column) => (
-                  <th key={column.id} className="px-4 py-3 text-left font-medium text-sm">
+                {visibleColumnDefs?.map((column,index) => (
+                  <th
+                    key={`${column.id}.${index}`}
+                    className="px-4 py-3 text-left font-medium text-sm"
+                  >
                     <div className="flex items-center space-x-1">
                       <span>{column.header}</span>
                       {column.sortable && (
-                        <button onClick={() => handleSort(column.accessorKey)} className="ml-1 focus:outline-none">
+                        <button
+                          onClick={() => handleSort(column.accessorKey)}
+                          className="ml-1 focus:outline-none"
+                        >
                           {sorting.column === column.accessorKey ? (
                             sorting.direction === "asc" ? (
                               <ChevronUp className="w-4 h-4" />
@@ -323,11 +310,15 @@ export function DynamicApplicationsList() {
                       {column.filterable && (
                         <button
                           onClick={() => {
-                            setActiveFilterColumn(column.id)
-                            setShowFilterModal(true)
-                            setFilterValue(filters[column.id] || "")
+                            setActiveFilterColumn(column.id);
+                            setShowFilterModal(true);
+                            setFilterValue(filters[column.id] || "");
                           }}
-                          className={`ml-1 focus:outline-none ${filters[column.id] ? "text-primary" : "opacity-30 hover:opacity-100"}`}
+                          className={`ml-1 focus:outline-none ${
+                            filters[column.id]
+                              ? "text-primary"
+                              : "opacity-30 hover:opacity-100"
+                          }`}
                         >
                           <Filter className="w-3 h-3" />
                         </button>
@@ -338,49 +329,53 @@ export function DynamicApplicationsList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-             
-              {paginatedData.length > 0 ? (
-                paginatedData.map((row) => (
-                  <tr
-                    key={row.id}
-                    className={`hover:bg-muted/50`}
-                  >
-                    {visibleColumnDefs.map((column) => (
-                      <td key={column.id} className="px-4 py-3">
-                        {column.cell ? column.cell(row[column.accessorKey], row) : row[column.accessorKey] || "-"}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : (
-                <>
-                 {isFetching ? (
-                 <tr>
-                  <td colSpan={visibleColumnDefs.length + 1} className="px-4 py-8 text-center text-muted-foreground">
-                      loading...
-                  </td>
-                </tr>
+              <AnimatePresence>
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((row) => (
+                    <tr key={row.id} className={`hover:bg-muted/50`}>
+                      {visibleColumnDefs?.map((column,index) => (
+                        <td key={`${column.id}.table.${index}`} className="px-4 py-3">
+                          {column.cell
+                            ? column.cell(row[column.accessorKey], row)
+                            : row[column.accessorKey] || "-"}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
                 ) : (
-                  <tr>
-                  <td colSpan={visibleColumnDefs.length + 1} className="px-4 py-8 text-center text-muted-foreground">
-                     No applications found
-                  </td>
-                </tr>
+                  <>
+                    {isFetching ? (
+                      <tr>
+                        <td
+                          colSpan={visibleColumnDefs?.length + 1}
+                          className="px-4 py-8 text-center text-muted-foreground"
+                        >
+                          loading...
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={visibleColumnDefs.length + 1}
+                          className="px-4 py-8 text-center text-muted-foreground"
+                        >
+                          No applications found
+                        </td>
+                      </tr>
+                    )}
+                  </>
                 )}
-                </>
-               
-              )}
+              </AnimatePresence>
             </tbody>
           </table>
         </div>
 
-        {/* FEATURE: Pagination for table */}
-        {/* Pagination controls */}
         {filteredData.length > 0 && (
           <div className="border-t border-border px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <span>
-                Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredData.length)} of{" "}
+                Showing {(currentPage - 1) * pageSize + 1} to{" "}
+                {Math.min(currentPage * pageSize, filteredData.length)} of{" "}
                 {filteredData.length} entries
               </span>
               <div className="flex items-center space-x-2">
@@ -421,18 +416,21 @@ export function DynamicApplicationsList() {
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
-                {/* Page numbers */}
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-md ${
-                      currentPage === page ? "bg-primary text-primary-foreground" : "hover:bg-muted"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`w-8 h-8 flex items-center justify-center rounded-md ${
+                        currentPage === page
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-muted"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
 
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
@@ -458,7 +456,6 @@ export function DynamicApplicationsList() {
         )}
       </div>
 
-      {/* Column customizer modal */}
       {showColumnCustomizer && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-card text-card-foreground p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -482,7 +479,10 @@ export function DynamicApplicationsList() {
                     onChange={() => handleToggleColumn(column.id)}
                     className="rounded border-input h-4 w-4 text-primary focus:ring-primary"
                   />
-                  <label htmlFor={`column-${column.id}`} className="ml-2 text-sm">
+                  <label
+                    htmlFor={`column-${column.id}`}
+                    className="ml-2 text-sm"
+                  >
                     {column.header}
                   </label>
                 </div>
@@ -500,20 +500,25 @@ export function DynamicApplicationsList() {
         </div>
       )}
 
-      {/* Filter modal */}
       {showFilterModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-card text-card-foreground p-6 rounded-lg shadow-lg max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium">Filter</h3>
-              <button onClick={() => setShowFilterModal(false)} className="text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => setShowFilterModal(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
                 <span className="sr-only">Close</span>
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label htmlFor="filter-column" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="filter-column"
+                  className="block text-sm font-medium mb-1"
+                >
                   Column
                 </label>
                 <select
@@ -533,7 +538,10 @@ export function DynamicApplicationsList() {
                 </select>
               </div>
               <div>
-                <label htmlFor="filter-value" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="filter-value"
+                  className="block text-sm font-medium mb-1"
+                >
                   Value
                 </label>
                 <input
@@ -556,7 +564,7 @@ export function DynamicApplicationsList() {
               <button
                 onClick={() => {
                   if (activeFilterColumn && filterValue) {
-                    handleFilter(activeFilterColumn, filterValue)
+                    handleFilter(activeFilterColumn, filterValue);
                   }
                 }}
                 disabled={!activeFilterColumn || !filterValue}
@@ -568,8 +576,6 @@ export function DynamicApplicationsList() {
           </div>
         </div>
       )}
-
     </div>
-  )
+  );
 }
-
