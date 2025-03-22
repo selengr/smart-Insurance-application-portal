@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner"
-import { Locale, i18n } from '../../../i18n.config'
+import type { Metadata } from "next";
+import { Toaster } from "@/components/ui/sonner";
+import { Locale, i18n } from "../../../i18n.config";
 
-import { ThemeProvider } from "@/components/theme/theme-provider";
 import Navbar from "@/sections/nav/navbar";
 import QueryProvider from "@/provider/QueryClientProvider";
-import { estedad } from "@/tailwind/font";
-
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { estedad, geistMono, geistSans } from "@/tailwind/font";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,35 +15,34 @@ export const metadata: Metadata = {
 
 // ----------------------------------------------------------------------
 export async function generateStaticParams() {
-  return i18n.locales.map((locale:any) => ({ lang: locale }))
+  return i18n.locales.map((locale: any) => ({ lang: locale }));
 }
 // ----------------------------------------------------------------------
 export default function RootLayout({
   children,
-  params
+  params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { lang: Locale }
+  params: { lang: Locale };
 }>) {
-
   const fontClass =
-  params.lang === "fa"
-    ? `${estedad.className}`
-    : `${geistSans.variable} ${geistMono.variable} font-sans`;
+    params.lang === "fa"
+      ? `${estedad.className}`
+      : `${geistSans.variable} ${geistMono.variable} font-sans`;
 
   return (
     <html lang={params.lang}>
       <body
         className={`${fontClass} antialiased min-h-screen dark:text-[hsla(0,0%,100%,.9)] transition-colors duration-300`}
       >
-          <ThemeProvider defaultTheme="dark" storageKey="theme">
-             <Navbar lang={params.lang} />
+        <ThemeProvider defaultTheme="dark" storageKey="theme">
+          <Navbar lang={params.lang} />
 
-                  <div className="mt-16">
-                   <QueryProvider>{children}</QueryProvider>
-                  </div>
-              <Toaster />
-          </ThemeProvider>
+          <div className="mt-16">
+            <QueryProvider>{children}</QueryProvider>
+          </div>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

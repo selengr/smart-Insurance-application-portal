@@ -7,7 +7,5 @@ export default async function Home({
   params: { lang: Locale }
 }) {
 
-  return (
-      <InsurancePage lang={lang}/>
-  );
+  return <InsurancePage lang={lang}/>
 }

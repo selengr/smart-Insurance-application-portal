@@ -1,8 +1,8 @@
 import { NextPage } from "next";
 import Link from "next/link";
-import { InsuranceForm } from "@/types/insurance";
 import { Locale } from "../../../i18n.config";
 import { getDictionary } from "@/lib/dictionary";
+import { InsuranceForm } from "@/types/insurance";
 import { fetchInsuranceTypes } from "@/services/api/home";
 
 interface HomeProps {

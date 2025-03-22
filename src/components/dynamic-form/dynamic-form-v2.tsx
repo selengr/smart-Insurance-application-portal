@@ -17,172 +17,28 @@ import { Checkbox } from "@/components/ui/checkbox"
 import classNames from "classnames"
 import { CalendarIcon, Save } from "lucide-react"
 import { toast } from "sonner"
+import Link from "next/link"
+import { InsuranceField, InsuranceForm } from "@/types/insurance"
+import { useFetchInsuranceForms } from "@/hooks/use-fetch-insurance-forms"
 
 const BASE_URL = "https://assignment.devotel.io"
 
-// Define interfaces for the form structure
-interface FormField {
-  id: string
-  type: string
-  label?: string
-  required?: boolean
-  options?: string[]
-  fields?: FormField[]
-  visibility?: {
-    dependsOn: string
-    condition: string
-    value: string
-  }
-  validation?: {
-    min?: number
-    max?: number
-    pattern?: string
-  }
-  dynamicOptions?: {
-    dependsOn: string
-    endpoint: string
-    method: string
-  }
-}
-
-interface FormData {
-  formId: string
-  title: string
-  fields: FormField[]
-}
 
 interface DynamicFormProps {
   formId: string
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({ formId }) => {
-  const [formData, setFormData] = useState<FormData | null>(null)
-  const [formSchema, setFormSchema] = useState<z.ZodTypeAny | null>(null)
   const [dynamicOptions, setDynamicOptions] = useState<Record<string, string[]>>({})
-  const [isLoading, setIsLoading] = useState(true)
 
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
-  // const [isLoadingOptionsMap, setIsLoadingOptionsMap] = useState<Record<string, boolean>>({})
 
-  // Function to generate dynamic Zod schema based on form fields
-  const generateZodSchema = (fields: FormField[]): z.ZodTypeAny => {
-    const schemaMap: Record<string, z.ZodTypeAny> = {}
+  const { data, isFetching : isLoading } = useFetchInsuranceForms(formId);
+  const formData = data?.form || null;
+  const formSchema = data?.schema || null;
 
-    const processFields = (fieldList: FormField[], parentId = "") => {
-      fieldList.forEach((field) => {
-        const fieldId = parentId ? `${parentId}.${field.id}` : field.id
-
-        if (field.type === "group" && field.fields) {
-          // For group fields, create a nested object schema
-          const nestedSchema: Record<string, z.ZodTypeAny> = {}
-
-          field.fields.forEach((subField) => {
-            const subFieldSchema = createFieldSchema(subField)
-            if (subFieldSchema) {
-              nestedSchema[subField.id] = subFieldSchema
-            }
-          })
-
-          schemaMap[field.id] = z.object(nestedSchema)
-        } else {
-          const fieldSchema = createFieldSchema(field)
-          if (fieldSchema) {
-            schemaMap[field.id] = fieldSchema
-          }
-        }
-      })
-    }
-
-    const createFieldSchema = (field: FormField): z.ZodTypeAny | null => {
-      let schema: z.ZodTypeAny
-
-      switch (field.type) {
-        case "text":
-          schema = z.string()
-          if (field.validation?.pattern) {
-            schema = schema.regex(new RegExp(field.validation.pattern))
-          }
-          break
-
-        case "number":
-          schema = z.number()
-          if (field.validation?.min !== undefined) {
-            schema = schema.min(field.validation.min)
-          }
-          if (field.validation?.max !== undefined) {
-            schema = schema.max(field.validation.max)
-          }
-          break
-
-        case "date":
-          schema = z.date()
-          break
-
-        case "select":
-          schema = z.string()
-          break
-
-        case "radio":
-          if (field.options) {
-            schema = z.enum(field.options as [string, ...string[]])
-          } else {
-            schema = z.string()
-          }
-          break
-
-        case "checkbox":
-          if (field.options) {
-            schema = z.array(z.string()).min(1)
-          } else {
-            schema = z.boolean()
-          }
-          break
-
-        case "group":
-          // Group fields are handled separately
-          return null
-
-        default:
-          schema = z.string()
-      }
-
-      // Handle required fields
-      if (!field.required) {
-        schema = schema.optional()
-      }
-
-      return schema
-    }
-
-    processFields(fields)
-    return z.object(schemaMap)
-  }
-
-  useEffect(() => {
-    const fetchForm = async () => {
-      setIsLoading(true)
-      try {
-        const response = await axios.get<FormData[]>(`${BASE_URL}/api/insurance/forms`)
-        const form = response.data.find((f) => f.formId === formId)
-
-        if (form) {
-          setFormData(form)
-          const schema = generateZodSchema(form.fields)
-          setFormSchema(schema)
-        }
-      } catch (error) {
-        console.error("Error fetching form:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchForm()
-  }, [formId])
-
-  // Initialize form with dynamic schema
   const form = useForm<any>({
     resolver: formSchema ? zodResolver(formSchema) : undefined,
     mode: "onBlur",
@@ -214,7 +70,8 @@ console.log("=========",parsedDraft)
     } catch (error) {
       console.error("Error loading draft:", error)
     }
-  }, [formData, formSchema, formId, form])
+  }, [formId, form])
+  // }, [formData, formSchema, formId, form])
 
   const processDraftDates = (draft: any): any => {
     if (!draft) return draft
@@ -285,7 +142,7 @@ console.log("=========",parsedDraft)
   }, [formId])
 
   // Update the fetchDynamicOptions function to be triggered when the dependent field changes
-  const fetchDynamicOptions = async (field: FormField, dependentValue: string) => {
+  const fetchDynamicOptions = async (field: InsuranceField, dependentValue: string) => {
     if (!field.dynamicOptions) return
 
     try {
@@ -336,7 +193,7 @@ console.log("=========",parsedDraft)
 
   console.log(form.watch("address.country"))
   // Check if a field should be visible based on dependencies
-  const isFieldVisible = (field: FormField, parentPath: string): boolean => {
+  const isFieldVisible = (field: InsuranceField, parentPath: string): boolean => {
     if (!field.visibility) return true
     const { dependsOn, condition, value } = field.visibility
     const dependsOnField = parentPath ? `${parentPath}.${dependsOn}` : dependsOn
@@ -377,7 +234,7 @@ console.log("=========",parsedDraft)
   }
 
   // Render a single form field based on its type
-  const renderField = (field: FormField, parentPath = "") => {
+  const renderField = (field: InsuranceField, parentPath = "") => {
     const fieldPath = parentPath ? `${parentPath}.${field.id}` : field.id
 
     // Check visibility conditions
@@ -467,9 +324,10 @@ console.log("=========",parsedDraft)
           />
         )
 
+
+        
         case "select":
           const options = field.dynamicOptions ? dynamicOptions[field.id] || [] : field.options || []
-  
           // Check if this field depends on another field
           const isDependentField = field.dynamicOptions?.dependsOn
           const dependentValue = isDependentField ? form.watch(field.dynamicOptions?.dependsOn || "") : null
@@ -527,14 +385,14 @@ console.log("=========",parsedDraft)
             name={fieldPath}
             render={({ field: formField }) => (
               <FormItem className="space-y-3">
-                <FormLabel>{field.label}</FormLabel>
+                <FormLabel>{field?.label}</FormLabel>
                 <FormControl>
                   <RadioGroup
                     onValueChange={formField.onChange}
                     value={formField.value || ""} // FIXED: Use value instead of defaultValue
                     className="flex flex-col space-y-1"
                   >
-                    {field.options?.map((option) => (
+                    {field?.options?.map((option) => (
                       <FormItem key={option} className="flex items-center space-x-3 space-y-0">
                         <FormControl>
                           <RadioGroupItem value={option} />
@@ -671,7 +529,10 @@ console.log("=========",parsedDraft)
         <div className="text-sm text-muted-foreground">
           {lastSaved ? "Your progress is automatically saved every 30 seconds." : ""}
         </div>
-        <Button type="submit">Submit</Button>
+       <div className="flex gap-3">
+         <Button className="cursor-pointer" type="submit">Submit</Button>
+         <Link href={"/fa/"}><Button className="cursor-pointer" variant={"destructive"} type="submit">cansel</Button></Link>
+       </div>
       </form>
     </Form>
   )
