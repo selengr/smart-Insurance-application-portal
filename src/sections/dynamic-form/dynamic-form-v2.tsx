@@ -6,7 +6,6 @@ import { format } from "date-fns"
 import { Save } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
-import { useParams } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react"
 
 
@@ -255,8 +254,8 @@ console.log("=========",parsedDraft)
           {lastSaved ? "Your progress is automatically saved every 30 seconds." : ""}
         </div>
        <div className="flex gap-3">
-         <Button className="cursor-pointer" type="submit">Submit</Button>
-         <Link href={"/fa/"}><Button className="cursor-pointer" variant={"destructive"} type="submit">cansel</Button></Link>
+         <Button className="cursor-pointer" type="submit" disabled={isSubmitingForm}>{isSubmitingForm ? "submiting" : "submit"}</Button>
+         <Link href={"/fa/"}><Button className="cursor-pointer" variant={"destructive"} type="submit">cancel</Button></Link>
        </div>
       </form>
     </Form>

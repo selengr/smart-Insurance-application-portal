@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useMemo, useCallback, useEffect } from "react"
 import { ChevronDown, ChevronUp, Filter, Settings, X, ChevronLeft, ChevronRight } from "lucide-react"
+import { useFetchusePurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances"
 
 // Define the Application type based on the API response
 type Application = {
@@ -160,6 +161,9 @@ export function DynamicApplicationsList() {
   const [pageSize, setPageSize] = useState(5)
   const pageSizeOptions = [5, 10, 20, 50]
 
+
+  const { data, isFetching } = useFetchusePurchasedInsurances()
+  console.log("============",data)
   // Update visible columns when API data changes
   useEffect(() => {
     setVisibleColumns(apiData.columns)
