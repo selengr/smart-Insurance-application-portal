@@ -1,8 +1,6 @@
 "use client"
 import type React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
-import axios from "axios"
-import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { format } from "date-fns"
@@ -20,6 +18,9 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { InsuranceField, InsuranceForm } from "@/types/insurance"
 import { useFetchInsuranceForms } from "@/hooks/use-fetch-insurance-forms"
+import { dynamicOptionsApi } from "@/services/api/insurance-forms"
+import { renderFormField } from "./render-form-field"
+import axios from "axios"
 
 const BASE_URL = "https://assignment.devotel.io"
 
@@ -34,6 +35,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ formId }) => {
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
+
 
   const { data, isFetching : isLoading } = useFetchInsuranceForms(formId);
   const formData = data?.form || null;
@@ -141,32 +143,25 @@ console.log("=========",parsedDraft)
     setLastSaved(null)
   }, [formId])
 
-  // Update the fetchDynamicOptions function to be triggered when the dependent field changes
+
   const fetchDynamicOptions = async (field: InsuranceField, dependentValue: string) => {
     if (!field.dynamicOptions) return
-
     try {
-      console.log(`Fetching options for ${field.id} with ${field.dynamicOptions.dependsOn}=${dependentValue}`)
-      const response = await axios({
-        method: field.dynamicOptions.method,
-        url: `${BASE_URL}${field.dynamicOptions.endpoint}`,
-        params: { [field.dynamicOptions.dependsOn]: dependentValue },
-      })
-      console.log("rtetsestse=======", response.data.states)
+      const response = await dynamicOptionsApi(field,dependentValue)
       setDynamicOptions((prev) => ({
         ...prev,
-        [field.id]: response.data.states,
+        [field.id]: response
       }))
     } catch (error) {
       console.error(`Error fetching options for ${field.id}:`, error)
     }
   }
 
-  // Add a useEffect to watch for changes in dependent fields
+   //----------------- useEffect for watching changes in dependent fields
   useEffect(() => {
     if (!formData) return
 
-    // Find fields with dynamic options
+    //----------------- this line is looking for fielding dynamic options
     const fieldsWithDynamicOptions = formData.fields.flatMap((field) =>
       field.type === "group" && field.fields
         ? field.fields.filter((f) => f.dynamicOptions)
@@ -184,6 +179,7 @@ console.log("=========",parsedDraft)
         fetchDynamicOptions(field, dependentValue2)
       }
     })
+    //----------------- this line is added hard code to prevent error due to country do not exist in health form api
     if (formId === "home_insurance_application") {
       setTimeout(() => {
         form.setValue("address.country", "France")
@@ -191,26 +187,7 @@ console.log("=========",parsedDraft)
     }
   }, [form.watch("address.country"), formData])
 
-  console.log(form.watch("address.country"))
-  // Check if a field should be visible based on dependencies
-  const isFieldVisible = (field: InsuranceField, parentPath: string): boolean => {
-    if (!field.visibility) return true
-    const { dependsOn, condition, value } = field.visibility
-    const dependsOnField = parentPath ? `${parentPath}.${dependsOn}` : dependsOn
-    // const dependentValue = form.watch("health_info.smoker")
-    const dependentValue = form.watch(dependsOnField)
-
-    if (!dependentValue) return false
-
-    switch (condition) {
-      case "equals":
-        return dependentValue === value
-      case "notEquals":
-        return dependentValue !== value
-      default:
-        return true
-    }
-  }
+ 
 
   // Handle form submission
   const onSubmit = (values: any) => {
@@ -233,275 +210,12 @@ console.log("=========",parsedDraft)
     })
   }
 
-  // Render a single form field based on its type
-  const renderField = (field: InsuranceField, parentPath = "") => {
-    const fieldPath = parentPath ? `${parentPath}.${field.id}` : field.id
 
-    // Check visibility conditions
-    if (!isFieldVisible(field, parentPath)) {
-      return null
-    }
-
-    switch (field.type) {
-      case "text":
-        return (
-          <UIFormField
-            key={fieldPath}
-            control={form.control}
-            name={fieldPath}
-            render={({ field: formField }) => (
-              <FormItem>
-                <FormLabel>{field.label}</FormLabel>
-                <FormControl>
-                  <Input {...formField} value={formField.value || ""} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )
-
-      case "date":
-        return (
-          <UIFormField
-            key={fieldPath}
-            control={form.control}
-            name={fieldPath}
-            render={({ field: formField }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>{field.label}</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className={classNames(
-                          "w-full pl-3 text-left font-normal",
-                          !formField.value && "text-muted-foreground",
-                        )}
-                      >
-                        {formField.value ? format(formField.value, "PPP") : <span>Pick a date</span>}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formField.value}
-                      onSelect={formField.onChange}
-                      disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )
-
-      case "number":
-        return (
-          <UIFormField
-            key={fieldPath}
-            control={form.control}
-            name={fieldPath}
-            render={({ field: formField }) => (
-              <FormItem>
-                <FormLabel>{field.label}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...formField}
-                    value={formField.value || ""}
-                    onChange={(e) => formField.onChange(Number(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )
-
-
-        
-        case "select":
-          const options = field.dynamicOptions ? dynamicOptions[field.id] || [] : field.options || []
-          // Check if this field depends on another field
-          const isDependentField = field.dynamicOptions?.dependsOn
-          const dependentValue = isDependentField ? form.watch(field.dynamicOptions?.dependsOn || "") : null
-          const isDisabled = isDependentField && !dependentValue
-  
-          // FIXED: Changed defaultValue to value to ensure the select field shows the saved value
-          return (
-            <UIFormField
-              key={fieldPath}
-              control={form.control}
-              name={fieldPath}
-              render={({ field: formField }) => (
-                <FormItem>
-                  <FormLabel>{field.label}</FormLabel>
-                  <Select
-                    onValueChange={formField.onChange}
-                    value={formField.value || ""}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="min-w-full">
-                        <SelectValue
-                          placeholder={
-                            isDisabled ? `Select a ${field.dynamicOptions?.dependsOn} first` : "Select an option"
-                          }
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {options.length === 0 && isDependentField && dependentValue ? (
-                        <div className="p-2 text-center text-muted-foreground">Loading...</div>
-                      ) : options.length === 0 ? (
-                        <div className="p-2 text-center text-muted-foreground">No options available</div>
-                      ) : (
-                        options.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )
-  
-
-      case "radio":
-        // FIXED: Changed defaultValue to value to ensure the radio field shows the saved value
-        return (
-          <UIFormField
-            key={fieldPath}
-            control={form.control}
-            name={fieldPath}
-            render={({ field: formField }) => (
-              <FormItem className="space-y-3">
-                <FormLabel>{field?.label}</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={formField.onChange}
-                    value={formField.value || ""} // FIXED: Use value instead of defaultValue
-                    className="flex flex-col space-y-1"
-                  >
-                    {field?.options?.map((option) => (
-                      <FormItem key={option} className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value={option} />
-                        </FormControl>
-                        <FormLabel className="font-normal">{option}</FormLabel>
-                      </FormItem>
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )
-
-      case "checkbox":
-        if (field.options) {
-          // FIXED: Initialize formField.value as an array if it's undefined
-          return (
-            <UIFormField
-              key={fieldPath}
-              control={form.control}
-              name={fieldPath}
-              render={() => (
-                <FormItem>
-                  <div className="mb-4">
-                    <FormLabel>{field.label}</FormLabel>
-                  </div>
-                  {field.options?.map((option) => (
-                    <UIFormField
-                      key={option}
-                      control={form.control}
-                      name={fieldPath}
-                      render={({ field: formField }) => {
-                        const currentValue = formField.value || []
-                        // Convert object-like array {0: 'value1', 1: 'value2'} to proper array ['value1', 'value2']
-                        const valueArray = Array.isArray(currentValue) ? currentValue : Object.values(currentValue)
-                        const isChecked = valueArray.includes(option)
-
-                        return (
-                          <FormItem key={option} className="flex flex-row items-start space-x-3 space-y-0 mb-2">
-                            <FormControl>
-                            <Checkbox
-                                checked={isChecked}
-                                onCheckedChange={(checked) => {
-                                  // Ensure we're working with an array
-                                  const valueArray = Array.isArray(currentValue)
-                                    ? [...currentValue]
-                                    : Object.values(currentValue)
-
-                                  if (checked) {
-                                    formField.onChange([...valueArray, option])
-                                  } else {
-                                    formField.onChange(valueArray.filter((value) => value !== option))
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">{option}</FormLabel>
-                          </FormItem>
-                        )
-                      }}
-                    />
-                  ))}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )
-        } else {
-          // FIXED: Handle boolean checkbox value properly
-          return (
-            <UIFormField
-              key={fieldPath}
-              control={form.control}
-              name={fieldPath}
-              render={({ field: formField }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={!!formField.value} // FIXED: Convert to boolean with !!
-                      onCheckedChange={formField.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>{field.label}</FormLabel>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )
-        }
-
-      case "group":
-        return (
-          <div key={fieldPath} className="space-y-4 border p-4 rounded-md">
-            <h3 className="text-lg font-medium">{field.label}</h3>
-            <div className="space-y-4">{field.fields?.map((subField) => renderField(subField, fieldPath))}</div>
-          </div>
-        )
-
-      default:
-        return null
-    }
-  }
 
   if (isLoading) return <div>Loading form...</div>
   if (!formData) return <div>Form not found</div>
+
+ 
 
   return (
     <Form {...form}>
@@ -525,7 +239,7 @@ console.log("=========",parsedDraft)
             </Button>
           </div>
         </div>
-        <div className="space-y-6">{formData.fields.map((field) => renderField(field))}</div>
+        <div className="space-y-6">{formData.fields.map((field) => renderFormField(field,"",form.control,form.watch,dynamicOptions))}</div>
         <div className="text-sm text-muted-foreground">
           {lastSaved ? "Your progress is automatically saved every 30 seconds." : ""}
         </div>
