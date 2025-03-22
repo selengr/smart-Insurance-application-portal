@@ -12,109 +12,6 @@ type Application = {
   [key: string]: string | number // Dynamic fields
 }
 
-// Sample API response
-const sampleApiResponse = {
-  columns: ["Full Name", "Age", "Insurance Type", "City", "Status"],
-  data: [
-    {
-      id: "1",
-      "Full Name": "John Doe",
-      Age: 28,
-      "Insurance Type": "Health",
-      City: "New York",
-      Status: "Pending",
-    },
-    {
-      id: "2",
-      "Full Name": "Jane Smith",
-      Age: 32,
-      "Insurance Type": "Life",
-      City: "Los Angeles",
-      Status: "Approved",
-    },
-    {
-      id: "3",
-      "Full Name": "Robert Johnson",
-      Age: 45,
-      "Insurance Type": "Auto",
-      City: "Chicago",
-      Status: "In Review",
-    },
-    {
-      id: "4",
-      "Full Name": "Emily Davis",
-      Age: 29,
-      "Insurance Type": "Home",
-      City: "Houston",
-      Status: "Approved",
-    },
-    {
-      id: "5",
-      "Full Name": "Michael Wilson",
-      Age: 38,
-      "Insurance Type": "Health",
-      City: "Phoenix",
-      Status: "Rejected",
-    },
-    {
-      id: "6",
-      "Full Name": "Sarah Brown",
-      Age: 41,
-      "Insurance Type": "Life",
-      City: "Philadelphia",
-      Status: "Pending",
-    },
-    {
-      id: "7",
-      "Full Name": "David Lee",
-      Age: 35,
-      "Insurance Type": "Auto",
-      City: "San Antonio",
-      Status: "In Review",
-    },
-    {
-      id: "8",
-      "Full Name": "Lisa Garcia",
-      Age: 27,
-      "Insurance Type": "Health",
-      City: "San Diego",
-      Status: "Approved",
-    },
-    {
-      id: "9",
-      "Full Name": "Thomas Martinez",
-      Age: 52,
-      "Insurance Type": "Home",
-      City: "Dallas",
-      Status: "Rejected",
-    },
-    {
-      id: "10",
-      "Full Name": "Jennifer Robinson",
-      Age: 39,
-      "Insurance Type": "Life",
-      City: "San Jose",
-      Status: "Pending",
-    },
-    {
-      id: "11",
-      "Full Name": "William Clark",
-      Age: 44,
-      "Insurance Type": "Health",
-      City: "Austin",
-      Status: "Approved",
-    },
-    {
-      id: "12",
-      "Full Name": "Patricia Lewis",
-      Age: 31,
-      "Insurance Type": "Auto",
-      City: "Jacksonville",
-      Status: "In Review",
-    },
-  ],
-}
-
 // Define column configuration
 type ColumnDef = {
   id: string
@@ -149,9 +46,6 @@ export function DynamicApplicationsList() {
 
   // State for visible columns
   const [visibleColumns, setVisibleColumns] = useState<string[]>(apiData.columns)
-
-  // State for selected rows
-  const [selectedRows, setSelectedRows] = useState<string[]>([])
 
   // State for column customization modal
   const [showColumnCustomizer, setShowColumnCustomizer] = useState(false)
@@ -256,29 +150,6 @@ export function DynamicApplicationsList() {
     setCurrentPage(1)
   }, [])
 
-  // Handle row selection
-  const handleSelectRow = useCallback((id: string) => {
-    setSelectedRows((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]))
-  }, [])
-
-  // Handle select all rows (only for current page)
-  const handleSelectAllRows = useCallback(() => {
-    const currentPageIds = paginatedData.map((row) => row.id)
-
-    if (currentPageIds.every((id) => selectedRows.includes(id))) {
-      // If all rows on current page are selected, deselect them
-      setSelectedRows((prev) => prev.filter((id) => !currentPageIds.includes(id)))
-    } else {
-      // Otherwise, select all rows on current page
-      const newSelectedRows = [...selectedRows]
-      currentPageIds.forEach((id) => {
-        if (!newSelectedRows.includes(id)) {
-          newSelectedRows.push(id)
-        }
-      })
-      setSelectedRows(newSelectedRows)
-    }
-  }, [selectedRows])
 
   // Handle toggling column visibility
   const handleToggleColumn = useCallback((columnId: string) => {
@@ -429,16 +300,6 @@ export function DynamicApplicationsList() {
           <table className="w-full">
             <thead className="bg-muted">
               <tr>
-                <th className="px-4 py-3 text-left">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={paginatedData.length > 0 && paginatedData.every((row) => selectedRows.includes(row.id))}
-                      onChange={handleSelectAllRows}
-                      className="rounded border-input h-4 w-4 text-primary focus:ring-primary"
-                    />
-                  </div>
-                </th>
                 {visibleColumnDefs.map((column) => (
                   <th key={column.id} className="px-4 py-3 text-left font-medium text-sm">
                     <div className="flex items-center space-x-1">
@@ -482,16 +343,8 @@ export function DynamicApplicationsList() {
                 paginatedData.map((row) => (
                   <tr
                     key={row.id}
-                    className={`hover:bg-muted/50 ${selectedRows.includes(row.id) ? "bg-primary/5" : ""}`}
+                    className={`hover:bg-muted/50`}
                   >
-                    <td className="px-4 py-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedRows.includes(row.id)}
-                        onChange={() => handleSelectRow(row.id)}
-                        className="rounded border-input h-4 w-4 text-primary focus:ring-primary"
-                      />
-                    </td>
                     {visibleColumnDefs.map((column) => (
                       <td key={column.id} className="px-4 py-3">
                         {column.cell ? column.cell(row[column.accessorKey], row) : row[column.accessorKey] || "-"}
@@ -556,7 +409,6 @@ export function DynamicApplicationsList() {
                   aria-label="First page"
                 >
                   <span className="sr-only">First page</span>
-                  <ChevronLeft className="w-4 h-4" />
                   <ChevronLeft className="w-4 h-4 -ml-2" />
                 </button>
                 <button
@@ -598,7 +450,6 @@ export function DynamicApplicationsList() {
                   aria-label="Last page"
                 >
                   <span className="sr-only">Last page</span>
-                  <ChevronRight className="w-4 h-4" />
                   <ChevronRight className="w-4 h-4 -ml-2" />
                 </button>
               </nav>
@@ -718,26 +569,6 @@ export function DynamicApplicationsList() {
         </div>
       )}
 
-      {/* Selected rows actions */}
-      {selectedRows.length > 0 && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-card text-card-foreground shadow-lg rounded-lg p-4 flex items-center space-x-4 border border-border">
-          <span>{selectedRows.length} selected</span>
-          <div className="flex space-x-2">
-            <button className="px-3 py-1 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
-              Export
-            </button>
-            <button className="px-3 py-1 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors">
-              Delete
-            </button>
-            <button
-              onClick={() => setSelectedRows([])}
-              className="px-3 py-1 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
