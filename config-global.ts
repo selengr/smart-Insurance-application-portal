@@ -8,4 +8,4 @@ export const APP_DESCRIPTION = "آوینــــــــا | ما یک تیم خ
 // API
 // ----------------------------------------------------------------------
 
-export const HOST_API_KEY = process.env.NEXT_PUBLIC_HOST_API_KEY || '';
+export const HOST_API_KEY = process.env.NEXT_PUBLIC_HOST_API_KEY || 'https://assignment.devotel.io';

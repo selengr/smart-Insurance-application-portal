@@ -1,21 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
 import { Locale, i18n } from '../../../i18n.config'
 
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import Navbar from "@/sections/nav/navbar";
+import QueryProvider from "@/provider/QueryClientProvider";
+import { estedad } from "@/tailwind/font";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -34,15 +26,23 @@ export default function RootLayout({
   children: React.ReactNode;
   params: { lang: Locale }
 }>) {
+
+  const fontClass =
+  params.lang === "fa"
+    ? `${estedad.className}`
+    : `${geistSans.variable} ${geistMono.variable} font-sans`;
+
   return (
     <html lang={params.lang}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 transition-colors duration-300`}
+        className={`${fontClass} antialiased min-h-screen dark:text-[hsla(0,0%,100%,.9)] transition-colors duration-300`}
       >
-          <ThemeProvider defaultTheme="system" storageKey="theme">
+          <ThemeProvider defaultTheme="dark" storageKey="theme">
              <Navbar lang={params.lang} />
 
-                 <div className="mt-16">{children}</div>
+                  <div className="mt-16">
+                   <QueryProvider>{children}</QueryProvider>
+                  </div>
               <Toaster />
           </ThemeProvider>
       </body>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import styles from "./nav.module.css"
 import { Locale } from '../../../i18n.config'
 import LocaleSwitcher from './locale-switcher'
 import { getDictionary } from '@/lib/dictionary'
@@ -8,8 +9,8 @@ const Navbar = async ({ lang }: { lang: Locale }) => {
   const { navigation } = await getDictionary(lang)
     
   return (
-    <nav className='fixed inset-0 h-16 border-b py-3'>
-         <div className='flex items-center justify-between'>
+    <nav className='border-b py-3'>
+        <div className={`${styles["landing-top"]} flex items-center justify-between`}>
                <div className="flex justify-end flex-row align-middle items-center w-full pr-10">
             
                <Link href={`/${lang}`}

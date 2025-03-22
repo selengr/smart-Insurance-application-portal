@@ -7,6 +7,8 @@
       "home": {
         "title": "Smart Insurance Application Portal",
         "InsuranceTypes": "Insurance Types",
+        "InsuranceLink": "Click to apply",
+        "myInsurance": "My insurances",
         "description": "Internationalisierung im NextJs 13 App-Router"
       },
       "about": {

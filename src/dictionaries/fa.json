@@ -7,6 +7,8 @@
       "home": {
         "title": "پورتال کاربردی بیمه هوشمند",
         "InsuranceTypes": "انواع بیمه",
+        "InsuranceLink": "ادامه و خريد",
+        "myInsurance": "بیمه‌های من",
         "description": "Internationalization in NextJs 13 App router"
       },
       "about": {
