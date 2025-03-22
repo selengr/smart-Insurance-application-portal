@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
+import { Locale, i18n } from '../../../i18n.config'
 
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import Navbar from "@/sections/nav/navbar";
@@ -22,21 +23,26 @@ export const metadata: Metadata = {
 };
 
 // ----------------------------------------------------------------------
-
+export async function generateStaticParams() {
+  return i18n.locales.map((locale:any) => ({ lang: locale }))
+}
+// ----------------------------------------------------------------------
 export default function RootLayout({
   children,
+  params
 }: Readonly<{
   children: React.ReactNode;
+  params: { lang: Locale }
 }>) {
   return (
-    <html lang="en">
+    <html lang={params.lang}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 transition-colors duration-300`}
       >
           <ThemeProvider defaultTheme="system" storageKey="theme">
-             <Navbar />
+             <Navbar lang={params.lang} />
 
-              {children}
+                 <div className="mt-16">{children}</div>
               <Toaster />
           </ThemeProvider>
       </body>
