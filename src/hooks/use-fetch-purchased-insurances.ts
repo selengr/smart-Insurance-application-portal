@@ -3,7 +3,7 @@ import { purchasedInsurancesApi } from '@/services/api/purchased-insurances';
 
 
 export const useFetchusePurchasedInsurances = () => {
-    return useQuery({
+    const { data, isFetching } = useQuery({
       queryKey: ["purchased-insurances"],
       queryFn: () => purchasedInsurancesApi(),
       retry: 3,
@@ -11,5 +11,11 @@ export const useFetchusePurchasedInsurances = () => {
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
     });
+
+    return {
+      data,
+      isFetching
+    }
+
   };
 

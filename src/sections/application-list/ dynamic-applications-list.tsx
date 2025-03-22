@@ -126,11 +126,17 @@ type ColumnDef = {
 }
 
 export function DynamicApplicationsList() {
+
+  const { data: apiResponse, isFetching } = useFetchusePurchasedInsurances();
+
   // State for API data
   const [apiData, setApiData] = useState<{
     columns: string[]
     data: Application[]
-  }>(sampleApiResponse)
+  }>({
+    columns : [],
+    data : []
+  })
 
   // State for sorting
   const [sorting, setSorting] = useState<{ column: string | null; direction: "asc" | "desc" }>({
@@ -161,9 +167,16 @@ export function DynamicApplicationsList() {
   const [pageSize, setPageSize] = useState(5)
   const pageSizeOptions = [5, 10, 20, 50]
 
-
-  const { data, isFetching } = useFetchusePurchasedInsurances()
-  console.log("============",data)
+  useEffect(() => {
+    if (apiResponse) {
+      setApiData({
+        columns: apiResponse.columns,
+        data: apiResponse.data
+      });
+      setVisibleColumns(apiResponse.columns);
+    }
+  }, [apiResponse]);
+  
   // Update visible columns when API data changes
   useEffect(() => {
     setVisibleColumns(apiData.columns)
@@ -464,6 +477,7 @@ export function DynamicApplicationsList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
+             
               {paginatedData.length > 0 ? (
                 paginatedData.map((row) => (
                   <tr
@@ -486,11 +500,22 @@ export function DynamicApplicationsList() {
                   </tr>
                 ))
               ) : (
-                <tr>
+                <>
+                 {isFetching ? (
+                 <tr>
                   <td colSpan={visibleColumnDefs.length + 1} className="px-4 py-8 text-center text-muted-foreground">
-                    No applications found
+                      loading...
                   </td>
                 </tr>
+                ) : (
+                  <tr>
+                  <td colSpan={visibleColumnDefs.length + 1} className="px-4 py-8 text-center text-muted-foreground">
+                     No applications found
+                  </td>
+                </tr>
+                )}
+                </>
+               
               )}
             </tbody>
           </table>
