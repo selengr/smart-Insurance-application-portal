@@ -33,23 +33,25 @@ export const useGenerateZodSchema = (fields: InsuranceForm["fields"]): z.ZodType
   
       switch (field.type) {
         case "text":
-          schema = z.string();
-          if (field.validation?.pattern) {
-            schema = schema.regex(new RegExp(field.validation.pattern));
-          }
-          break;
+        schema = z.string();
+        if (field.validation?.pattern) {
+          schema = (schema as z.ZodString).regex(new RegExp(field.validation.pattern));
+        }
+        break;
   
-        case "number":
-          schema = z.number();
-          if (field.validation?.min !== undefined) {
-            schema = schema.min(field.validation.min);
-          }
-          if (field.validation?.max !== undefined) {
-            schema = schema.max(field.validation.max);
-          }
-          break;
+          case "number":
+            schema = z.number();
+            if (field.validation?.min !== undefined) {
+              schema = (schema as z.ZodNumber).min(field.validation.min);
+            }
+            if (field.validation?.max !== undefined) {
+              schema = (schema as z.ZodNumber).max(field.validation.max);
+            }
+            break;
   
-        case "date":
+          case "date":
+            schema = z.date();
+          break;
           case "select":
           case "radio":
           case "checkbox":

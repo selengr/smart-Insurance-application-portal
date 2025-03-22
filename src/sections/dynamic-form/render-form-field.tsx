@@ -1,8 +1,9 @@
 import { InsuranceField } from "@/types/insurance";
-import { InputField, DateField, SelectField, RadioField, CheckboxField } from "./fields";
 import { Control, FieldValues, UseFormWatch } from "react-hook-form";
+import { InputField, DateField, SelectField, RadioField, CheckboxField } from "../../components/fields";
 
-// Helper function to determine if a field should be visible
+
+// ------------------------------------------------------------------------------------
 const isFieldVisible = (
   field: InsuranceField,
   parentPath: string,
@@ -25,8 +26,8 @@ const isFieldVisible = (
       return true;
   }
 };
+// ------------------------------------------------------------------------------------
 
-// Function to render form fields dynamically
 export const renderFormField = (
   field: InsuranceField,
   parentPath: string = "",
@@ -41,7 +42,6 @@ export const renderFormField = (
   }
 
   const commonProps = {
-    key: field.id,
     fieldPath,
     control,
     field,
@@ -49,22 +49,22 @@ export const renderFormField = (
 
   switch (field.type) {
     case "text":
-      return <InputField {...commonProps} />;
+      return <InputField key={field.id} {...commonProps} />;
 
     case "date":
-      return <DateField {...commonProps} />;
+      return <DateField key={field.id} {...commonProps} />;
 
     case "number":
-      return <InputField {...commonProps} type="number" />;
+      return <InputField key={field.id} {...commonProps} type="number" />;
 
     case "select":
-      return <SelectField {...commonProps} watch={watch} dynamicOptions={dynamicOptions} />;
+      return <SelectField key={field.id} {...commonProps} watch={watch} dynamicOptions={dynamicOptions} />;
 
     case "radio":
-      return <RadioField {...commonProps} />;
+      return <RadioField key={field.id} {...commonProps} />;
 
     case "checkbox":
-      return <CheckboxField {...commonProps} />;
+      return <CheckboxField key={field.id} {...commonProps} />;
 
     case "group":
       return (

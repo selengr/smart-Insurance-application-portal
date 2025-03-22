@@ -5,8 +5,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import classNames from "classnames";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
-import { InsuranceField } from "@/types/insurance";
 import { Input } from "@/components/ui/input";
+import { InsuranceField } from "@/types/insurance";
 import { Control, FieldValues } from "react-hook-form";
 
 interface IInputFieldProps {
@@ -17,6 +17,7 @@ interface IInputFieldProps {
  
 }
 
+// ------------------------------------------------------------------------------------
 export const InputField: React.FC<IInputFieldProps> = ({ fieldPath, control, field, type = "string" }) => {
   
     return (

@@ -1,5 +1,5 @@
 import { Locale } from '../../../i18n.config'
-import InsurancePage from "@/components/home-page/home-page";
+import InsurancePage from "@/sections/home-page/home-page";
 
 export default async function Home({
   params: { lang }

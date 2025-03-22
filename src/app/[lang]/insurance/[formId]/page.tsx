@@ -1,13 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card"
-import DynamicFormV2 from "@/components/dynamic-form/dynamic-form-v2";
+import DynamicFormV2 from "@/sections/dynamic-form/dynamic-form-v2";
 
 
 export default async function Page({
     params,
   }: {
-    params: Promise<{ formId: string }>;
+    params: { formId: string; lang: string }; 
   }) {
-    const { formId } = await params;
+  const { formId, lang } = params;
+  
     
 
     return (
@@ -15,7 +16,7 @@ export default async function Page({
         <div className="max-w-3xl mx-auto">
           <Card>
             <CardContent>
-              <DynamicFormV2 formId={formId} />
+              <DynamicFormV2 formId={formId} lang={lang}/>
             </CardContent>
           </Card>
         </div>

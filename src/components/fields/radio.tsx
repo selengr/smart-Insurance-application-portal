@@ -1,12 +1,7 @@
-import { FormControl, FormField as UIFormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import classNames from "classnames";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Control, FieldValues } from "react-hook-form";
 import { InsuranceField } from "@/types/insurance";
-import { Input } from "@/components/input";
+import { Control, FieldValues } from "react-hook-form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { FormControl, FormField as UIFormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface IRadioFieldProps {
   fieldPath: string;
@@ -14,6 +9,7 @@ interface IRadioFieldProps {
   field: InsuranceField;
 }
 
+// ------------------------------------------------------------------------------------
 export const RadioField: React.FC<IRadioFieldProps> = ({ fieldPath, control, field }) => {
   
     return (
@@ -27,7 +23,7 @@ export const RadioField: React.FC<IRadioFieldProps> = ({ fieldPath, control, fie
                 <FormControl>
                   <RadioGroup
                     onValueChange={formField.onChange}
-                    value={formField.value || ""} // FIXED: Use value instead of defaultValue
+                    value={formField.value || ""} 
                     className="flex flex-col space-y-1"
                   >
                     {field?.options?.map((option) => (

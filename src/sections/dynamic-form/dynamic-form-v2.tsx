@@ -1,35 +1,31 @@
 "use client"
-import type React from "react"
-import { useState, useEffect, useRef, useCallback } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { format } from "date-fns"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormField as UIFormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Checkbox } from "@/components/ui/checkbox"
-import classNames from "classnames"
-import { CalendarIcon, Save } from "lucide-react"
-import { toast } from "sonner"
 import Link from "next/link"
-import { InsuranceField, InsuranceForm } from "@/types/insurance"
-import { useFetchInsuranceForms } from "@/hooks/use-fetch-insurance-forms"
-import { dynamicOptionsApi } from "@/services/api/insurance-forms"
+import type React from "react"
+import { toast } from "sonner"
+import { format } from "date-fns"
+import { Save } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
+import { useParams } from "next/navigation";
+import { useState, useEffect, useRef, useCallback } from "react"
+
+
+import { Form } from "@/components/ui/form"
+import { Button } from "@/components/ui/button"
+import { InsuranceField } from "@/types/insurance"
 import { renderFormField } from "./render-form-field"
-import axios from "axios"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useSubmitForm } from "@/hooks/use-submit-form"
+import { dynamicOptionsApi } from "@/services/api/insurance-forms"
+import { useFetchInsuranceForms } from "@/hooks/use-fetch-insurance-forms"
 
-const BASE_URL = "https://assignment.devotel.io"
-
-
-interface DynamicFormProps {
+interface IDynamicFormProps {
   formId: string
+  lang: string
 }
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ formId }) => {
+const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang }) => {
+  const {push, refresh} = useRouter()
   const [dynamicOptions, setDynamicOptions] = useState<Record<string, string[]>>({})
 
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
@@ -40,6 +36,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ formId }) => {
   const { data, isFetching : isLoading } = useFetchInsuranceForms(formId);
   const formData = data?.form || null;
   const formSchema = data?.schema || null;
+
+  const {
+    mutate: submitForm,
+    isPending: isSubmitingForm,
+  } = useSubmitForm();
 
   const form = useForm<any>({
     resolver: formSchema ? zodResolver(formSchema) : undefined,
@@ -189,17 +190,27 @@ console.log("=========",parsedDraft)
 
  
 
-  // Handle form submission
   const onSubmit = (values: any) => {
     console.log("Form submitted with values:", values)
-    // Here you would typically send the data to your backend
-
-    clearDraft()
-
-    toast("Form Submitted", {
-      description: "Your form has been successfully submitted.",
-      duration: 5000,
-    })
+    
+    submitForm(
+      { data: values },
+      {
+        onSuccess: () => {
+          toast("Form Submitted", {
+            description: "Your form has been successfully submitted.",
+            duration: 5000,
+          })
+          refresh()
+          clearDraft()
+          form.reset();
+          setTimeout(() => {
+            push(`/${lang}/purchased-insurances`)
+          }, 200);
+        },
+        
+      }
+    );
   }
 
   const handleManualSave = () => {

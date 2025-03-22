@@ -1,4 +1,4 @@
-import { DynamicApplicationsList } from "@/components/application-list/ dynamic-applications-list";
+import { DynamicApplicationsList } from "@/sections/application-list/ dynamic-applications-list";
 
 const page = () => {
     return (

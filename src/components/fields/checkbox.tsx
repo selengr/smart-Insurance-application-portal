@@ -1,20 +1,14 @@
-import { FormControl, FormField as UIFormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import classNames from "classnames";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
 import { InsuranceField } from "@/types/insurance";
-import { Control, FieldValues } from "react-hook-form";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Control, FieldValues } from "react-hook-form";
+import { FormControl, FormField as UIFormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface ICheckboxFieldProps {
   fieldPath: string;
   control: Control<FieldValues>,
   field: InsuranceField;
 }
-
+// ------------------------------------------------------------------------------------
 export const CheckboxField: React.FC<ICheckboxFieldProps> = ({ fieldPath, control, field}) => {
     if (field.options) {
     return (
@@ -34,7 +28,6 @@ export const CheckboxField: React.FC<ICheckboxFieldProps> = ({ fieldPath, contro
                       name={fieldPath}
                       render={({ field: formField }) => {
                         const currentValue = formField.value || []
-                        // Convert object-like array {0: 'value1', 1: 'value2'} to proper array ['value1', 'value2']
                         const valueArray = Array.isArray(currentValue) ? currentValue : Object.values(currentValue)
                         const isChecked = valueArray.includes(option)
 
@@ -44,7 +37,6 @@ export const CheckboxField: React.FC<ICheckboxFieldProps> = ({ fieldPath, contro
                             <Checkbox
                                 checked={isChecked}
                                 onCheckedChange={(checked) => {
-                                  // Ensure we're working with an array
                                   const valueArray = Array.isArray(currentValue)
                                     ? [...currentValue]
                                     : Object.values(currentValue)
@@ -69,7 +61,6 @@ export const CheckboxField: React.FC<ICheckboxFieldProps> = ({ fieldPath, contro
             />
 
        ) } else {
-            // FIXED: Handle boolean checkbox value properly
             return (
               <UIFormField
                 key={fieldPath}
@@ -79,7 +70,7 @@ export const CheckboxField: React.FC<ICheckboxFieldProps> = ({ fieldPath, contro
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                     <FormControl>
                       <Checkbox
-                        checked={!!formField.value} // FIXED: Convert to boolean with !!
+                        checked={!!formField.value} 
                         onCheckedChange={formField.onChange}
                       />
                     </FormControl>
