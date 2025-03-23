@@ -1,5 +1,7 @@
 import { Locale } from '../../../i18n.config'
+import { getDictionary } from '@/lib/dictionary';
 import InsurancePage from "@/sections/home-page/home-page";
+import BackgroundPaths from '@/components/background-paths/background-paths';
 
 export default async function Home({
   params
@@ -7,6 +9,9 @@ export default async function Home({
   params: Promise<{ lang: Locale }>
 }) {
   const { lang } = await params;
+  const { page } = await getDictionary(lang)
 
-  return <InsurancePage lang={lang}/>
+  return <BackgroundPaths title={page.home.title}>
+        <InsurancePage lang={lang}/>
+    </BackgroundPaths>
 }
