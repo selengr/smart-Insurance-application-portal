@@ -1,6 +1,5 @@
 import { NextPage } from "next";
 import Link from "next/link";
-import Image from 'next/image'
 import { Locale } from "../../../i18n.config";
 import { getDictionary } from "@/lib/dictionary";
 import { fetchInsuranceTypes } from "@/services/api/home";
