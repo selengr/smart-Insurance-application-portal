@@ -15,28 +15,30 @@ export const metadata: Metadata = {
 
 // ----------------------------------------------------------------------
 export async function generateStaticParams() {
-  return i18n.locales.map((locale: any) => ({ lang: locale }));
+  return i18n.locales.map((locale: string) => ({ lang: locale }));
 }
 // ----------------------------------------------------------------------
-export default function RootLayout({
+export default async function RootLayout({
   children,
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { lang: Locale };
+  params: Promise<{ lang: Locale }>;
 }>) {
+  const { lang } = await params;
+
   const fontClass =
-    params.lang === "fa"
+     lang === "fa"
       ? `${estedad.className}`
       : `${geistSans.variable} ${geistMono.variable} font-sans`;
 
   return (
-    <html lang={params.lang}>
+    <html lang={lang}>
       <body
         className={`${fontClass} antialiased min-h-screen dark:text-[hsla(0,0%,100%,.9)] transition-colors duration-300`}
       >
         <ThemeProvider defaultTheme="dark" storageKey="theme">
-          <Navbar lang={params.lang} />
+          <Navbar lang={lang} />
 
           <div className="mt-16">
             <QueryProvider>{children}</QueryProvider>

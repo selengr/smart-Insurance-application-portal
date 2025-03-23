@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { InsuranceForm } from "@/types/insurance";
 
-export const useGenerateZodSchema = (fields: InsuranceForm["fields"]): z.ZodTypeAny => {
+export const generateZodSchema = (fields: InsuranceForm["fields"]): z.ZodTypeAny => {
     const schemaMap: Record<string, z.ZodTypeAny> = {};
   
-    const processFields = (fieldList: InsuranceForm["fields"], parentId = "") => {
+    const processFields = (fieldList: InsuranceForm["fields"]) => {
       fieldList.forEach((field) => {
-        const fieldId = parentId ? `${parentId}.${field.id}` : field.id;
+        // const fieldId = parentId ? `${parentId}.${field.id}` : field.id;
   
         if (field.type === "group" && field.fields) {
           const nestedSchema: Record<string, z.ZodTypeAny> = {};

@@ -1,12 +1,11 @@
-
-
+// @typescript-eslint/no-explicit-any
 export type TColumnDef = {
     id: string
     header: string
     accessorKey: string
     sortable: boolean
     filterable: boolean
-    cell?: (value: any, row: ITabelRow) => React.ReactNode
+    cell?: (value: string | number, row: ITabelRow) => React.ReactNode
   }
 
 export interface ITabelRow {

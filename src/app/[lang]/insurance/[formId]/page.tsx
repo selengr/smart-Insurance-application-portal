@@ -5,9 +5,9 @@ import DynamicFormV2 from "@/sections/dynamic-form/dynamic-form-v2";
 export default async function Page({
     params,
   }: {
-    params: { formId: string; lang: string }; 
+    params: Promise<{ formId: string; lang: string }>; 
   }) {
-  const { formId, lang } = params;
+  const { formId, lang } = await params;
   
     
 

@@ -1,6 +1,11 @@
-import { IApiResponse } from '@/types';
 import axios, { AxiosResponse } from 'axios';
 import { HOST_API_KEY } from '../../config-global';
+
+
+export interface IApiResponse<T> {
+    data: T;
+}
+
 
 const httpService = axios.create({
   baseURL: HOST_API_KEY,
@@ -11,7 +16,6 @@ const httpService = axios.create({
 
 httpService.interceptors.request.use(
   (config) => {
-    console.log('HOST_API_KEY===', config);
     // اضافه کردن توکن یا هدرهای موردنیاز
     return config;
   },
@@ -25,17 +29,16 @@ httpService.interceptors.response.use(
     return res;
   },
   (error) => {
-    console.log('error===', error);
     return Promise.reject(error);
   }
 );
 
-const get = <T>(url: string, params?: any) => {
-  return httpService.get<any, IApiResponse<T>>(url, { params });
+const get = (url: string, params?: Record<string, unknown>) => {
+  return httpService.get(url, { params });
 };
 
-const post = <T>(url: string, data: any) => {
-  return httpService.post<any, IApiResponse<T>>(url, data);
+const post = (url: string, data: Record<string, unknown>) => {
+  return httpService.post(url, data);
 };
 
 export default {

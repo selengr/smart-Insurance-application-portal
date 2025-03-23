@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import Link from "next/link"
 import type React from "react"
@@ -53,27 +54,21 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang }) => {
       const savedDraft = localStorage.getItem(`form_draft_${formId}`)
       if (savedDraft) {
         const parsedDraft = JSON.parse(savedDraft)
-console.log("=========",parsedDraft)
-        // Convert date strings back to Date objects
         const processedDraft = processDraftDates(parsedDraft)
-
-        // Set the form values from the draft
         form.reset(processedDraft)
 
-        // Show toast notification
         toast("Draft Restored", {
           description: "Your previous progress has been restored.",
           duration: 3000,
         })
 
-        // Update last saved timestamp
         setLastSaved(new Date(parsedDraft._lastSaved || Date.now()))
       }
     } catch (error) {
       console.error("Error loading draft:", error)
     }
   }, [formId, form])
-  // }, [formData, formSchema, formId, form])
+    // }, [formData, formSchema, formId, form])
 
   const processDraftDates = (draft: any): any => {
     if (!draft) return draft
@@ -81,12 +76,10 @@ console.log("=========",parsedDraft)
     const result = { ...draft }
     delete result._lastSaved
 
-    // Process each field to convert date strings to Date objects
     Object.keys(result).forEach((key) => {
       if (typeof result[key] === "object" && result[key] !== null) {
         result[key] = processDraftDates(result[key])
       } else if (typeof result[key] === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(result[key])) {
-        // This looks like an ISO date string
         result[key] = new Date(result[key])
       }
     })
@@ -98,39 +91,27 @@ console.log("=========",parsedDraft)
     if (!formData) return
 
     setIsSaving(true)
-
-    // Get current form values
     const formValues = form.getValues()
 
-    // Add timestamp
     const draftToSave = {
       ...formValues,
       _lastSaved: new Date().toISOString(),
     }
-
-    // Save to localStorage
     localStorage.setItem(`form_draft_${formId}`, JSON.stringify(draftToSave))
-
-    // Update last saved timestamp
     setLastSaved(new Date())
-
     setIsSaving(false)
   }, [form, formData, formId])
 
   useEffect(() => {
     if (!formData) return
-
-    // Clear any existing timer
     if (autoSaveTimerRef.current) {
       clearInterval(autoSaveTimerRef.current)
     }
 
-    // Set up new timer to save every 30 seconds
     autoSaveTimerRef.current = setInterval(() => {
       saveDraft()
-    }, 30000) // 30 seconds
+    }, 30000) 
 
-    // Clean up timer on unmount
     return () => {
       if (autoSaveTimerRef.current) {
         clearInterval(autoSaveTimerRef.current)
@@ -170,10 +151,8 @@ console.log("=========",parsedDraft)
           : [],
     )
 
-    // For each field with dynamic options, watch its dependency
     fieldsWithDynamicOptions.forEach((field) => {
       if (!field.dynamicOptions) return
-      const dependentValue = form.watch(field.dynamicOptions.dependsOn)
       const dependentValue2 = form.watch("address.country")
       if (dependentValue2) {
         fetchDynamicOptions(field, dependentValue2)
@@ -190,8 +169,6 @@ console.log("=========",parsedDraft)
  
 
   const onSubmit = (values: any) => {
-    console.log("Form submitted with values:", values)
-    
     submitForm(
       { data: values },
       {

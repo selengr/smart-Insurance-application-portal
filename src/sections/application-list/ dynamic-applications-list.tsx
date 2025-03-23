@@ -57,7 +57,7 @@ export function DynamicApplicationsList() {
       //-----------------status do not exist in api res so i add fake status
       const status = ["Pending", "Approved", "Rejected", "In Review"];
       apiResponse.columns.push("Status");
-      apiResponse.data.map((item: any, index) => (item.Status = status[index<=3?index:1]));
+      apiResponse.data.map((item: ITabelRow, index) => (item.Status = status[index<=3?index:1]));
       //----------------------------------------------------------------------
       setApiData({
         columns: apiResponse.columns,
@@ -80,7 +80,7 @@ export function DynamicApplicationsList() {
           accessorKey: column,
           sortable: true,
           filterable: true,
-          cell: (value, row) => {
+          cell: (value) => {
             const statusStyles: Record<string, string> = {
               Pending:
                 "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",

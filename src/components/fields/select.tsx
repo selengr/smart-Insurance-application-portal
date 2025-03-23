@@ -1,3 +1,4 @@
+//@typescript-eslint/no-explicit-any
 import { InsuranceField } from "@/types/insurance";
 import { Control, FieldValues, UseFormWatch } from "react-hook-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -8,7 +9,7 @@ interface ISelectFieldProps {
   control: Control<FieldValues>,
   watch: UseFormWatch<FieldValues>,
   field: InsuranceField;
-  dynamicOptions :any
+  dynamicOptions :Record<string, string[]>
 }
 
 // ------------------------------------------------------------------------------------
@@ -46,7 +47,7 @@ export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, f
                 ) : options.length === 0 ? (
                   <div className="p-2 text-center text-muted-foreground">No options available</div>
                 ) : (
-                  options.map((option :any) => (
+                  options.map((option : string) => (
                     <SelectItem key={option} value={option}>
                       {option}
                     </SelectItem>

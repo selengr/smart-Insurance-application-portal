@@ -6,10 +6,13 @@ enum METHOD {
     POST = "post"
 }
 
+interface IFormValues {
+    [key: string]: unknown;
+  }
 
 //------------------------------------------------------------------------------------------------------------
 export const insuranceFormsApi = async (formId: string): Promise<InsuranceForm | undefined> => {
-     const response = await httpService.get<InsuranceForm[]>(`/api/insurance/forms`)
+     const response = await httpService.get(`/api/insurance/forms`)
      return response.data.find((f:InsuranceForm) => f.formId === formId);
 }
 
@@ -24,6 +27,6 @@ export const dynamicOptionsApi = async (field: InsuranceField,dependentValue:str
 
 
 
-export const submitFormApi = async (data: InsuranceForm) => (
-     await httpService.post("/api/insurance/forms/submit",data)
+export const submitFormApi = async (data: IFormValues) => (
+     await httpService.post("/api/insurance/forms/submit",{data})   
 )
