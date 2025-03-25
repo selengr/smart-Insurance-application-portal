@@ -16,13 +16,13 @@ export default function LocaleSwitcher() {
   }
 
   return (
-    <ul className='flex gap-x-3'>
+    <ul className='flex gap-x-3 pl-[20%]'>
       {i18n.locales.map(locale => {
         return (
           <li key={locale}>
             <Link
               href={redirectedPathName(locale)}
-              className='rounded-md border px-3 py-2 dark:border-black'
+              className='rounded-md border py-1 px-2 md:px-3 md:py-2 dark:border-black'
             >
               {locale}
             </Link>

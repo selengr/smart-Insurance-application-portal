@@ -11,7 +11,7 @@ export default async function Home({
   const { lang } = await params;
   const { page } = await getDictionary(lang)
 
-  return <BackgroundPaths title={page.home.title}>
+  return <BackgroundPaths title={page.home.title} lang={lang}>
         <InsurancePage lang={lang}/>
     </BackgroundPaths>
 }

@@ -11,7 +11,7 @@ const Navbar = async ({ lang }: { lang: Locale }) => {
   return (
     <nav className='border-b py-3'>
         <div className={`${styles["landing-top"]} flex items-center justify-between`}>
-               <div className="flex justify-end flex-row align-middle items-center w-full pr-10">
+               <div className="flex justify-end flex-row align-middle items-center w-full pr-[1%]">
             
                <Link href={`/${lang}`}
                   passHref
@@ -19,7 +19,7 @@ const Navbar = async ({ lang }: { lang: Locale }) => {
 
                <Link href={`/${lang}`}
                        passHref
-               >  <label className="mr-4 ml-2">{navigation.home}</label></Link>
+               >  <label className="mr-2 ml-1">{navigation.home}</label></Link>
                 <ThemeToggle />
 
                </div>
