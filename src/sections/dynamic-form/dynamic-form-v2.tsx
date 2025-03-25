@@ -67,8 +67,8 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang }) => {
     } catch (error) {
       console.error("Error loading draft:", error)
     }
-  }, [formId, form])
-    // }, [formData, formSchema, formId, form])
+  // }, [formId,formSchema ,form])
+    }, [formData, formId, form])
 
   const processDraftDates = (draft: any): any => {
     if (!draft) return draft
