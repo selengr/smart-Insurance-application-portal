@@ -7,7 +7,7 @@ import Navbar from "@/sections/nav/navbar";
 import QueryProvider from "@/provider/QueryClientProvider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { estedad, geistMono, geistSans } from "@/tailwind/font";
-import { APP_DEFAULT_TITLE_EN, APP_DESCRIPTION_EN, APP_TITLE_TEMPLATE_EN, APP_DEFAULT_TITLE_FA, APP_DESCRIPTION_FA, APP_TITLE_TEMPLATE_FA } from "../../../config-global";
+import { APP_DEFAULT_TITLE_EN, APP_DESCRIPTION_EN, APP_TITLE_TEMPLATE_EN, APP_DEFAULT_TITLE_FA, APP_DESCRIPTION_FA, APP_TITLE_TEMPLATE_FA, APP_KEYWORDS } from "../../../config-global";
 
 
 // ----------------------------------------------------------------------
@@ -20,7 +20,7 @@ const metadataTranslations: Record<Locale, Metadata> = {
       template: APP_TITLE_TEMPLATE_EN,
     },
     description: APP_DESCRIPTION_EN,
-  keywords: '',
+    keywords: APP_KEYWORDS,
   },
   fa: {
     title: {
@@ -29,7 +29,7 @@ const metadataTranslations: Record<Locale, Metadata> = {
       template: APP_TITLE_TEMPLATE_FA,
     },
     description: APP_DESCRIPTION_FA,
-  keywords: '',
+    keywords: APP_KEYWORDS,
   },
 };
 
