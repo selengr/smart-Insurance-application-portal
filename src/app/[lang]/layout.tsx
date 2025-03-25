@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "./globals.css";
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
@@ -33,8 +34,10 @@ const metadataTranslations: Record<Locale, Metadata> = {
   },
 };
 
-export async function generateMetadata({ params }: { params: { lang: Locale } }): Promise<Metadata> {
-  const { lang } = await params;
+type Params = Promise<{ lang: Locale }>
+export async function generateMetadata({ params }: { params: Params }) {
+
+  const { lang } = await (params);
   return metadataTranslations[lang];
 }
 
@@ -51,7 +54,7 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
+  params: Params
 }>) {
   const { lang } = await params;
 
