@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import "./globals.css";
+import { use } from 'react'
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
 import { Locale, i18n } from "../../../i18n.config";
@@ -49,14 +49,13 @@ export async function generateStaticParams() {
 }
 // ----------------------------------------------------------------------
 
-export default async function RootLayout({
-  children,
-  params,
-}: Readonly<{
-  children: React.ReactNode;
-  params: Params
-}>) {
-  const { lang } = await params;
+
+  export default function RootLayout(props: {
+    children: React.ReactNode
+    params: Params
+  }) {
+  const params = use(props.params)
+  const lang = params.lang
 
   const fontClass =
      lang === "fa"
@@ -72,7 +71,7 @@ export default async function RootLayout({
           <Navbar lang={lang} />
 
           <div className="mt-16">
-            <QueryProvider>{children}</QueryProvider>
+            <QueryProvider>{props.children}</QueryProvider>
           </div>
           <Toaster />
         </ThemeProvider>
