@@ -34,7 +34,8 @@ const metadataTranslations: Record<Locale, Metadata> = {
 };
 
 export async function generateMetadata({ params }: { params: { lang: Locale } }): Promise<Metadata> {
-  return metadataTranslations[params.lang];
+  const { lang } = await params;
+  return metadataTranslations[lang];
 }
 
 // ----------------------------------------------------------------------
