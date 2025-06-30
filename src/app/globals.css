@@ -1,0 +1,23 @@
+@import "../../public/fonts/font.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html body * {
+  font-family: IranSans, serif !important;
+  -moz-font-feature-settings: "ss01";
+  -webkit-font-feature-settings: "ss01";
+  font-feature-settings: "ss01";
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  background-color: #F2F4F8 !important;
+  background-image: url("../../public/images/home-page/bg-pattern.svg");
+  background-repeat: repeat;
+}
