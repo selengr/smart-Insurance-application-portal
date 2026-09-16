@@ -1,14 +1,13 @@
-
-export const APP_NAME_EN = "smart Insurance portal";
-export const APP_DEFAULT_TITLE_EN = "smart Insurance portal";
-export const APP_TITLE_TEMPLATE_EN = "%s - smart Insurance portal";
-export const APP_DESCRIPTION_EN = "smart Insurance portal | this is a Smart Insurance Application Portal, where users can apply for different types of insurance (Health, Home, Car, Life, etc.) through a dynamic form.";
+export const APP_NAME_EN = "Smart Insurance Portal";
+export const APP_DEFAULT_TITLE_EN = "Smart Insurance Portal";
+export const APP_TITLE_TEMPLATE_EN = "%s - Smart Insurance Portal";
+export const APP_DESCRIPTION_EN = "Smart Insurance Portal — apply for Health, Home, Car, Life and more through dynamic, schema-driven forms.";
 
 export const APP_NAME_FA = "پورتال هوشمند بیمه";
 export const APP_DEFAULT_TITLE_FA = "پورتال هوشمند بیمه";
 export const APP_TITLE_TEMPLATE_FA = "%s - پورتال هوشمند بیمه";
-export const APP_DESCRIPTION_FA = "پورتال  هوشمند بیمه | این یک پورتال کاربردی بیمه هوشمند است که در آن کاربران می توانند از طریق یک فرم پویا برای انواع مختلف بیمه (سلامت، خانه، خودرو، زندگی و غیره) درخواست دهند.";
-export const APP_KEYWORDS = ['هوشمند', 'بیمه', 'هوشمند بیمه', 'smart', 'Insurance', 'smart Insurance']
+export const APP_DESCRIPTION_FA = "پورتال هوشمند بیمه — درخواست بیمه سلامت، خانه، خودرو و زندگی از طریق فرم‌های پویا.";
+export const APP_KEYWORDS = ['هوشمند', 'بیمه', 'هوشمند بیمه', 'smart', 'Insurance', 'smart Insurance', 'insurance portal']
 
 // API
 // ----------------------------------------------------------------------
