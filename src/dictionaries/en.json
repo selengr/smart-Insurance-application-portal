@@ -1,19 +1,19 @@
 {
-    "navigation": {
-      "home": "Home",
-      "about": "About"
+  "navigation": {
+    "home": "Home",
+    "about": "About"
+  },
+  "page": {
+    "home": {
+      "title": "Smart Insurance Application Portal",
+      "InsuranceTypes": "Insurance Types",
+      "InsuranceLink": "Click to apply",
+      "myInsurance": "My insurances",
+      "description": "Apply for Health, Home, Car, and Life insurance through dynamic forms."
     },
-    "page": {
-      "home": {
-        "title": "Smart Insurance Application Portal",
-        "InsuranceTypes": "Insurance Types",
-        "InsuranceLink": "Click to apply",
-        "myInsurance": "My insurances",
-        "description": "Internationalisierung im NextJs 13 App-Router"
-      },
-      "about": {
-        "title": "Über uns",
-        "description": "Dies ist die About-Seite"
-      }
+    "about": {
+      "title": "About",
+      "description": "A multilingual smart insurance application portal with schema-driven forms."
     }
   }
+}
