@@ -347,19 +347,28 @@ export function DynamicApplicationsList() {
                     {isFetching ? (
                       <tr>
                         <td
-                          colSpan={visibleColumnDefs?.length + 1}
-                          className="px-4 py-8 text-center text-muted-foreground"
+                          colSpan={Math.max(visibleColumnDefs?.length || 1, 1)}
+                          className="px-4 py-10 text-center text-muted-foreground"
+                          role="status"
+                          aria-live="polite"
                         >
-                          loading...
+                          <div className="mx-auto mb-3 h-2 w-40 animate-pulse rounded bg-muted" />
+                          <div className="mx-auto mb-2 h-2 w-56 animate-pulse rounded bg-muted" />
+                          <div className="mx-auto h-2 w-48 animate-pulse rounded bg-muted" />
+                          <span className="sr-only">Loading applications…</span>
                         </td>
                       </tr>
                     ) : (
                       <tr>
                         <td
-                          colSpan={visibleColumnDefs.length + 1}
-                          className="px-4 py-8 text-center text-muted-foreground"
+                          colSpan={Math.max(visibleColumnDefs.length || 1, 1)}
+                          className="px-4 py-12 text-center"
+                          role="status"
                         >
-                          No applications found
+                          <p className="text-base font-medium">No applications found</p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            Submit an insurance form to see it listed here.
+                          </p>
                         </td>
                       </tr>
                     )}
