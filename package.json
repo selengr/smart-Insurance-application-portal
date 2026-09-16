@@ -1,7 +1,9 @@
 {
-  "name": "my-app",
+  "name": "smart-insurance-application-portal",
   "version": "0.1.0",
   "private": true,
+  "description": "Multilingual smart insurance portal with dynamic schema-driven application forms",
+  "author": "selengr",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
