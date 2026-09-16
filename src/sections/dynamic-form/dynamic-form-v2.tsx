@@ -154,14 +154,7 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang }) => {
         void fetchDynamicOptions(field, countryValue)
       }
     })
-
-    if (formId === "home_insurance_application") {
-      const timer = setTimeout(() => {
-        form.setValue("address.country", "France")
-      }, 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [countryValue, formData, formId, form])
+  }, [countryValue, formData, formId])
 
   const onSubmit = (values: FormValues) => {
     submitForm(
