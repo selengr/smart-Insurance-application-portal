@@ -14,10 +14,10 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useFetchusePurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances";
+import { useFetchPurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances";
 
 export function DynamicApplicationsList() {
-  const { data: apiResponse, isFetching } = useFetchusePurchasedInsurances();
+  const { data: apiResponse, isFetching } = useFetchPurchasedInsurances();
 
   const [apiData, setApiData] = useState<{
     columns: string[];
