@@ -39,7 +39,14 @@ Optional env:
 
 ```bash
 NEXT_PUBLIC_HOST_API_KEY=https://assignment.devotel.io
+NEXT_PUBLIC_USE_MOCK_API=true
 ```
+
+Set `NEXT_PUBLIC_USE_MOCK_API=true` to run fully offline with local fixtures (handy for demos and recruiters).
+
+## Screenshots
+
+> Tip: drop screenshots into `docs/screenshots/` and link them here (home, dynamic form, applications table).
 
 ## Scripts
 
@@ -49,6 +56,7 @@ NEXT_PUBLIC_HOST_API_KEY=https://assignment.devotel.io
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
 | `npm run lint` | ESLint |
+| `npm test` | Schema builder smoke tests |
 
 ## Project structure
 
