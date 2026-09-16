@@ -54,8 +54,12 @@ export const generateZodSchema = (fields: InsuranceForm["fields"]): z.ZodTypeAny
           break;
           case "select":
           case "radio":
-          case "checkbox":
             schema = z.string();
+            break;
+          case "checkbox":
+            schema = field.options && field.options.length > 0
+              ? z.array(z.string())
+              : z.boolean();
             break;
   
         case "group":
