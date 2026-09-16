@@ -53,17 +53,16 @@ export function DynamicApplicationsList() {
 
   useEffect(() => {
     if (apiResponse) {
-      //----------------------------------------------------------------------
-      //-----------------status do not exist in api res so i add fake status
       const status = ["Pending", "Approved", "Rejected", "In Review"];
-      apiResponse.columns.push("Status");
-      apiResponse.data.map((item: ITabelRow, index) => (item.Status = status[index<=3?index:1]));
-      //----------------------------------------------------------------------
-      setApiData({
-        columns: apiResponse.columns,
-        data: apiResponse.data,
-      });
-      setVisibleColumns(apiResponse.columns);
+      const columns = apiResponse.columns.includes("Status")
+        ? [...apiResponse.columns]
+        : [...apiResponse.columns, "Status"];
+      const data = apiResponse.data.map((item: ITabelRow, index) => ({
+        ...item,
+        Status: item.Status ?? status[index <= 3 ? index : 1],
+      }));
+      setApiData({ columns, data });
+      setVisibleColumns(columns);
     }
   }, [apiResponse]);
 
