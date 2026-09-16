@@ -16,7 +16,9 @@ jobs:
           node-version: "20"
           cache: npm
       - run: npm ci
+      - run: npm test
       - run: npm run lint
       - run: npm run build
         env:
           NEXT_PUBLIC_HOST_API_KEY: https://assignment.devotel.io
+          NEXT_PUBLIC_USE_MOCK_API: "true"
