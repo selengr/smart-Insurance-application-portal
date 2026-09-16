@@ -63,11 +63,11 @@ export async function generateStaticParams() {
       : `${geistSans.variable} ${geistMono.variable} font-sans`;
 
   return (
-    <html lang={lang}>
+    <html lang={lang} dir={lang === "fa" ? "rtl" : "ltr"}>
       <body
         className={`${fontClass} antialiased min-h-screen dark:text-[hsla(0,0%,100%,.9)] transition-colors duration-300`}
       >
-        <ThemeProvider defaultTheme="dark" storageKey="theme">
+        <ThemeProvider defaultTheme="system" storageKey="theme">
           <Navbar lang={lang} />
 
           <div className="mt-16">
