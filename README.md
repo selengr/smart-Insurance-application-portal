@@ -62,6 +62,23 @@ src/
   dictionaries/        # en / fa translations
 ```
 
+## Architecture
+
+```
+Browser (EN/FA routes)
+   │
+   ├─ Home → fetch insurance product list
+   ├─ /insurance/[formId] → schema-driven dynamic form
+   │     ├─ Zod schema built from API field definitions
+   │     ├─ React Hook Form + draft autosave (localStorage)
+   │     └─ Submit → purchased list
+   └─ /purchased-insurances → filterable applications table
+
+API: NEXT_PUBLIC_HOST_API_KEY (Devotel assignment API)
+```
+
+Recruiters can skim this as: **API schema → Zod → dynamic UI → validated submit**.
+
 ## Author
 
 Built by [@selengr](https://github.com/selengr)
