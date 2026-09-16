@@ -4,67 +4,78 @@ import { Locale } from "../../../i18n.config";
 import { getDictionary } from "@/lib/dictionary";
 import { fetchInsuranceTypes } from "@/services/api/home";
 import { Button } from "@/components/ui/button";
+import { Shield, FolderOpen } from "lucide-react";
 
 interface HomeProps {
-  lang : Locale
+  lang: Locale;
 }
 
-const InsurancePage: NextPage<HomeProps> = async ({lang}) => {
-    const insuranceTypes = await fetchInsuranceTypes()
-    const { page } = await getDictionary(lang)
-    
-  return (
-    <div className="min-h-screen bg-gradient-to-r p-8 bg-[rgb(2 2 30 / 1)]">
-    <h1 className="text-4xl font-bold mb-8 text-center ">{page.home.title}</h1>
-    <h2 className="text-2xl font-semibold mb-8 text-center">{page.home.InsuranceTypes}</h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {insuranceTypes.data.map((insurance) => (
-        <Link key={insurance.formId} href={`/${lang}/insurance/${insurance.formId}`}>
-          <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer transform border border-gray-100">
-            <div className="flex items-center justify-center mb-4">
-              <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v1m0 0v1m0-1H9m3 0h3m-3 0H9m3 0h3m-3 0v1m0-1V7m0 1v1m0 0v1m0-1H9m3 0h3m-3 0H9"></path>
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold mb-4 text-center ">{insurance.title}</h2>
-            <Button
-              variant="ghost"
-              key={insurance.formId}
-              className="rounded-[1.15rem] px-8 py-6 text-lg font-semibold backdrop-blur-md 
-                         bg-white/95 hover:bg-white/100 dark:bg-transparent dark:hover:bg-black/20 
-                          text-black dark:text-white transition-all duration-300 
-                           hover:-translate-y-0.5 border border-black/10 dark:border-white/10
-                          hover:shadow-md dark:hover:shadow-neutral-800/50"
-            >
-              <span className="opacity-90 hover:opacity-100 transition-opacity">{page.home.InsuranceLink}</span>
-              <span
-                className="ml-3 opacity-70 hover:opacity-100 hover:translate-x-1.5 
-                                transition-all duration-300"
-              >
-                →
-              </span>
-            </Button>
-          </div>
-        </Link>
-      ))}
-    </div>
+const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
+  const insuranceTypes = await fetchInsuranceTypes();
+  const { page } = await getDictionary(lang);
+  const items = insuranceTypes?.data ?? [];
 
-    <div className="mt-10">
-    
-    <Link  href={`/${lang}/purchased-insurances`}>
-          <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer transform border border-gray-100">
-            <div className="flex items-center justify-center mb-4">
-              <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v1m0 0v1m0-1H9m3 0h3m-3 0H9m3 0h3m-3 0v1m0-1V7m0 1v1m0 0v1m0-1H9m3 0h3m-3 0H9"></path>
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold mb-4 text-center ">{page.home.myInsurance}</h2>
-          </div>
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+      <header className="mb-10 text-center sm:mb-12">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          {page.home.title}
+        </h1>
+        <p className="mt-3 text-base text-muted-foreground sm:text-lg">
+          {page.home.InsuranceTypes}
+        </p>
+      </header>
+
+      {items.length === 0 ? (
+        <div
+          className="rounded-2xl border border-dashed p-10 text-center text-muted-foreground"
+          role="status"
+        >
+          No insurance products available right now.
+        </div>
+      ) : (
+        <ul className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {items.map((insurance) => (
+            <li key={insurance.formId}>
+              <Link
+                href={`/${lang}/insurance/${insurance.formId}`}
+                className="group flex h-full flex-col rounded-2xl border border-border/60 bg-background/40 p-6 transition hover:border-primary/40 hover:bg-background/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={`${page.home.InsuranceLink}: ${insurance.title}`}
+              >
+                <div className="mb-4 flex justify-center text-primary">
+                  <Shield className="h-10 w-10" aria-hidden />
+                </div>
+                <h2 className="mb-4 text-center text-xl font-semibold">
+                  {insurance.title}
+                </h2>
+                <Button
+                  variant="ghost"
+                  className="mt-auto w-full justify-center rounded-xl border border-border/50 group-hover:-translate-y-0.5 transition"
+                  tabIndex={-1}
+                >
+                  <span>{page.home.InsuranceLink}</span>
+                  <span className="ml-2 transition group-hover:translate-x-1" aria-hidden>
+                    →
+                  </span>
+                </Button>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-8 sm:mt-10">
+        <Link
+          href={`/${lang}/purchased-insurances`}
+          className="flex items-center justify-center gap-3 rounded-2xl border border-border/60 bg-background/40 p-6 transition hover:border-primary/40 hover:bg-background/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={page.home.myInsurance}
+        >
+          <FolderOpen className="h-8 w-8 text-primary" aria-hidden />
+          <span className="text-xl font-semibold">{page.home.myInsurance}</span>
         </Link>
+      </div>
     </div>
-  </div>
   );
 };
-
 
 export default InsurancePage;
