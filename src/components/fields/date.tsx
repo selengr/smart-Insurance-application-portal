@@ -1,22 +1,25 @@
-import { format } from "date-fns";
-import classNames from "classnames";
-import { CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { InsuranceField } from "@/types/insurance";
-import { Calendar } from "@/components/ui/calendar";
-import { Control, FieldValues } from "react-hook-form";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { FormControl, FormField as UIFormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+"use client"
 
+import { useState } from "react"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { InsuranceField } from "@/types/insurance"
+import { Calendar } from "@/components/ui/calendar"
+import { Control, FieldValues } from "react-hook-form"
+import { cn } from "@/lib/utils"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { FormControl, FormField as UIFormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 
 interface IDateFieldProps {
-  fieldPath: string;
-  control: Control<FieldValues>,
-  field: InsuranceField;
- 
+  fieldPath: string
+  control: Control<FieldValues>
+  field: InsuranceField
 }
-// ------------------------------------------------------------------------------------
+
 export const DateField: React.FC<IDateFieldProps> = ({ fieldPath, control, field }) => {
+  const [open, setOpen] = useState(false)
+
   return (
     <UIFormField
       key={fieldPath}
@@ -25,19 +28,23 @@ export const DateField: React.FC<IDateFieldProps> = ({ fieldPath, control, field
       render={({ field: formField }) => (
         <FormItem className="flex flex-col">
           <FormLabel>{field.label}</FormLabel>
-          <Popover>
+          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
                   variant="outline"
-                  className={classNames(
+                  className={cn(
                     "w-full pl-3 text-left font-normal",
                     !formField.value && "text-muted-foreground"
                   )}
                   aria-haspopup="dialog"
-                  aria-expanded={formField.value ? "true" : "false"}
+                  aria-expanded={open}
                 >
-                  {formField.value ? format(formField.value, "PPP") : <span>Pick a date</span>}
+                  {formField.value ? (
+                    format(formField.value, "PPP")
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
               </FormControl>
@@ -46,7 +53,10 @@ export const DateField: React.FC<IDateFieldProps> = ({ fieldPath, control, field
               <Calendar
                 mode="single"
                 selected={formField.value}
-                onSelect={formField.onChange}
+                onSelect={(date) => {
+                  formField.onChange(date)
+                  setOpen(false)
+                }}
                 disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                 initialFocus
               />
@@ -56,5 +66,5 @@ export const DateField: React.FC<IDateFieldProps> = ({ fieldPath, control, field
         </FormItem>
       )}
     />
-  );
-};
+  )
+}
