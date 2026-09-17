@@ -1,19 +1,19 @@
 {
-    "navigation": {
-      "home": "خانه",
-      "about": "درباره ما"
+  "navigation": {
+    "home": "خانه",
+    "about": "درباره ما"
+  },
+  "page": {
+    "home": {
+      "title": "پورتال کاربردی بیمه هوشمند",
+      "InsuranceTypes": "انواع بیمه",
+      "InsuranceLink": "ادامه و خرید",
+      "myInsurance": "بیمه‌های من",
+      "description": "درخواست بیمه سلامت، خانه، خودرو و زندگی از طریق فرم‌های پویا."
     },
-    "page": {
-      "home": {
-        "title": "پورتال کاربردی بیمه هوشمند",
-        "InsuranceTypes": "انواع بیمه",
-        "InsuranceLink": "ادامه و خريد",
-        "myInsurance": "بیمه‌های من",
-        "description": "Internationalization in NextJs 13 App router"
-      },
-      "about": {
-        "title": "About Us",
-        "description": "This is the about page"
-      }
+    "about": {
+      "title": "درباره ما",
+      "description": "پورتال چندزبانه بیمه هوشمند با فرم‌های مبتنی بر اسکیما."
     }
   }
+}
