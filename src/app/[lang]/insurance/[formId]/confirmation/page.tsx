@@ -24,6 +24,8 @@ export default async function ConfirmationPage({
       src: "/images/product-home.jpg",
       alt: formId,
     }
+  const product =
+    page.home.productTitles?.[formId] ?? insuranceTypeFromFormId(formId)
   const steps = [
     { id: "details", label: page.form.stepDetails },
     { id: "review", label: page.form.stepReview },
@@ -54,14 +56,29 @@ export default async function ConfirmationPage({
             {page.confirmation.subtitle}
           </p>
 
-          <div className="mx-auto mt-8 max-w-sm border border-border bg-background/80 px-5 py-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              {page.confirmation.reference}
-            </p>
-            <p className="mt-1 font-mono text-xl font-semibold tracking-wide">{reference}</p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {page.home.productTitles?.[formId] ?? insuranceTypeFromFormId(formId)}
-            </p>
+          <div className="mx-auto mt-8 max-w-md border border-border bg-background/90 text-start">
+            <div className="flex items-center justify-between border-b border-border px-5 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {page.confirmation.receiptTitle}
+              </p>
+              <span className="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                {page.confirmation.statusPending}
+              </span>
+            </div>
+            <div className="space-y-3 px-5 py-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                  {page.confirmation.reference}
+                </p>
+                <p className="mt-1 font-mono text-lg font-semibold tracking-wide">{reference}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                  {page.home.InsuranceTypes}
+                </p>
+                <p className="mt-1 text-sm font-medium">{product}</p>
+              </div>
+            </div>
           </div>
 
           <div className="mx-auto mt-8 max-w-md border-t border-border pt-6 text-start">
