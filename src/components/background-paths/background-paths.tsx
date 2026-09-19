@@ -1,15 +1,9 @@
-"use client";
+"use client"
 
-import { motion } from "motion/react";
+import { motion } from "motion/react"
 
-function FloatingPaths({
-  position,
-  title,
-}: {
-  position: number;
-  title: string;
-}) {
-  const paths = Array.from({ length: 36 }, (_, i) => ({
+function FloatingPaths({ position }: { position: number }) {
+  const paths = Array.from({ length: 28 }, (_, i) => ({
     id: i,
     d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
       380 - i * 5 * position
@@ -18,33 +12,27 @@ function FloatingPaths({
     } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
       684 - i * 5 * position
     } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-    color: `rgba(15,23,42,${0.1 + i * 0.03})`,
-    width: 0.5 + i * 0.03,
-  }));
+    width: 0.45 + i * 0.025,
+  }))
 
   return (
-    <div className="absolute inset-0 pointer-events-none">
-      <svg
-        className="w-full h-full text-slate-950 dark:text-white"
-        viewBox="0 0 696 316"
-        fill="none"
-      >
-        <title>{title}</title>
+    <div className="pointer-events-none absolute inset-0" aria-hidden>
+      <svg className="h-full w-full text-foreground" viewBox="0 0 696 316" fill="none">
         {paths.map((path) => (
           <motion.path
             key={path.id}
             d={path.d}
             stroke="currentColor"
             strokeWidth={path.width}
-            strokeOpacity={0.1 + path.id * 0.03}
-            initial={{ pathLength: 0.3, opacity: 0.6 }}
+            strokeOpacity={0.04 + path.id * 0.012}
+            initial={{ pathLength: 0.25, opacity: 0.4 }}
             animate={{
               pathLength: 1,
-              opacity: [0.3, 0.6, 0.3],
+              opacity: [0.2, 0.45, 0.2],
               pathOffset: [0, 1, 0],
             }}
             transition={{
-              duration: 20 + Math.random() * 10,
+              duration: 22 + path.id * 0.35,
               repeat: Number.POSITIVE_INFINITY,
               ease: "linear",
             }}
@@ -52,70 +40,23 @@ function FloatingPaths({
         ))}
       </svg>
     </div>
-  );
+  )
 }
 
+/** Quiet atmospheric layer — no competing headline */
 export default function BackgroundPaths({
-  title = "",
   children,
-  lang,
 }: {
-  title?: string;
-  children: React.ReactNode;
-  lang: string;
+  children: React.ReactNode
+  title?: string
+  lang?: string
 }) {
-  const words = lang === "en" ? title.split(" "): title.split(" ").reverse()
-
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden ">
-      <div className="absolute inset-0">
-        <FloatingPaths position={1} title={title} />
-        <FloatingPaths position={-1} title={title} />
-      </div>
-
-      <div className="relative z-10 container mx-auto px-4 md:px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2 }}
-          className="max-w-5xl mx-auto"
-        >
-          <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold mb-8 tracking-tighter">
-            {words.map((word, wordIndex) => (
-              <span key={wordIndex} className="inline-block mr-4 last:mr-0">
-                {word.split("").map((letter, letterIndex) => (
-                  <motion.span
-                    key={`${wordIndex}-${letterIndex}`}
-                    initial={{ y: 100, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{
-                      delay: wordIndex * 0.1 + letterIndex * 0.03,
-                      type: "spring",
-                      stiffness: 150,
-                      damping: 25,
-                    }}
-                    className={`${
-                      lang === "en" ? "inline-block" : ""
-                    } text-transparent bg-clip-text 
-                                        bg-gradient-to-r from-neutral-900 to-neutral-700/80 
-                                        dark:from-white dark:to-white/80`}
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
-              </span>
-            ))}
-          </h1>
-
-          <div
-            className="inline-block group relative bg-gradient-to-b from-black/10 to-white/10 
-                        dark:from-white/10 dark:to-black/10 p-px rounded-2xl backdrop-blur-lg 
-                        overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-          >
-            {children}
-          </div>
-        </motion.div>
-      </div>
+    <div className="relative min-h-[calc(100vh-4rem)] w-full overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_0%,oklch(0.85_0.06_195/0.35),transparent_55%),radial-gradient(ellipse_at_90%_20%,oklch(0.9_0.07_85/0.28),transparent_50%),linear-gradient(180deg,var(--background),oklch(0.94_0.02_200/0.5))] dark:bg-[radial-gradient(ellipse_at_15%_0%,oklch(0.35_0.06_195/0.35),transparent_55%),radial-gradient(ellipse_at_85%_10%,oklch(0.35_0.05_85/0.2),transparent_50%),linear-gradient(180deg,var(--background),oklch(0.14_0.02_220))]" />
+      <FloatingPaths position={1} />
+      <FloatingPaths position={-1} />
+      <div className="relative z-10">{children}</div>
     </div>
-  );
+  )
 }
