@@ -4,29 +4,11 @@ import Link from "next/link"
 import { Locale } from "../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import { fetchInsuranceTypes } from "@/services/api/home"
+import { PRODUCT_VISUAL, productTitle } from "@/lib/product-visuals"
 import { ArrowUpRight, FolderOpen } from "lucide-react"
 
 interface HomeProps {
   lang: Locale
-}
-
-const PRODUCT_VISUAL: Record<string, { src: string; alt: string }> = {
-  health_insurance_application: {
-    src: "/images/product-health.jpg",
-    alt: "Health insurance",
-  },
-  home_insurance_application: {
-    src: "/images/product-home.jpg",
-    alt: "Home insurance",
-  },
-  car_insurance_application: {
-    src: "/images/product-car.jpg",
-    alt: "Car insurance",
-  },
-  life_insurance_application: {
-    src: "/images/product-life.jpg",
-    alt: "Life insurance",
-  },
 }
 
 type HomeDict = Awaited<ReturnType<typeof getDictionary>>["page"]["home"]
@@ -138,7 +120,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
                     <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
                       <div>
                         <h3 className="font-[family-name:var(--font-display)] text-lg font-bold leading-snug">
-                          {insurance.title.replace(" Application", "")}
+                          {productTitle(insurance.title)}
                         </h3>
                         {blurb ? (
                           <p className="mt-1.5 text-sm text-muted-foreground">{blurb}</p>

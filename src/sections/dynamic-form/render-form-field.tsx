@@ -68,14 +68,28 @@ export const renderFormField = (
 
     case "group":
       return (
-        <div key={fieldPath} className="space-y-4 border p-4 rounded-md">
-          <h3 className="text-lg font-medium">{field.label}</h3>
-          <div className="space-y-4">
-            {field.fields?.map((subField) =>
-              renderFormField(subField, fieldPath, control, watch, dynamicOptions)
-            )}
+        <fieldset
+          key={fieldPath}
+          className="space-y-4 border border-border/80 bg-card/40 p-5 sm:p-6"
+        >
+          <legend className="px-1 font-[family-name:var(--font-display)] text-base font-bold tracking-tight">
+            {field.label}
+          </legend>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {field.fields?.map((subField) => (
+              <div
+                key={subField.id}
+                className={
+                  subField.type === "radio" || subField.type === "checkbox"
+                    ? "sm:col-span-2"
+                    : undefined
+                }
+              >
+                {renderFormField(subField, fieldPath, control, watch, dynamicOptions)}
+              </div>
+            ))}
           </div>
-        </div>
+        </fieldset>
       );
 
     default:
