@@ -22,6 +22,12 @@
         "home_insurance_application": "Property & belongings",
         "car_insurance_application": "Vehicle protection",
         "life_insurance_application": "Family & future planning"
+      },
+      "productTitles": {
+        "health_insurance_application": "Health",
+        "home_insurance_application": "Home",
+        "car_insurance_application": "Car",
+        "life_insurance_application": "Life"
       }
     },
     "about": {
@@ -56,7 +62,8 @@
       "notFoundBody": "That page does not exist or the link is outdated.",
       "errorTitle": "Something went wrong",
       "errorBody": "Please try again. If the problem continues, come back later.",
-      "goHome": "Go home"
+      "goHome": "Go home",
+      "skipToContent": "Skip to content"
     },
     "form": {
       "saveDraft": "Save draft",
@@ -92,7 +99,10 @@
       "reviewSubtitle": "Check everything looks right before you reserve this cover.",
       "reviewEmpty": "No answers yet",
       "secureNote": "Demo only — answers stay in this browser until you connect a real API.",
-      "requiredHint": "Required fields must be completed before review."
+      "requiredHint": "Required fields must be completed before review.",
+      "selectPlaceholder": "Select an option",
+      "selectDepends": "Select {field} first",
+      "retry": "Retry"
     },
     "footer": {
       "tagline": "Schema-driven insurance applications for modern teams.",
@@ -106,6 +116,132 @@
       "termsTitle": "Terms of use",
       "termsBody": "This project is a portfolio demonstration. Demo sign-in is not real authentication. Do not submit sensitive personal or financial information. Features and fixtures may change without notice.",
       "backHome": "Back to home"
+    },
+    "forms": {
+      "health_insurance_application": {
+        "title": "Health Insurance Application",
+        "fields": {
+          "personal_info": {
+            "label": "Personal Information",
+            "fields": {
+              "first_name": {
+                "label": "First Name"
+              },
+              "last_name": {
+                "label": "Last Name"
+              },
+              "age": {
+                "label": "Age"
+              }
+            }
+          },
+          "coverage": {
+            "label": "Coverage Type",
+            "options": {
+              "Basic": "Basic",
+              "Standard": "Standard",
+              "Premium": "Premium"
+            }
+          }
+        }
+      },
+      "home_insurance_application": {
+        "title": "Home Insurance Application",
+        "fields": {
+          "address": {
+            "label": "Address",
+            "fields": {
+              "country": {
+                "label": "Country",
+                "options": {
+                  "France": "France",
+                  "Iran": "Iran",
+                  "Germany": "Germany"
+                }
+              },
+              "city": {
+                "label": "City"
+              }
+            }
+          }
+        }
+      },
+      "car_insurance_application": {
+        "title": "Car Insurance Application",
+        "fields": {
+          "make": {
+            "label": "Make"
+          },
+          "model": {
+            "label": "Model"
+          },
+          "year": {
+            "label": "Year"
+          }
+        }
+      },
+      "life_insurance_application": {
+        "title": "Life Insurance Application",
+        "fields": {
+          "full_name": {
+            "label": "Full name"
+          },
+          "coverage_amount": {
+            "label": "Coverage amount",
+            "options": {
+              "$50,000": "$50,000",
+              "$100,000": "$100,000",
+              "$250,000": "$250,000",
+              "$500,000": "$500,000"
+            }
+          },
+          "term": {
+            "label": "Term length",
+            "options": {
+              "10 years": "10 years",
+              "20 years": "20 years",
+              "30 years": "30 years"
+            }
+          }
+        }
+      }
+    },
+    "policiesList": {
+      "applications": "Applications",
+      "columns": {
+        "id": "ID",
+        "Insurance Type": "Insurance type",
+        "Applicant": "Applicant",
+        "Submitted At": "Submitted at",
+        "Status": "Status"
+      },
+      "status": {
+        "Pending": "Pending",
+        "Approved": "Approved",
+        "Rejected": "Rejected",
+        "In Review": "In review"
+      },
+      "filter": "Filter",
+      "customize": "Customize columns",
+      "clearAll": "Clear all",
+      "noApps": "No applications found",
+      "noAppsHint": "Submit an insurance form to see it listed here.",
+      "loadError": "Could not load applications",
+      "retry": "Retry",
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "entries": "entries",
+      "show": "Show",
+      "perPage": "per page",
+      "applyNew": "Start a new application",
+      "demoApplicant": "Demo User"
+    },
+    "aboutPage": {
+      "title": "About this portal",
+      "lead": "A bilingual, schema-driven insurance application demo built for real product flows.",
+      "body": "Apply for Health, Home, Car, or Life cover with auto-saved drafts, a review step before submit, and a policies list that tracks reserved applications in your browser.",
+      "cta": "Browse products"
     }
   }
 }

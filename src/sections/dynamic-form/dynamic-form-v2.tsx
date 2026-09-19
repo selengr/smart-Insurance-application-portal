@@ -7,7 +7,7 @@ import { format } from "date-fns"
 import { ArrowRight, Save, ShieldCheck } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
@@ -20,6 +20,11 @@ import { useFetchInsuranceForms } from "@/hooks/use-fetch-insurance-forms"
 import { ApplicationHero } from "@/sections/application/application-hero"
 import { ApplicationStepper } from "@/sections/application/application-stepper"
 import { buildReviewRows } from "@/lib/review-rows"
+import {
+  localizeDynamicCities,
+  localizeInsuranceForm,
+  type FormsCatalog,
+} from "@/lib/form-i18n"
 
 type FormCopy = {
   saveDraft: string
@@ -55,6 +60,9 @@ type FormCopy = {
   reviewEmpty: string
   secureNote: string
   requiredHint: string
+  selectPlaceholder: string
+  selectDepends: string
+  retry: string
 }
 
 interface IDynamicFormProps {
@@ -62,6 +70,7 @@ interface IDynamicFormProps {
   lang: string
   copy: FormCopy
   productBlurb?: string
+  formsCatalog?: FormsCatalog
 }
 
 const isIsoDateString = (value: string) =>
@@ -85,7 +94,13 @@ const processDraftDates = (draft: FormValues): FormValues => {
 
 type FlowStep = "details" | "review"
 
-const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang, copy, productBlurb }) => {
+const DynamicForm: React.FC<IDynamicFormProps> = ({
+  formId,
+  lang,
+  copy,
+  productBlurb,
+  formsCatalog,
+}) => {
   const { push } = useRouter()
   const [flowStep, setFlowStep] = useState<FlowStep>("details")
   const [dynamicOptions, setDynamicOptions] = useState<Record<string, string[]>>({})
@@ -94,7 +109,11 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang, copy, productB
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const { data, isFetching: isLoading, isError, error, refetch } = useFetchInsuranceForms(formId)
-  const formData = data?.form || null
+  const rawForm = data?.form || null
+  const formData = useMemo(
+    () => (rawForm ? localizeInsuranceForm(rawForm, formsCatalog) : null),
+    [rawForm, formsCatalog],
+  )
   const formSchema = data?.schema || null
 
   const { mutate: submitForm, isPending: isSubmitingForm } = useSubmitForm()
@@ -167,9 +186,10 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang, copy, productB
     if (!field.dynamicOptions) return
     try {
       const response = await dynamicOptionsApi(field, dependentValue)
+      const localized = localizeDynamicCities(lang, dependentValue, response)
       setDynamicOptions((prev) => ({
         ...prev,
-        [field.id]: response,
+        [field.id]: localized,
       }))
     } catch (err) {
       console.error(`Error fetching options for ${field.id}:`, err)
@@ -275,7 +295,7 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang, copy, productB
           {error instanceof Error ? error.message : copy.connectionHint}
         </p>
         <Button type="button" variant="outline" onClick={() => refetch()}>
-          Retry
+          {copy.retry}
         </Button>
       </div>
     )
@@ -366,7 +386,10 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang, copy, productB
 
               <div className="space-y-5">
                 {formData.fields.map((field) =>
-                  renderFormField(field, "", form.control, form.watch, dynamicOptions),
+                  renderFormField(field, "", form.control, form.watch, dynamicOptions, {
+                    selectPlaceholder: copy.selectPlaceholder,
+                    selectDepends: copy.selectDepends,
+                  }),
                 )}
               </div>
 

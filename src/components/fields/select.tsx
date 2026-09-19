@@ -9,9 +9,13 @@ interface ISelectFieldProps {
   watch: UseFormWatch<FieldValues>,
   field: InsuranceField;
   dynamicOptions: Record<string, string[]>
+  placeholders?: {
+    selectPlaceholder?: string
+    selectDepends?: string
+  }
 }
 
-export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, field, dynamicOptions, watch }) => {
+export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, field, dynamicOptions, watch, placeholders }) => {
   const options = field.dynamicOptions ? dynamicOptions[field.id] || [] : field.options || []
   const dependsOn = field.dynamicOptions?.dependsOn
   const parentPath = fieldPath.includes(".")
@@ -24,6 +28,8 @@ export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, f
     : ""
   const dependentValue = dependsOnPath ? watch(dependsOnPath) : null
   const isDisabled = Boolean(dependsOn) && !dependentValue
+  const selectAnOption = placeholders?.selectPlaceholder ?? "Select an option"
+  const selectDepends = placeholders?.selectDepends ?? `Select a ${dependsOn} first`
 
   return (
     <UIFormField
@@ -39,12 +45,12 @@ export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, f
             disabled={isDisabled}
           >
             <FormControl>
-              <SelectTrigger className="min-w-full" aria-disabled={isDisabled}>
+              <SelectTrigger className="min-w-full h-11 rounded-none" aria-disabled={isDisabled}>
                 <SelectValue
                   placeholder={
                     isDisabled
-                      ? `Select a ${dependsOn} first`
-                      : "Select an option"
+                      ? selectDepends.replace("{field}", dependsOn || "")
+                      : selectAnOption
                   }
                 />
               </SelectTrigger>

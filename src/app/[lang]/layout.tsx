@@ -9,6 +9,7 @@ import SiteFooter from "@/sections/footer/site-footer";
 import QueryProvider from "@/provider/QueryClientProvider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { estedad, displayFont, bodyFont } from "@/tailwind/font";
+import { getDictionary } from "@/lib/dictionary";
 import { APP_DEFAULT_TITLE_EN, APP_DESCRIPTION_EN, APP_TITLE_TEMPLATE_EN, APP_DEFAULT_TITLE_FA, APP_DESCRIPTION_FA, APP_TITLE_TEMPLATE_FA, APP_KEYWORDS } from "../../../config-global";
 
 const metadataTranslations: Record<Locale, Metadata> = {
@@ -70,6 +71,7 @@ export default function RootLayout(props: {
 }) {
   const params = use(props.params)
   const lang = params.lang
+  const { page } = use(getDictionary(lang))
 
   const fontClass =
     lang === "fa"
@@ -86,7 +88,7 @@ export default function RootLayout(props: {
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
           >
-            Skip to content
+            {page.common.skipToContent}
           </a>
           <div className="flex min-h-screen flex-col">
             <Navbar lang={lang} />

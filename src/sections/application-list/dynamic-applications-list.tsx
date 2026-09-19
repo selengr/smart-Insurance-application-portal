@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import Link from "next/link";
 
 import { AnimatePresence } from "motion/react";
 import { useState, useMemo, useCallback, useEffect } from "react";
@@ -13,10 +14,39 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ArrowUpRight,
 } from "lucide-react";
 import { useFetchPurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances";
+import { insuranceTypeFromFormId } from "@/lib/local-applications";
 
-export function DynamicApplicationsList() {
+export function DynamicApplicationsList({
+  labels,
+  productTitles,
+  lang,
+}: {
+  labels: {
+    applications: string
+    columns: Record<string, string>
+    status: Record<string, string>
+    filter: string
+    customize: string
+    clearAll: string
+    noApps: string
+    noAppsHint: string
+    loadError: string
+    retry: string
+    showing: string
+    to: string
+    of: string
+    entries: string
+    show: string
+    perPage: string
+    applyNew: string
+    demoApplicant: string
+  }
+  productTitles?: Record<string, string>
+  lang: string
+}) {
   const { data: apiResponse, isFetching, isError, refetch } = useFetchPurchasedInsurances();
 
   const [apiData, setApiData] = useState<{
@@ -53,18 +83,33 @@ export function DynamicApplicationsList() {
 
   useEffect(() => {
     if (apiResponse) {
-      const status = ["Pending", "Approved", "Rejected", "In Review"];
+      const statusKeys = ["Pending", "Approved", "Rejected", "In Review"];
       const columns = apiResponse.columns.includes("Status")
         ? [...apiResponse.columns]
         : [...apiResponse.columns, "Status"];
-      const data = apiResponse.data.map((item: ITabelRow, index) => ({
-        ...item,
-        Status: item.Status ?? status[index <= 3 ? index : 1],
-      }));
+      const data = apiResponse.data.map((item: ITabelRow, index) => {
+        const formId = typeof item.formId === "string" ? item.formId : undefined
+        const typeLabel = formId
+          ? insuranceTypeFromFormId(formId, productTitles)
+          : String(item["Insurance Type"] ?? "")
+        const statusKey =
+          (item.Status as string) ?? statusKeys[index <= 3 ? index : 1]
+        const applicant =
+          item.Applicant === "Demo User"
+            ? labels.demoApplicant
+            : item.Applicant
+        return {
+          ...item,
+          "Insurance Type": typeLabel,
+          Applicant: applicant,
+          Status: labels.status[statusKey] ?? statusKey,
+          _statusKey: statusKey,
+        }
+      });
       setApiData({ columns, data });
       setVisibleColumns(columns);
     }
-  }, [apiResponse]);
+  }, [apiResponse, labels.status, labels.demoApplicant, productTitles]);
 
   useEffect(() => {
     setVisibleColumns(apiData.columns);
@@ -75,11 +120,12 @@ export function DynamicApplicationsList() {
       if (column === "Status") {
         return {
           id: column,
-          header: column,
+          header: labels.columns[column] ?? column,
           accessorKey: column,
           sortable: true,
           filterable: true,
-          cell: (value) => {
+          cell: (value, row) => {
+            const statusKey = String(row._statusKey ?? value)
             const statusStyles: Record<string, string> = {
               Pending:
                 "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
@@ -92,7 +138,7 @@ export function DynamicApplicationsList() {
             };
 
             const style =
-              statusStyles[value as string] ||
+              statusStyles[statusKey] ||
               "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
 
             return (
@@ -108,13 +154,13 @@ export function DynamicApplicationsList() {
 
       return {
         id: column,
-        header: column,
+        header: labels.columns[column] ?? column,
         accessorKey: column,
         sortable: true,
         filterable: true,
       };
     });
-  }, [apiData.columns]);
+  }, [apiData.columns, labels.columns]);
 
   const handleSort = useCallback((column: string) => {
     setSorting((prev) => ({
@@ -226,13 +272,13 @@ export function DynamicApplicationsList() {
   if (isError) {
     return (
       <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center space-y-3" role="alert">
-        <p className="font-medium">Could not load applications</p>
+        <p className="font-medium">{labels.loadError}</p>
         <button
           type="button"
           onClick={() => refetch()}
           className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
         >
-          Retry
+          {labels.retry}
         </button>
       </div>
     );
@@ -242,7 +288,7 @@ export function DynamicApplicationsList() {
     <div className="w-full">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">
-          Applications ({filteredData.length})
+          {labels.applications} ({filteredData.length})
         </h2>
         <div className="flex space-x-2">
           <button
@@ -250,14 +296,14 @@ export function DynamicApplicationsList() {
             className="px-3 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
           >
             <Filter className="w-4 h-4" />
-            <span className="sr-only">Filter</span>
+            <span className="sr-only">{labels.filter}</span>
           </button>
           <button
             onClick={() => setShowColumnCustomizer(true)}
             className="px-3 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
           >
             <Settings className="w-4 h-4" />
-            <span className="sr-only">Customize Columns</span>
+            <span className="sr-only">{labels.customize}</span>
           </button>
         </div>
       </div>
@@ -285,7 +331,7 @@ export function DynamicApplicationsList() {
             onClick={() => setFilters({})}
             className="text-sm text-primary hover:underline"
           >
-            Clear all
+            {labels.clearAll}
           </button>
         </div>
       )}
@@ -379,10 +425,17 @@ export function DynamicApplicationsList() {
                           className="px-4 py-12 text-center"
                           role="status"
                         >
-                          <p className="text-base font-medium">No applications found</p>
+                          <p className="text-base font-medium">{labels.noApps}</p>
                           <p className="mt-1 text-sm text-muted-foreground">
-                            Submit an insurance form to see it listed here.
+                            {labels.noAppsHint}
                           </p>
+                          <Link
+                            href={`/${lang}#products`}
+                            className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                          >
+                            {labels.applyNew}
+                            <ArrowUpRight className="h-4 w-4" aria-hidden />
+                          </Link>
                         </td>
                       </tr>
                     )}
@@ -397,12 +450,12 @@ export function DynamicApplicationsList() {
           <div className="border-t border-border px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <span>
-                Showing {(currentPage - 1) * pageSize + 1} to{" "}
-                {Math.min(currentPage * pageSize, filteredData.length)} of{" "}
-                {filteredData.length} entries
+                {labels.showing} {(currentPage - 1) * pageSize + 1} {labels.to}{" "}
+                {Math.min(currentPage * pageSize, filteredData.length)} {labels.of}{" "}
+                {filteredData.length} {labels.entries}
               </span>
               <div className="flex items-center space-x-2">
-                <span>Show</span>
+                <span>{labels.show}</span>
                 <select
                   value={pageSize}
                   onChange={handlePageSizeChange}
@@ -414,7 +467,7 @@ export function DynamicApplicationsList() {
                     </option>
                   ))}
                 </select>
-                <span>per page</span>
+                <span>{labels.perPage}</span>
               </div>
             </div>
 
@@ -483,7 +536,7 @@ export function DynamicApplicationsList() {
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-card text-card-foreground p-6 rounded-lg shadow-lg max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">Customize Columns</h3>
+              <h3 className="text-lg font-medium">{labels.customize}</h3>
               <button
                 onClick={() => setShowColumnCustomizer(false)}
                 className="text-muted-foreground hover:text-foreground"
@@ -527,7 +580,7 @@ export function DynamicApplicationsList() {
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-card text-card-foreground p-6 rounded-lg shadow-lg max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">Filter</h3>
+              <h3 className="text-lg font-medium">{labels.filter}</h3>
               <button
                 onClick={() => setShowFilterModal(false)}
                 className="text-muted-foreground hover:text-foreground"

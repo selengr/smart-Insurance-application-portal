@@ -32,7 +32,11 @@ export function getLocalApplications(): LocalApplication[] {
   return readStorage()
 }
 
-export function insuranceTypeFromFormId(formId: string) {
+export function insuranceTypeFromFormId(
+  formId: string,
+  titles?: Record<string, string>,
+) {
+  if (titles?.[formId]) return titles[formId]
   return FORM_LABELS[formId] || formId.replace(/_application$/, "").replace(/_/g, " ")
 }
 

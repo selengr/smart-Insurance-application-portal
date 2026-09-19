@@ -4,7 +4,7 @@ import { i18n } from "../../i18n.config"
 const base = "https://smart-insurance-application-portal.liara.run"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const paths = ["", "/purchased-insurances", "/login", "/privacy", "/terms"]
+  const paths = ["", "/purchased-insurances", "/login", "/privacy", "/terms", "/about"]
 
   return i18n.locales.flatMap((lang) =>
     paths.map((path) => ({

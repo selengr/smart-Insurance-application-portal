@@ -60,7 +60,7 @@ export default async function ConfirmationPage({
             </p>
             <p className="mt-1 font-mono text-xl font-semibold tracking-wide">{reference}</p>
             <p className="mt-2 text-xs text-muted-foreground">
-              {insuranceTypeFromFormId(formId)}
+              {page.home.productTitles?.[formId] ?? insuranceTypeFromFormId(formId)}
             </p>
           </div>
 

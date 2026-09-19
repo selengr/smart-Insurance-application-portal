@@ -22,6 +22,7 @@ export default async function Page({
         lang={lang}
         copy={page.form}
         productBlurb={productBlurb}
+        formsCatalog={page.forms}
       />
     </main>
   )

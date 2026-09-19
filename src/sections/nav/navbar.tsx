@@ -27,6 +27,9 @@ const Navbar = async ({ lang }: { lang: Locale }) => {
           <Link href={`/${lang}/purchased-insurances`} className={styles.link}>
             {navigation.policies}
           </Link>
+          <Link href={`/${lang}/about`} className={styles.link}>
+            {navigation.about}
+          </Link>
         </div>
 
         <div className={styles.actions}>
