@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation'
 import { i18n } from '../../../i18n.config'
 
 const LOCALE_LABELS: Record<string, string> = {
-  en: 'English',
-  fa: 'فارسی',
+  en: 'EN',
+  fa: 'FA',
 }
 
 export default function LocaleSwitcher() {
@@ -22,27 +22,30 @@ export default function LocaleSwitcher() {
   }
 
   return (
-    <nav aria-label="Language">
-      <ul className="flex gap-x-3 pl-[20%]">
-        {i18n.locales.map((locale) => {
-          const isActive = locale === activeLocale
-          return (
-            <li key={locale}>
-              <Link
-                href={redirectedPathName(locale)}
-                hrefLang={locale}
-                lang={locale}
-                aria-current={isActive ? 'page' : undefined}
-                className={`rounded-md border py-1 px-2 md:px-3 md:py-2 dark:border-black ${
-                  isActive ? 'bg-muted font-semibold' : ''
-                }`}
-              >
-                {LOCALE_LABELS[locale] ?? locale}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
-    </nav>
+    <div
+      className="inline-flex items-center rounded-md border border-border bg-background/70 p-0.5"
+      role="navigation"
+      aria-label="Language"
+    >
+      {i18n.locales.map((locale) => {
+        const isActive = locale === activeLocale
+        return (
+          <Link
+            key={locale}
+            href={redirectedPathName(locale)}
+            hrefLang={locale}
+            lang={locale}
+            aria-current={isActive ? 'page' : undefined}
+            className={`rounded px-2.5 py-1 text-xs font-semibold tracking-wide transition ${
+              isActive
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {LOCALE_LABELS[locale] ?? locale}
+          </Link>
+        )
+      })}
+    </div>
   )
 }

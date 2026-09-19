@@ -54,6 +54,27 @@ export const mockInsuranceForms: InsuranceForm[] = [
       { id: "year", label: "Year", type: "number", required: true, validation: { min: 1980, max: 2030 } },
     ],
   },
+  {
+    formId: "life_insurance_application",
+    title: "Life Insurance Application",
+    fields: [
+      { id: "full_name", label: "Full name", type: "text", required: true },
+      {
+        id: "coverage_amount",
+        label: "Coverage amount",
+        type: "select",
+        required: true,
+        options: ["$50,000", "$100,000", "$250,000", "$500,000"],
+      },
+      {
+        id: "term",
+        label: "Term length",
+        type: "radio",
+        required: true,
+        options: ["10 years", "20 years", "30 years"],
+      },
+    ],
+  },
 ];
 
 export const mockPurchasedColumns = [

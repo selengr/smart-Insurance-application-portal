@@ -1,15 +1,26 @@
 {
   "navigation": {
     "home": "Home",
+    "products": "Products",
+    "policies": "My policies",
     "about": "About"
   },
   "page": {
     "home": {
-      "title": "Smart Insurance Application Portal",
-      "InsuranceTypes": "Insurance Types",
-      "InsuranceLink": "Start application",
-      "myInsurance": "My policies",
-      "description": "Schema-driven forms for Health, Home, Car, and Life — apply in minutes, draft as you go."
+      "title": "Coverage that feels considered",
+      "brand": "Smart Insurance Portal",
+      "InsuranceTypes": "Choose a product",
+      "InsuranceLink": "Apply now",
+      "myInsurance": "View my policies",
+      "description": "Health, Home, Car, and Life — guided forms, auto-saved drafts, bilingual from day one.",
+      "emptyProducts": "No insurance products available right now.",
+      "heroCaption": "Protection designed for real life",
+      "productMeta": {
+        "health_insurance_application": "Medical & wellness cover",
+        "home_insurance_application": "Property & belongings",
+        "car_insurance_application": "Vehicle protection",
+        "life_insurance_application": "Family & future planning"
+      }
     },
     "about": {
       "title": "About",
