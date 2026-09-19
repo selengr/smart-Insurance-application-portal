@@ -92,6 +92,7 @@ export const mockPurchasedRows = [
     Applicant: "Demo User",
     "Submitted At": "2026-01-12",
     Status: "Approved",
+    formId: "health_insurance_application",
   },
   {
     id: "app-2",
@@ -99,6 +100,7 @@ export const mockPurchasedRows = [
     Applicant: "Demo User",
     "Submitted At": "2026-02-03",
     Status: "In Review",
+    formId: "home_insurance_application",
   },
 ];
 

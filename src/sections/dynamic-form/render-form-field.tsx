@@ -2,8 +2,6 @@ import { InsuranceField } from "@/types/insurance";
 import { Control, FieldValues, UseFormWatch } from "react-hook-form";
 import { InputField, DateField, SelectField, RadioField, CheckboxField } from "../../components/fields";
 
-
-// ------------------------------------------------------------------------------------
 const isFieldVisible = (
   field: InsuranceField,
   parentPath: string,
@@ -26,14 +24,19 @@ const isFieldVisible = (
       return true;
   }
 };
-// ------------------------------------------------------------------------------------
+
+type Placeholders = {
+  selectPlaceholder?: string
+  selectDepends?: string
+}
 
 export const renderFormField = (
   field: InsuranceField,
   parentPath: string = "",
   control: Control<FieldValues>,
   watch: UseFormWatch<FieldValues>,
-  dynamicOptions: Record<string, string[]>
+  dynamicOptions: Record<string, string[]>,
+  placeholders?: Placeholders,
 ) => {
   const fieldPath = parentPath ? `${parentPath}.${field.id}` : field.id;
 
@@ -58,7 +61,15 @@ export const renderFormField = (
       return <InputField key={field.id} {...commonProps} type="number" />;
 
     case "select":
-      return <SelectField key={field.id} {...commonProps} watch={watch} dynamicOptions={dynamicOptions} />;
+      return (
+        <SelectField
+          key={field.id}
+          {...commonProps}
+          watch={watch}
+          dynamicOptions={dynamicOptions}
+          placeholders={placeholders}
+        />
+      );
 
     case "radio":
       return <RadioField key={field.id} {...commonProps} />;
@@ -85,7 +96,14 @@ export const renderFormField = (
                     : undefined
                 }
               >
-                {renderFormField(subField, fieldPath, control, watch, dynamicOptions)}
+                {renderFormField(
+                  subField,
+                  fieldPath,
+                  control,
+                  watch,
+                  dynamicOptions,
+                  placeholders,
+                )}
               </div>
             ))}
           </div>

@@ -22,6 +22,12 @@
         "home_insurance_application": "اموال و دارایی‌ها",
         "car_insurance_application": "محافظت از خودرو",
         "life_insurance_application": "آینده خانواده"
+      },
+      "productTitles": {
+        "health_insurance_application": "درمان",
+        "home_insurance_application": "منزل",
+        "car_insurance_application": "خودرو",
+        "life_insurance_application": "عمر"
       }
     },
     "about": {
@@ -56,7 +62,8 @@
       "notFoundBody": "این صفحه وجود ندارد یا لینک منقضی شده است.",
       "errorTitle": "مشکلی پیش آمد",
       "errorBody": "لطفا دوباره تلاش کنید. اگر مشکل ادامه داشت، بعدا بازگردید.",
-      "goHome": "رفتن به خانه"
+      "goHome": "رفتن به خانه",
+      "skipToContent": "پرش به محتوا"
     },
     "form": {
       "saveDraft": "ذخیره پیش‌نویس",
@@ -92,7 +99,10 @@
       "reviewSubtitle": "قبل از رزرو پوشش، همه چیز را یک‌بار چک کنید.",
       "reviewEmpty": "هنوز پاسخی نیست",
       "secureNote": "فقط دمو — پاسخ‌ها تا اتصال API واقعی در همین مرورگر می‌مانند.",
-      "requiredHint": "قبل از بازبینی، فیلدهای الزامی را کامل کنید."
+      "requiredHint": "قبل از بازبینی، فیلدهای الزامی را کامل کنید.",
+      "selectPlaceholder": "یک گزینه انتخاب کنید",
+      "selectDepends": "ابتدا {field} را انتخاب کنید",
+      "retry": "تلاش مجدد"
     },
     "footer": {
       "tagline": "درخواست بیمه مبتنی بر اسکیما برای تیم‌های مدرن.",
@@ -106,6 +116,132 @@
       "termsTitle": "شرایط استفاده",
       "termsBody": "این پروژه یک نمونه کار نمایشی است. ورود دمو احراز هویت واقعی نیست. اطلاعات حساس شخصی یا مالی ارسال نکنید. امکانات و داده‌های نمونه ممکن است بدون اطلاع تغییر کنند.",
       "backHome": "بازگشت به خانه"
+    },
+    "forms": {
+      "health_insurance_application": {
+        "title": "درخواست بیمه درمان",
+        "fields": {
+          "personal_info": {
+            "label": "اطلاعات شخصی",
+            "fields": {
+              "first_name": {
+                "label": "نام"
+              },
+              "last_name": {
+                "label": "نام خانوادگی"
+              },
+              "age": {
+                "label": "سن"
+              }
+            }
+          },
+          "coverage": {
+            "label": "نوع پوشش",
+            "options": {
+              "Basic": "پایه",
+              "Standard": "استاندارد",
+              "Premium": "ویژه"
+            }
+          }
+        }
+      },
+      "home_insurance_application": {
+        "title": "درخواست بیمه منزل",
+        "fields": {
+          "address": {
+            "label": "آدرس",
+            "fields": {
+              "country": {
+                "label": "کشور",
+                "options": {
+                  "France": "فرانسه",
+                  "Iran": "ایران",
+                  "Germany": "آلمان"
+                }
+              },
+              "city": {
+                "label": "شهر"
+              }
+            }
+          }
+        }
+      },
+      "car_insurance_application": {
+        "title": "درخواست بیمه خودرو",
+        "fields": {
+          "make": {
+            "label": "برند"
+          },
+          "model": {
+            "label": "مدل"
+          },
+          "year": {
+            "label": "سال ساخت"
+          }
+        }
+      },
+      "life_insurance_application": {
+        "title": "درخواست بیمه عمر",
+        "fields": {
+          "full_name": {
+            "label": "نام کامل"
+          },
+          "coverage_amount": {
+            "label": "مبلغ پوشش",
+            "options": {
+              "$50,000": "۵۰٬۰۰۰ دلار",
+              "$100,000": "۱۰۰٬۰۰۰ دلار",
+              "$250,000": "۲۵۰٬۰۰۰ دلار",
+              "$500,000": "۵۰۰٬۰۰۰ دلار"
+            }
+          },
+          "term": {
+            "label": "مدت بیمه‌نامه",
+            "options": {
+              "10 years": "۱۰ سال",
+              "20 years": "۲۰ سال",
+              "30 years": "۳۰ سال"
+            }
+          }
+        }
+      }
+    },
+    "policiesList": {
+      "applications": "درخواست‌ها",
+      "columns": {
+        "id": "شناسه",
+        "Insurance Type": "نوع بیمه",
+        "Applicant": "متقاضی",
+        "Submitted At": "تاریخ ارسال",
+        "Status": "وضعیت"
+      },
+      "status": {
+        "Pending": "در انتظار",
+        "Approved": "تأیید شده",
+        "Rejected": "رد شده",
+        "In Review": "در حال بررسی"
+      },
+      "filter": "فیلتر",
+      "customize": "ستون‌ها",
+      "clearAll": "پاک کردن همه",
+      "noApps": "درخواستی یافت نشد",
+      "noAppsHint": "یک فرم بیمه ارسال کنید تا اینجا نمایش داده شود.",
+      "loadError": "بارگذاری درخواست‌ها ممکن نشد",
+      "retry": "تلاش مجدد",
+      "showing": "نمایش",
+      "to": "تا",
+      "of": "از",
+      "entries": "مورد",
+      "show": "نمایش",
+      "perPage": "در هر صفحه",
+      "applyNew": "شروع درخواست جدید",
+      "demoApplicant": "کاربر نمونه"
+    },
+    "aboutPage": {
+      "title": "درباره این پورتال",
+      "lead": "دموی دو زبانه درخواست بیمه مبتنی بر اسکیما، برای جریان واقعی محصول.",
+      "body": "برای درمان، منزل، خودرو یا عمر درخواست دهید؛ پیش‌نویس خودکار، مرحله بازبینی قبل از ارسال، و فهرست بیمه‌ها که درخواست‌های رزرو‌شده را در مرورگر نگه می‌دارد.",
+      "cta": "مشاهده محصولات"
     }
   }
 }

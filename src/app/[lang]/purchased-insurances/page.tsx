@@ -36,7 +36,11 @@ export default async function PurchasedInsurancesPage({
           <ArrowUpRight className="h-4 w-4" aria-hidden />
         </Link>
       </header>
-      <DynamicApplicationsList />
+      <DynamicApplicationsList
+        lang={lang}
+        labels={page.policiesList}
+        productTitles={page.home.productTitles}
+      />
     </div>
   )
 }

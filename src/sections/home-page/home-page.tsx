@@ -21,6 +21,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
     emptyProducts: string
     heroCaption: string
     productMeta: Record<string, string>
+    productTitles?: Record<string, string>
   }
   const items = insuranceTypes?.data ?? []
 
@@ -120,7 +121,8 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
                     <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
                       <div>
                         <h3 className="font-[family-name:var(--font-display)] text-lg font-bold leading-snug">
-                          {productTitle(insurance.title)}
+                          {home.productTitles?.[insurance.formId] ??
+                            productTitle(insurance.title)}
                         </h3>
                         {blurb ? (
                           <p className="mt-1.5 text-sm text-muted-foreground">{blurb}</p>

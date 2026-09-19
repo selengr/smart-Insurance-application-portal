@@ -29,6 +29,9 @@ export const dynamicOptionsApi = async (field: InsuranceField, dependentValue: s
       France: ["Paris", "Lyon", "Marseille"],
       Iran: ["Tehran", "Isfahan", "Shiraz"],
       Germany: ["Berlin", "Munich", "Hamburg"],
+      فرانسه: ["Paris", "Lyon", "Marseille"],
+      ایران: ["Tehran", "Isfahan", "Shiraz"],
+      آلمان: ["Berlin", "Munich", "Hamburg"],
     };
     return citiesByCountry[dependentValue] || [];
   }
