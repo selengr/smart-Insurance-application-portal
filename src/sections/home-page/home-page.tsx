@@ -11,76 +11,94 @@ interface HomeProps {
 }
 
 const PRODUCT_VISUAL: Record<string, { src: string; alt: string }> = {
-  health_insurance_application: { src: "/icons/health.png", alt: "Health coverage" },
-  home_insurance_application: { src: "/icons/home.png", alt: "Home coverage" },
-  car_insurance_application: { src: "/icons/car.png", alt: "Car coverage" },
+  health_insurance_application: {
+    src: "/images/product-health.jpg",
+    alt: "Health insurance",
+  },
+  home_insurance_application: {
+    src: "/images/product-home.jpg",
+    alt: "Home insurance",
+  },
+  car_insurance_application: {
+    src: "/images/product-car.jpg",
+    alt: "Car insurance",
+  },
+  life_insurance_application: {
+    src: "/images/product-life.jpg",
+    alt: "Life insurance",
+  },
 }
+
+type HomeDict = Awaited<ReturnType<typeof getDictionary>>["page"]["home"]
 
 const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
   const insuranceTypes = await fetchInsuranceTypes()
   const { page } = await getDictionary(lang)
+  const home = page.home as HomeDict & {
+    brand: string
+    emptyProducts: string
+    heroCaption: string
+    productMeta: Record<string, string>
+  }
   const items = insuranceTypes?.data ?? []
-  const isFa = lang === "fa"
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
-      {/* Hero — one composition: brand, line, support, CTA */}
-      <section className="relative mb-14 grid gap-8 lg:mb-20 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:gap-12">
-        <div className={isFa ? "text-right" : "text-left"}>
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-            Smart Insurance Portal
+    <div className="mx-auto w-full max-w-6xl px-4 pb-20 pt-10 sm:px-6 sm:pb-28 sm:pt-14">
+      <section className="relative mb-16 grid items-center gap-10 lg:mb-24 lg:grid-cols-2 lg:gap-14">
+        <div>
+          <p className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-primary">
+            {home.brand}
           </p>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-[4.25rem]">
-            {page.home.title}
+          <h1 className="font-[family-name:var(--font-display)] text-[2.35rem] font-extrabold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            {home.title}
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            {page.home.description}
+          <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+            {home.description}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
               href="#products"
               className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              {page.home.InsuranceTypes}
+              {home.InsuranceTypes}
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </a>
             <Link
               href={`/${lang}/purchased-insurances`}
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-background/60 px-5 py-3 text-sm font-semibold backdrop-blur-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-background/70 px-5 py-3 text-sm font-semibold backdrop-blur-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <FolderOpen className="h-4 w-4" aria-hidden />
-              {page.home.myInsurance}
+              {home.myInsurance}
             </Link>
           </div>
         </div>
 
-        <div className="relative hidden min-h-[280px] overflow-hidden rounded-sm border border-border/70 lg:block">
+        <div className="relative aspect-[16/10] overflow-hidden border border-border/70 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.35)] sm:aspect-[5/4] lg:aspect-[4/3]">
           <Image
-            src="/icons/home2.jpg"
-            alt=""
+            src="/images/hero-living.jpg"
+            alt={home.heroCaption}
             fill
             className="object-cover"
-            sizes="(min-width: 1024px) 40vw, 100vw"
+            sizes="(min-width: 1024px) 42vw, 100vw"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-          <p className="absolute bottom-4 start-4 end-4 text-sm font-medium text-foreground/90">
-            {page.home.InsuranceLink}
+          <div className="absolute inset-0 bg-gradient-to-t from-background/75 via-background/10 to-transparent" />
+          <p className="absolute bottom-4 start-4 end-4 text-sm font-medium text-foreground">
+            {home.heroCaption}
           </p>
         </div>
       </section>
 
-      {/* Products — interaction containers only */}
-      <section id="products" aria-labelledby="products-heading" className="scroll-mt-24">
-        <div className="mb-6 flex items-end justify-between gap-4 border-b border-border pb-3">
+      <section id="products" aria-labelledby="products-heading" className="scroll-mt-28">
+        <div className="mb-7 flex items-end justify-between gap-4 border-b border-border pb-3">
           <h2
             id="products-heading"
             className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight sm:text-3xl"
           >
-            {page.home.InsuranceTypes}
+            {home.InsuranceTypes}
           </h2>
-          <span className="text-xs uppercase tracking-widest text-muted-foreground">
-            {items.length || "—"}
+          <span className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            {String(items.length).padStart(2, "0")}
           </span>
         </div>
 
@@ -89,42 +107,45 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
             className="border border-dashed border-border p-10 text-center text-muted-foreground"
             role="status"
           >
-            No insurance products available right now.
+            {home.emptyProducts}
           </div>
         ) : (
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-            {items.map((insurance, index) => {
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            {items.map((insurance) => {
               const visual =
                 PRODUCT_VISUAL[insurance.formId] ?? {
-                  src: "/icons/check.svg",
+                  src: "/images/product-home.jpg",
                   alt: insurance.title,
                 }
+              const blurb = home.productMeta?.[insurance.formId]
 
               return (
-                <li
-                  key={insurance.formId}
-                  className={index === 0 ? "sm:col-span-2 lg:col-span-1" : undefined}
-                >
+                <li key={insurance.formId}>
                   <Link
                     href={`/${lang}/insurance/${insurance.formId}`}
-                    className="group relative flex h-full min-h-[220px] flex-col overflow-hidden border border-border bg-card/70 transition duration-300 hover:-translate-y-1 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    aria-label={`${page.home.InsuranceLink}: ${insurance.title}`}
+                    className="group flex h-full flex-col overflow-hidden border border-border bg-card/80 transition duration-300 hover:-translate-y-1 hover:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={`${home.InsuranceLink}: ${insurance.title}`}
                   >
-                    <div className="relative h-36 w-full overflow-hidden bg-muted">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
                       <Image
                         src={visual.src}
                         alt={visual.alt}
                         fill
-                        className="object-cover transition duration-500 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover transition duration-500 group-hover:scale-[1.04]"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       />
                     </div>
-                    <div className="flex flex-1 flex-col justify-between gap-4 p-5">
-                      <h3 className="font-[family-name:var(--font-display)] text-xl font-bold leading-snug">
-                        {insurance.title}
-                      </h3>
-                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
-                        {page.home.InsuranceLink}
+                    <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
+                      <div>
+                        <h3 className="font-[family-name:var(--font-display)] text-lg font-bold leading-snug">
+                          {insurance.title.replace(" Application", "")}
+                        </h3>
+                        {blurb ? (
+                          <p className="mt-1.5 text-sm text-muted-foreground">{blurb}</p>
+                        ) : null}
+                      </div>
+                      <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                        {home.InsuranceLink}
                         <ArrowUpRight
                           className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                           aria-hidden

@@ -1,15 +1,26 @@
 {
   "navigation": {
     "home": "خانه",
+    "products": "محصولات",
+    "policies": "بیمه‌های من",
     "about": "درباره ما"
   },
   "page": {
     "home": {
-      "title": "پورتال کاربردی بیمه هوشمند",
-      "InsuranceTypes": "انواع بیمه",
+      "title": "پوششی که با دقت طراحی شده",
+      "brand": "پورتال هوشمند بیمه",
+      "InsuranceTypes": "انتخاب محصول",
       "InsuranceLink": "شروع درخواست",
-      "myInsurance": "بیمه‌های من",
-      "description": "فرم‌های پویا برای بیمه سلامت، خانه، خودرو و زندگی — در چند دقیقه درخواست دهید و پیش‌نویس را ذخیره کنید."
+      "myInsurance": "مشاهده بیمه‌های من",
+      "description": "سلامت، خانه، خودرو و زندگی — فرم‌های راهنما، ذخیره خودکار پیش‌نویس، دو زبانه از ابتدا.",
+      "emptyProducts": "در حال حاضر محصولی در دسترس نیست.",
+      "heroCaption": "حفاظتی برای زندگی واقعی",
+      "productMeta": {
+        "health_insurance_application": "پوشش درمان و سلامت",
+        "home_insurance_application": "اموال و دارایی‌ها",
+        "car_insurance_application": "محافظت از خودرو",
+        "life_insurance_application": "آینده خانواده"
+      }
     },
     "about": {
       "title": "درباره ما",
