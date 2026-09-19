@@ -8,8 +8,9 @@ const BASE: Record<string, number> = {
 }
 
 function flatten(values: FormValues, out: string[] = []): string[] {
-  Object.values(values).forEach((value) => {
-    if (value === undefined || value === null || value === "" || value === "_lastSaved") return
+  Object.entries(values).forEach(([key, value]) => {
+    if (key === "_lastSaved") return
+    if (value === undefined || value === null || value === "") return
     if (value instanceof Date) return
     if (typeof value === "object" && !Array.isArray(value)) {
       flatten(value as FormValues, out)
