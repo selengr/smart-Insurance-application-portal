@@ -82,9 +82,15 @@ export default function RootLayout(props: {
         className={`${fontClass} antialiased min-h-screen transition-colors duration-300`}
       >
         <ThemeProvider defaultTheme="system" storageKey="theme">
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
+          >
+            Skip to content
+          </a>
           <div className="flex min-h-screen flex-col">
             <Navbar lang={lang} />
-            <div className="flex-1 pt-16">
+            <div id="main-content" className="flex-1 pt-16" tabIndex={-1}>
               <QueryProvider>{props.children}</QueryProvider>
             </div>
             <SiteFooter lang={lang} />

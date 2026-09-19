@@ -29,8 +29,12 @@ export default async function SiteFooter({ lang }: { lang: Locale }) {
           >
             {navigation.policies}
           </Link>
-          <span className="text-muted-foreground/70">{page.footer.privacy}</span>
-          <span className="text-muted-foreground/70">{page.footer.terms}</span>
+          <Link href={`/${lang}/privacy`} className="text-muted-foreground hover:text-foreground">
+            {page.footer.privacy}
+          </Link>
+          <Link href={`/${lang}/terms`} className="text-muted-foreground hover:text-foreground">
+            {page.footer.terms}
+          </Link>
         </div>
       </div>
       <div className="border-t border-border/70">

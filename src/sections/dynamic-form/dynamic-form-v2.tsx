@@ -158,7 +158,7 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang }) => {
 
   const onSubmit = (values: FormValues) => {
     submitForm(
-      { data: values },
+      { data: { ...values, formId } },
       {
         onSuccess: (result) => {
           const applicationId =
