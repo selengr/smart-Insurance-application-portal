@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { format } from "date-fns"
+import { faIR } from "date-fns/locale"
 import { CalendarIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { InsuranceField } from "@/types/insurance"
@@ -15,10 +16,19 @@ interface IDateFieldProps {
   fieldPath: string
   control: Control<FieldValues>
   field: InsuranceField
+  pickDate?: string
+  dateLocale?: string
 }
 
-export const DateField: React.FC<IDateFieldProps> = ({ fieldPath, control, field }) => {
+export const DateField: React.FC<IDateFieldProps> = ({
+  fieldPath,
+  control,
+  field,
+  pickDate,
+  dateLocale,
+}) => {
   const [open, setOpen] = useState(false)
+  const isFa = dateLocale === "fa"
 
   return (
     <UIFormField
@@ -34,18 +44,20 @@ export const DateField: React.FC<IDateFieldProps> = ({ fieldPath, control, field
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full pl-3 text-left font-normal",
+                    "h-11 w-full rounded-none pl-3 text-left font-normal",
                     !formField.value && "text-muted-foreground"
                   )}
                   aria-haspopup="dialog"
                   aria-expanded={open}
                 >
                   {formField.value ? (
-                    format(formField.value, "PPP")
+                    format(formField.value, "PPP", {
+                      locale: isFa ? faIR : undefined,
+                    })
                   ) : (
-                    <span>Pick a date</span>
+                    <span>{pickDate ?? "Pick a date"}</span>
                   )}
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  <CalendarIcon className="ms-auto h-4 w-4 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>

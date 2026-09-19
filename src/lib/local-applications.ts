@@ -48,7 +48,7 @@ export function applicantFromValues(data: Record<string, unknown>): string {
   if (typeof data.full_name === "string" && data.full_name.trim()) {
     return data.full_name.trim()
   }
-  return "Applicant"
+  return "Demo User"
 }
 
 export function saveLocalApplication(app: LocalApplication) {

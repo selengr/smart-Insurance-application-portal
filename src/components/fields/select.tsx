@@ -12,6 +12,8 @@ interface ISelectFieldProps {
   placeholders?: {
     selectPlaceholder?: string
     selectDepends?: string
+    loadingOptions?: string
+    noOptions?: string
   }
 }
 
@@ -57,9 +59,13 @@ export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, f
             </FormControl>
             <SelectContent>
               {options.length === 0 && dependsOn && dependentValue ? (
-                <div className="p-2 text-center text-muted-foreground">Loading...</div>
+                <div className="p-2 text-center text-muted-foreground">
+                  {placeholders?.loadingOptions ?? "Loading…"}
+                </div>
               ) : options.length === 0 ? (
-                <div className="p-2 text-center text-muted-foreground">No options available</div>
+                <div className="p-2 text-center text-muted-foreground">
+                  {placeholders?.noOptions ?? "No options available"}
+                </div>
               ) : (
                 options.map((option: string) => (
                   <SelectItem key={option} value={option}>

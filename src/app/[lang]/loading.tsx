@@ -1,4 +1,14 @@
+"use client"
+
+import { useParams } from "next/navigation"
+import en from "@/dictionaries/en.json"
+import fa from "@/dictionaries/fa.json"
+
 export default function Loading() {
+  const params = useParams()
+  const lang = typeof params?.lang === "string" ? params.lang : "en"
+  const loading = (lang === "fa" ? fa : en).page.common.loading
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6" role="status" aria-live="polite">
       <div className="animate-pulse space-y-4">
@@ -10,7 +20,7 @@ export default function Loading() {
           <div className="h-48 rounded bg-muted" />
         </div>
       </div>
-      <span className="sr-only">Loading…</span>
+      <span className="sr-only">{loading}</span>
     </div>
   )
 }

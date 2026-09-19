@@ -25,9 +25,13 @@ const isFieldVisible = (
   }
 };
 
-type Placeholders = {
+export type FieldPlaceholders = {
   selectPlaceholder?: string
   selectDepends?: string
+  loadingOptions?: string
+  noOptions?: string
+  pickDate?: string
+  dateLocale?: string
 }
 
 export const renderFormField = (
@@ -36,7 +40,7 @@ export const renderFormField = (
   control: Control<FieldValues>,
   watch: UseFormWatch<FieldValues>,
   dynamicOptions: Record<string, string[]>,
-  placeholders?: Placeholders,
+  placeholders?: FieldPlaceholders,
 ) => {
   const fieldPath = parentPath ? `${parentPath}.${field.id}` : field.id;
 
@@ -55,7 +59,14 @@ export const renderFormField = (
       return <InputField key={field.id} {...commonProps} />;
 
     case "date":
-      return <DateField key={field.id} {...commonProps} />;
+      return (
+        <DateField
+          key={field.id}
+          {...commonProps}
+          pickDate={placeholders?.pickDate}
+          dateLocale={placeholders?.dateLocale}
+        />
+      );
 
     case "number":
       return <InputField key={field.id} {...commonProps} type="number" />;

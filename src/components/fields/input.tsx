@@ -27,8 +27,11 @@ export const InputField: React.FC<IInputFieldProps> = ({ fieldPath, control, fie
                         <Input
                         type="number"
                         {...formField}
-                        value={formField.value || ""}
-                        onChange={(e) => formField.onChange(Number(e.target.value))}
+                        value={formField.value ?? ""}
+                        onChange={(e) => {
+                          const raw = e.target.value
+                          formField.onChange(raw === "" ? undefined : Number(raw))
+                        }}
                         />
                  ) : (
                      <Input {...formField} value={formField.value || ""} />

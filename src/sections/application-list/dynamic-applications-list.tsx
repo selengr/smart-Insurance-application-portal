@@ -43,6 +43,20 @@ export function DynamicApplicationsList({
     perPage: string
     applyNew: string
     demoApplicant: string
+    done: string
+    close: string
+    column: string
+    selectColumn: string
+    value: string
+    filterValue: string
+    cancel: string
+    applyFilter: string
+    removeFilter: string
+    firstPage: string
+    prevPage: string
+    nextPage: string
+    lastPage: string
+    loadingApps: string
   }
   productTitles?: Record<string, string>
   lang: string
@@ -267,8 +281,6 @@ export function DynamicApplicationsList({
   }, [columns, visibleColumns]);
 
 
-  // if(!!!apiData.data) return <div> No applications found</div>
-
   if (isError) {
     return (
       <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center space-y-3" role="alert">
@@ -316,14 +328,14 @@ export function DynamicApplicationsList({
               className="flex items-center bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm"
             >
               <span>
-                {column}: {value}
+                {labels.columns[column] ?? column}: {value}
               </span>
               <button
                 onClick={() => handleRemoveFilter(column)}
                 className="ml-2 text-secondary-foreground/70 hover:text-secondary-foreground"
               >
                 <X className="w-3 h-3" />
-                <span className="sr-only">Remove filter</span>
+                <span className="sr-only">{labels.removeFilter}</span>
               </button>
             </div>
           ))}
@@ -415,7 +427,7 @@ export function DynamicApplicationsList({
                           <div className="mx-auto mb-3 h-2 w-40 animate-pulse rounded bg-muted" />
                           <div className="mx-auto mb-2 h-2 w-56 animate-pulse rounded bg-muted" />
                           <div className="mx-auto h-2 w-48 animate-pulse rounded bg-muted" />
-                          <span className="sr-only">Loading applications…</span>
+                          <span className="sr-only">{labels.loadingApps}</span>
                         </td>
                       </tr>
                     ) : (
@@ -477,18 +489,18 @@ export function DynamicApplicationsList({
                   onClick={() => handlePageChange(1)}
                   disabled={currentPage === 1}
                   className="p-2 rounded-md hover:bg-muted disabled:opacity-50 disabled:pointer-events-none"
-                  aria-label="First page"
+                  aria-label={labels.firstPage}
                 >
-                  <span className="sr-only">First page</span>
+                  <span className="sr-only">{labels.firstPage}</span>
                   <ChevronLeft className="w-4 h-4 -ml-2" />
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                   className="p-2 rounded-md hover:bg-muted disabled:opacity-50 disabled:pointer-events-none"
-                  aria-label="Previous page"
+                  aria-label={labels.prevPage}
                 >
-                  <span className="sr-only">Previous page</span>
+                  <span className="sr-only">{labels.prevPage}</span>
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
@@ -512,18 +524,18 @@ export function DynamicApplicationsList({
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className="p-2 rounded-md hover:bg-muted disabled:opacity-50 disabled:pointer-events-none"
-                  aria-label="Next page"
+                  aria-label={labels.nextPage}
                 >
-                  <span className="sr-only">Next page</span>
+                  <span className="sr-only">{labels.nextPage}</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handlePageChange(totalPages)}
                   disabled={currentPage === totalPages}
                   className="p-2 rounded-md hover:bg-muted disabled:opacity-50 disabled:pointer-events-none"
-                  aria-label="Last page"
+                  aria-label={labels.lastPage}
                 >
-                  <span className="sr-only">Last page</span>
+                  <span className="sr-only">{labels.lastPage}</span>
                   <ChevronRight className="w-4 h-4 -ml-2" />
                 </button>
               </nav>
@@ -542,7 +554,7 @@ export function DynamicApplicationsList({
                 className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" />
-                <span className="sr-only">Close</span>
+                <span className="sr-only">{labels.close}</span>
               </button>
             </div>
             <div className="space-y-2">
@@ -569,7 +581,7 @@ export function DynamicApplicationsList({
                 onClick={() => setShowColumnCustomizer(false)}
                 className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               >
-                Done
+                {labels.done}
               </button>
             </div>
           </div>
@@ -586,7 +598,7 @@ export function DynamicApplicationsList({
                 className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" />
-                <span className="sr-only">Close</span>
+                <span className="sr-only">{labels.close}</span>
               </button>
             </div>
             <div className="space-y-4">
@@ -603,7 +615,7 @@ export function DynamicApplicationsList({
                   onChange={(e) => setActiveFilterColumn(e.target.value)}
                   className="w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="">Select column</option>
+                  <option value="">{labels.selectColumn}</option>
                   {columns
                     .filter((col) => col.filterable)
                     .map((column) => (
@@ -625,7 +637,7 @@ export function DynamicApplicationsList({
                   type="text"
                   value={filterValue}
                   onChange={(e) => setFilterValue(e.target.value)}
-                  placeholder="Filter value..."
+                  placeholder={labels.filterValue}
                   className="w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
@@ -635,7 +647,7 @@ export function DynamicApplicationsList({
                 onClick={() => setShowFilterModal(false)}
                 className="px-4 py-2 border border-input bg-background hover:bg-muted transition-colors rounded-md"
               >
-                Cancel
+                {labels.cancel}
               </button>
               <button
                 onClick={() => {
@@ -646,7 +658,7 @@ export function DynamicApplicationsList({
                 disabled={!activeFilterColumn || !filterValue}
                 className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Apply Filter
+                {labels.applyFilter}
               </button>
             </div>
           </div>
