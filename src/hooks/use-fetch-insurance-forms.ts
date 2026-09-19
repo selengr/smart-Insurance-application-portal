@@ -1,16 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
-import { generateZodSchema } from './use-create-field-schema';
-import { insuranceFormsApi } from '@/services/api/insurance-forms';
+import { useQuery } from "@tanstack/react-query"
+import { generateZodSchema, type ValidationMessages } from "./use-create-field-schema"
+import { insuranceFormsApi } from "@/services/api/insurance-forms"
 
-export const useFetchInsuranceForms = (formId: string) => {
+export const useFetchInsuranceForms = (
+  formId: string,
+  messages?: ValidationMessages,
+) => {
   const queryResult = useQuery({
     queryKey: ["form", formId],
     queryFn: () => insuranceFormsApi(formId),
     staleTime: 1000 * 60 * 5,
     enabled: !!formId,
-  });
+  })
 
-  const schema = queryResult.data ? generateZodSchema(queryResult.data.fields) : null;
+  const schema = queryResult.data
+    ? generateZodSchema(queryResult.data.fields, messages)
+    : null
 
   return {
     ...queryResult,
@@ -18,5 +23,5 @@ export const useFetchInsuranceForms = (formId: string) => {
       form: queryResult.data || null,
       schema,
     },
-  };
-};
+  }
+}

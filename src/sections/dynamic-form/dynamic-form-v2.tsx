@@ -4,6 +4,7 @@ import Link from "next/link"
 import type React from "react"
 import { toast } from "sonner"
 import { format } from "date-fns"
+import { faIR } from "date-fns/locale"
 import { ArrowRight, Save, ShieldCheck } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
@@ -63,6 +64,19 @@ type FormCopy = {
   selectPlaceholder: string
   selectDepends: string
   retry: string
+  optionsLoadError: string
+  optionsLoadErrorBody: string
+  loadingForm: string
+  pickDate: string
+  yes: string
+  no: string
+  noOptions: string
+  loadingOptions: string
+  validationRequired: string
+  validationNumber: string
+  validationMin: string
+  validationMax: string
+  leaveConfirm: string
 }
 
 interface IDynamicFormProps {
@@ -108,7 +122,25 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
   const [isSaving, setIsSaving] = useState(false)
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const { data, isFetching: isLoading, isError, error, refetch } = useFetchInsuranceForms(formId)
+  const validationMessages = useMemo(
+    () => ({
+      required: copy.validationRequired,
+      invalidNumber: copy.validationNumber,
+      tooSmall: copy.validationMin,
+      tooBig: copy.validationMax,
+    }),
+    [
+      copy.validationRequired,
+      copy.validationNumber,
+      copy.validationMin,
+      copy.validationMax,
+    ],
+  )
+
+  const { data, isFetching: isLoading, isError, error, refetch } = useFetchInsuranceForms(
+    formId,
+    validationMessages,
+  )
   const rawForm = data?.form || null
   const formData = useMemo(
     () => (rawForm ? localizeInsuranceForm(rawForm, formsCatalog) : null),
@@ -122,6 +154,17 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
     resolver: formSchema ? zodResolver(formSchema) : undefined,
     mode: "onBlur",
   })
+
+  useEffect(() => {
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (form.formState.isDirty && flowStep === "details") {
+        event.preventDefault()
+        event.returnValue = copy.leaveConfirm
+      }
+    }
+    window.addEventListener("beforeunload", onBeforeUnload)
+    return () => window.removeEventListener("beforeunload", onBeforeUnload)
+  }, [form.formState.isDirty, flowStep, copy.leaveConfirm])
 
   useEffect(() => {
     if (!formData || !formSchema) return
@@ -193,8 +236,8 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
       }))
     } catch (err) {
       console.error(`Error fetching options for ${field.id}:`, err)
-      toast.error("Could not load options", {
-        description: `Failed to fetch choices for ${field.label}.`,
+      toast.error(copy.optionsLoadError, {
+        description: copy.optionsLoadErrorBody.replace("{field}", field.label),
       })
     }
   }
@@ -279,7 +322,7 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
         <div className="h-8 w-1/2 rounded bg-muted" />
         <div className="h-12 w-full rounded bg-muted" />
         <div className="h-12 w-full rounded bg-muted" />
-        <span className="sr-only">Loading form…</span>
+        <span className="sr-only">{copy.loadingForm}</span>
       </div>
     )
   }
@@ -318,7 +361,11 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
     0,
   )
   const progressPct = totalFields ? Math.min(100, (filledCount / totalFields) * 100) : 0
-  const reviewRows = buildReviewRows(formData.fields, watched)
+  const reviewRows = buildReviewRows(formData.fields, watched, {
+    yes: copy.yes,
+    no: copy.no,
+    locale: lang === "fa" ? "fa-IR" : "en-US",
+  })
 
   return (
     <div>
@@ -366,7 +413,10 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
                 <div className="flex flex-wrap items-center gap-3">
                   {lastSaved ? (
                     <span className="text-xs text-muted-foreground">
-                      {copy.lastSaved}: {format(lastSaved, "h:mm a")}
+                      {copy.lastSaved}:{" "}
+                      {format(lastSaved, lang === "fa" ? "HH:mm" : "h:mm a", {
+                        locale: lang === "fa" ? faIR : undefined,
+                      })}
                     </span>
                   ) : null}
                   <Button
@@ -389,6 +439,10 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
                   renderFormField(field, "", form.control, form.watch, dynamicOptions, {
                     selectPlaceholder: copy.selectPlaceholder,
                     selectDepends: copy.selectDepends,
+                    loadingOptions: copy.loadingOptions,
+                    noOptions: copy.noOptions,
+                    pickDate: copy.pickDate,
+                    dateLocale: lang,
                   }),
                 )}
               </div>

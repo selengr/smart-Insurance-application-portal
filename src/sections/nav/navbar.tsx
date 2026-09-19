@@ -14,7 +14,7 @@ const Navbar = async ({ lang }: { lang: Locale }) => {
   const signedIn = jar.get(DEMO_SESSION_COOKIE)?.value === "1"
 
   return (
-    <nav className={styles["landing-top"]} aria-label="Main">
+    <nav className={styles["landing-top"]} aria-label={page.common.mainNav}>
       <div className={styles.inner}>
         <Link href={`/${lang}`} className={styles.brand}>
           {page.home.brand}
@@ -33,7 +33,7 @@ const Navbar = async ({ lang }: { lang: Locale }) => {
         </div>
 
         <div className={styles.actions}>
-          <LocaleSwitcher />
+          <LocaleSwitcher label={page.common.language} />
           {signedIn ? (
             <form action={signOutDemo.bind(null, lang)}>
               <button type="submit" className={styles.link}>

@@ -6,10 +6,20 @@ export type ReviewRow = {
   path: string
 }
 
-function formatValue(value: unknown): string | null {
+type ReviewOptions = {
+  yes?: string
+  no?: string
+  locale?: string
+}
+
+function formatValue(value: unknown, options?: ReviewOptions): string | null {
   if (value === undefined || value === null || value === "") return null
-  if (value instanceof Date) return value.toLocaleDateString()
-  if (typeof value === "boolean") return value ? "Yes" : "No"
+  if (value instanceof Date) {
+    return value.toLocaleDateString(options?.locale ?? undefined)
+  }
+  if (typeof value === "boolean") {
+    return value ? (options?.yes ?? "Yes") : (options?.no ?? "No")
+  }
   if (Array.isArray(value)) return value.filter(Boolean).join(", ") || null
   if (typeof value === "object") return null
   return String(value)
@@ -18,6 +28,7 @@ function formatValue(value: unknown): string | null {
 export function buildReviewRows(
   fields: InsuranceField[],
   values: FormValues,
+  options?: ReviewOptions,
   parentPath = "",
 ): ReviewRow[] {
   const rows: ReviewRow[] = []
@@ -28,7 +39,9 @@ export function buildReviewRows(
     if (field.type === "group" && field.fields) {
       const nested = values[field.id]
       if (nested && typeof nested === "object" && !Array.isArray(nested)) {
-        rows.push(...buildReviewRows(field.fields, nested as FormValues, path))
+        rows.push(
+          ...buildReviewRows(field.fields, nested as FormValues, options, path),
+        )
       }
       continue
     }
@@ -36,7 +49,7 @@ export function buildReviewRows(
     const raw = parentPath
       ? (values as Record<string, unknown>)[field.id]
       : getByPath(values, path)
-    const formatted = formatValue(raw)
+    const formatted = formatValue(raw, options)
     if (formatted) {
       rows.push({ label: field.label, value: formatted, path })
     }

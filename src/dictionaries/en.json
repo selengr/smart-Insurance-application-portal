@@ -42,7 +42,8 @@
       "title": "Sign in to continue",
       "subtitle": "Demo access for viewing your policies. No password required.",
       "cta": "Continue as demo user",
-      "hint": "This sets a local session cookie for the portal demo."
+      "hint": "This sets a local session cookie for the portal demo.",
+      "backHome": "Back to home"
     },
     "confirmation": {
       "title": "You're covered — almost",
@@ -63,7 +64,10 @@
       "errorTitle": "Something went wrong",
       "errorBody": "Please try again. If the problem continues, come back later.",
       "goHome": "Go home",
-      "skipToContent": "Skip to content"
+      "skipToContent": "Skip to content",
+      "mainNav": "Main",
+      "language": "Language",
+      "toggleTheme": "Toggle theme"
     },
     "form": {
       "saveDraft": "Save draft",
@@ -102,7 +106,19 @@
       "requiredHint": "Required fields must be completed before review.",
       "selectPlaceholder": "Select an option",
       "selectDepends": "Select {field} first",
-      "retry": "Retry"
+      "retry": "Retry",
+      "optionsLoadError": "Could not load options",
+      "optionsLoadErrorBody": "Failed to fetch choices for {field}.",
+      "loadingForm": "Loading form…",
+      "pickDate": "Pick a date",
+      "yes": "Yes",
+      "no": "No",
+      "noOptions": "No options available",
+      "loadingOptions": "Loading…",
+      "validationRequired": "This field is required",
+      "validationNumber": "Enter a valid number",
+      "validationMin": "Value is too small",
+      "validationMax": "Value is too large"
     },
     "footer": {
       "tagline": "Schema-driven insurance applications for modern teams.",
@@ -235,7 +251,21 @@
       "show": "Show",
       "perPage": "per page",
       "applyNew": "Start a new application",
-      "demoApplicant": "Demo User"
+      "demoApplicant": "Demo User",
+      "done": "Done",
+      "close": "Close",
+      "column": "Column",
+      "selectColumn": "Select column",
+      "value": "Value",
+      "filterValue": "Filter value…",
+      "cancel": "Cancel",
+      "applyFilter": "Apply filter",
+      "removeFilter": "Remove filter",
+      "firstPage": "First page",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "lastPage": "Last page",
+      "loadingApps": "Loading applications…"
     },
     "aboutPage": {
       "title": "About this portal",
