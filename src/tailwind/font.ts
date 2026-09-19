@@ -1,5 +1,5 @@
 import localFont from 'next/font/local';
-import { Geist, Geist_Mono } from "next/font/google";
+import { Syne, DM_Sans } from "next/font/google";
 
 export const estedad = localFont({
   src: [
@@ -31,13 +31,20 @@ export const estedad = localFont({
   ],
 });
 
-
-export const geistSans = Geist({
-  variable: "--font-geist-sans",
+/** Display — bold postmodern headlines (EN) */
+export const displayFont = Syne({
+  variable: "--font-display",
   subsets: ["latin"],
+  weight: ["600", "700", "800"],
 });
 
-export const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+/** Body — clean readable UI text (EN) */
+export const bodyFont = DM_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
+
+/** Keep aliases used elsewhere */
+export const geistSans = bodyFont;
+export const geistMono = bodyFont;

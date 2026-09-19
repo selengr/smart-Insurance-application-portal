@@ -7,11 +7,8 @@ import { Locale, i18n } from "../../../i18n.config";
 import Navbar from "@/sections/nav/navbar";
 import QueryProvider from "@/provider/QueryClientProvider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { estedad, geistMono, geistSans } from "@/tailwind/font";
+import { estedad, displayFont, bodyFont } from "@/tailwind/font";
 import { APP_DEFAULT_TITLE_EN, APP_DESCRIPTION_EN, APP_TITLE_TEMPLATE_EN, APP_DEFAULT_TITLE_FA, APP_DESCRIPTION_FA, APP_TITLE_TEMPLATE_FA, APP_KEYWORDS } from "../../../config-global";
-
-
-// ----------------------------------------------------------------------
 
 const metadataTranslations: Record<Locale, Metadata> = {
   en: {
@@ -36,41 +33,34 @@ const metadataTranslations: Record<Locale, Metadata> = {
 
 type Params = Promise<{ lang: Locale }>
 export async function generateMetadata({ params }: { params: Params }) {
-
-  const { lang } = await (params);
+  const { lang } = await params;
   return metadataTranslations[lang];
 }
 
-// ----------------------------------------------------------------------
-
-// ----------------------------------------------------------------------
 export async function generateStaticParams() {
   return i18n.locales.map((locale: string) => ({ lang: locale }));
 }
-// ----------------------------------------------------------------------
 
-
-  export default function RootLayout(props: {
-    children: React.ReactNode
-    params: Params
-  }) {
+export default function RootLayout(props: {
+  children: React.ReactNode
+  params: Params
+}) {
   const params = use(props.params)
   const lang = params.lang
 
   const fontClass =
-     lang === "fa"
+    lang === "fa"
       ? `${estedad.className}`
-      : `${geistSans.variable} ${geistMono.variable} font-sans`;
+      : `${displayFont.variable} ${bodyFont.variable} font-[family-name:var(--font-body)]`;
 
   return (
     <html lang={lang} dir={lang === "fa" ? "rtl" : "ltr"}>
       <body
-        className={`${fontClass} antialiased min-h-screen dark:text-[hsla(0,0%,100%,.9)] transition-colors duration-300`}
+        className={`${fontClass} antialiased min-h-screen transition-colors duration-300`}
       >
         <ThemeProvider defaultTheme="system" storageKey="theme">
           <Navbar lang={lang} />
-
-          <div className="mt-16">
+          <div className="pt-16">
             <QueryProvider>{props.children}</QueryProvider>
           </div>
           <Toaster />

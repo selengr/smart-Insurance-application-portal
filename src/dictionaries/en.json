@@ -7,9 +7,9 @@
     "home": {
       "title": "Smart Insurance Application Portal",
       "InsuranceTypes": "Insurance Types",
-      "InsuranceLink": "Click to apply",
-      "myInsurance": "My insurances",
-      "description": "Apply for Health, Home, Car, and Life insurance through dynamic forms."
+      "InsuranceLink": "Start application",
+      "myInsurance": "My policies",
+      "description": "Schema-driven forms for Health, Home, Car, and Life — apply in minutes, draft as you go."
     },
     "about": {
       "title": "About",

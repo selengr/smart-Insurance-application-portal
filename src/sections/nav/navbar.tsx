@@ -9,20 +9,27 @@ const Navbar = async ({ lang }: { lang: Locale }) => {
   const { navigation } = await getDictionary(lang)
 
   return (
-    <nav className="border-b py-3" aria-label="Main">
-      <div className={`${styles["landing-top"]} flex items-center justify-between`}>
-        <div className="flex justify-end flex-row align-middle items-center w-full pr-[1%] gap-3">
+    <nav
+      className={`${styles["landing-top"]} border-b border-border/60`}
+      aria-label="Main"
+    >
+      <div className="mx-auto flex h-full w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+        <Link
+          href={`/${lang}`}
+          className="font-[family-name:var(--font-display)] text-sm font-bold tracking-tight text-foreground"
+        >
+          Smart Insurance
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <LocaleSwitcher />
           <Link
             href={`/${lang}`}
-            className="text-sm font-medium hover:underline"
+            className="hidden text-sm font-medium text-muted-foreground transition hover:text-foreground sm:inline"
           >
             {navigation.home}
           </Link>
           <ThemeToggle />
-        </div>
-
-        <div className="cover-individuals fixed sm:left-2 left-0 flex justify-center align-middle items-center">
-          <LocaleSwitcher />
         </div>
       </div>
     </nav>
