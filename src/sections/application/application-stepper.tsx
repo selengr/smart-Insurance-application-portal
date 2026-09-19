@@ -34,8 +34,6 @@ export function ApplicationStepper({
                       : "border-border bg-muted/40 text-muted-foreground",
                 ].join(" ")}
                 aria-current={active ? "step" : undefined}
-                animate={active ? { scale: [1, 1.06, 1] } : { scale: 1 }}
-                transition={{ duration: 0.45 }}
               >
                 {done ? <Check className="h-4 w-4" aria-hidden /> : index + 1}
               </motion.span>
