@@ -72,7 +72,11 @@ export function translateKnownValue(
 
 export const DYNAMIC_OPTION_I18N: Record<
   string,
-  { countries: Record<string, string>; cities: Record<string, Record<string, string>> }
+  {
+    countries: Record<string, string>
+    cities: Record<string, Record<string, string>>
+    carModels: Record<string, string>
+  }
 > = {
   fa: {
     countries: {
@@ -88,6 +92,32 @@ export const DYNAMIC_OPTION_I18N: Record<
       ایران: { Tehran: "تهران", Isfahan: "اصفهان", Shiraz: "شیراز" },
       آلمان: { Berlin: "برلین", Munich: "مونیخ", Hamburg: "هامبورگ" },
     },
+    carModels: {
+      Corolla: "کرولا",
+      Camry: "کمری",
+      RAV4: "RAV4",
+      Yaris: "یاریس",
+      Elantra: "النترا",
+      Tucson: "توسان",
+      "Santa Fe": "سانتافه",
+      i20: "i20",
+      "320i": "320i",
+      X3: "X3",
+      X5: "X5",
+      "530i": "530i",
+      C200: "C200",
+      E300: "E300",
+      GLC: "GLC",
+      A180: "A180",
+      "Peugeot 206": "پژو ۲۰۶",
+      Samand: "سمند",
+      Dena: "دنا",
+      Tara: "تارا",
+      Sportage: "اسپورتیج",
+      Cerato: "سراتو",
+      Sorento: "سورنتو",
+      Rio: "ریو",
+    },
   },
 }
 
@@ -97,6 +127,23 @@ export function localizeDynamicCities(lang: string, country: string, cities: str
   const cityMap = pack.cities[country]
   if (!cityMap) return cities
   return cities.map((c) => cityMap[c] ?? c)
+}
+
+export function localizeDynamicOptions(
+  lang: string,
+  dependsOn: string,
+  dependentValue: string,
+  options: string[],
+) {
+  if (dependsOn === "country") {
+    return localizeDynamicCities(lang, dependentValue, options)
+  }
+  if (dependsOn === "make") {
+    const map = DYNAMIC_OPTION_I18N[lang]?.carModels
+    if (!map) return options
+    return options.map((opt) => map[opt] ?? opt)
+  }
+  return options
 }
 
 export function localizeCountryName(lang: string, country: string) {

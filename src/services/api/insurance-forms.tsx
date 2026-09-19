@@ -1,6 +1,10 @@
 import httpService from "../http-service";
 import { InsuranceField, InsuranceForm } from "@/types/insurance";
-import { isMockApiEnabled, mockInsuranceForms } from "@/mocks/fixtures";
+import {
+  isMockApiEnabled,
+  mockCarModelsByMake,
+  mockInsuranceForms,
+} from "@/mocks/fixtures";
 
 enum METHOD {
   GET = "get",
@@ -10,6 +14,31 @@ enum METHOD {
 interface IFormValues {
   [key: string]: unknown;
 }
+
+const citiesByCountry: Record<string, string[]> = {
+  France: ["Paris", "Lyon", "Marseille"],
+  Iran: ["Tehran", "Isfahan", "Shiraz"],
+  Germany: ["Berlin", "Munich", "Hamburg"],
+  فرانسه: ["Paris", "Lyon", "Marseille"],
+  ایران: ["Tehran", "Isfahan", "Shiraz"],
+  آلمان: ["Berlin", "Munich", "Hamburg"],
+};
+
+/** Resolve localized brand labels back to English fixture keys */
+const carMakeAliases: Record<string, string> = {
+  Toyota: "Toyota",
+  Hyundai: "Hyundai",
+  BMW: "BMW",
+  "Mercedes-Benz": "Mercedes-Benz",
+  "Iran Khodro": "Iran Khodro",
+  Kia: "Kia",
+  تویوتا: "Toyota",
+  هیوندای: "Hyundai",
+  بی‌ام‌و: "BMW",
+  "مرسدس بنز": "Mercedes-Benz",
+  ایران‌خودرو: "Iran Khodro",
+  کیا: "Kia",
+};
 
 export const insuranceFormsApi = async (formId: string): Promise<InsuranceForm | undefined> => {
   if (isMockApiEnabled()) {
@@ -25,14 +54,13 @@ export const dynamicOptionsApi = async (field: InsuranceField, dependentValue: s
   if (!field.dynamicOptions) return [];
 
   if (isMockApiEnabled()) {
-    const citiesByCountry: Record<string, string[]> = {
-      France: ["Paris", "Lyon", "Marseille"],
-      Iran: ["Tehran", "Isfahan", "Shiraz"],
-      Germany: ["Berlin", "Munich", "Hamburg"],
-      فرانسه: ["Paris", "Lyon", "Marseille"],
-      ایران: ["Tehran", "Isfahan", "Shiraz"],
-      آلمان: ["Berlin", "Munich", "Hamburg"],
-    };
+    const endpoint = field.dynamicOptions.endpoint || "";
+
+    if (endpoint.includes("getCarModels") || field.dynamicOptions.dependsOn === "make") {
+      const key = carMakeAliases[dependentValue] || dependentValue;
+      return mockCarModelsByMake[key] || [];
+    }
+
     return citiesByCountry[dependentValue] || [];
   }
 

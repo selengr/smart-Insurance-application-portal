@@ -22,10 +22,11 @@ import { ApplicationHero } from "@/sections/application/application-hero"
 import { ApplicationStepper } from "@/sections/application/application-stepper"
 import { buildReviewRows } from "@/lib/review-rows"
 import {
-  localizeDynamicCities,
+  localizeDynamicOptions,
   localizeInsuranceForm,
   type FormsCatalog,
 } from "@/lib/form-i18n"
+import { estimateMonthlyPremium } from "@/lib/reserve-quote"
 
 type FormCopy = {
   saveDraft: string
@@ -77,6 +78,10 @@ type FormCopy = {
   validationMin: string
   validationMax: string
   leaveConfirm: string
+  reserveQuote: string
+  reserveQuoteHint: string
+  agreeLabel: string
+  agreeRequired: string
 }
 
 interface IDynamicFormProps {
@@ -108,6 +113,22 @@ const processDraftDates = (draft: FormValues): FormValues => {
 
 type FlowStep = "details" | "review"
 
+function collectDynamicFields(fields: InsuranceField[], parentPath = "") {
+  const found: { field: InsuranceField; path: string; dependsPath: string }[] = []
+  for (const field of fields) {
+    const path = parentPath ? `${parentPath}.${field.id}` : field.id
+    if (field.type === "group" && field.fields) {
+      found.push(...collectDynamicFields(field.fields, path))
+    } else if (field.dynamicOptions) {
+      const dependsPath = parentPath
+        ? `${parentPath}.${field.dynamicOptions.dependsOn}`
+        : field.dynamicOptions.dependsOn
+      found.push({ field, path, dependsPath })
+    }
+  }
+  return found
+}
+
 const DynamicForm: React.FC<IDynamicFormProps> = ({
   formId,
   lang,
@@ -120,7 +141,9 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
   const [dynamicOptions, setDynamicOptions] = useState<Record<string, string[]>>({})
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [agreed, setAgreed] = useState(false)
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const prevDependsRef = useRef<Record<string, string>>({})
 
   const validationMessages = useMemo(
     () => ({
@@ -225,45 +248,67 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
     setLastSaved(null)
   }, [formId])
 
-  const fetchDynamicOptions = async (field: InsuranceField, dependentValue: string) => {
-    if (!field.dynamicOptions) return
-    try {
-      const response = await dynamicOptionsApi(field, dependentValue)
-      const localized = localizeDynamicCities(lang, dependentValue, response)
-      setDynamicOptions((prev) => ({
-        ...prev,
-        [field.id]: localized,
-      }))
-    } catch (err) {
-      console.error(`Error fetching options for ${field.id}:`, err)
-      toast.error(copy.optionsLoadError, {
-        description: copy.optionsLoadErrorBody.replace("{field}", field.label),
-      })
-    }
-  }
+  const fetchDynamicOptions = useCallback(
+    async (field: InsuranceField, dependentValue: string) => {
+      if (!field.dynamicOptions) return
+      try {
+        const response = await dynamicOptionsApi(field, dependentValue)
+        const localized = localizeDynamicOptions(
+          lang,
+          field.dynamicOptions.dependsOn,
+          dependentValue,
+          response,
+        )
+        setDynamicOptions((prev) => ({
+          ...prev,
+          [field.id]: localized,
+        }))
+      } catch (err) {
+        console.error(`Error fetching options for ${field.id}:`, err)
+        toast.error(copy.optionsLoadError, {
+          description: copy.optionsLoadErrorBody.replace("{field}", field.label),
+        })
+      }
+    },
+    [copy.optionsLoadError, copy.optionsLoadErrorBody, lang],
+  )
 
-  const countryValue = form.watch("address.country")
+  const watchedAll = form.watch()
 
   useEffect(() => {
     if (!formData) return
+    const dynamics = collectDynamicFields(formData.fields)
 
-    const fieldsWithDynamicOptions = formData.fields.flatMap((field) =>
-      field.type === "group" && field.fields
-        ? field.fields.filter((f) => f.dynamicOptions)
-        : field.dynamicOptions
-          ? [field]
-          : [],
-    )
+    dynamics.forEach(({ field, path, dependsPath }) => {
+      const dependentValue = dependsPath.split(".").reduce<unknown>((acc, key) => {
+        if (acc && typeof acc === "object" && !Array.isArray(acc)) {
+          return (acc as Record<string, unknown>)[key]
+        }
+        return undefined
+      }, watchedAll)
 
-    fieldsWithDynamicOptions.forEach((field) => {
-      if (!field.dynamicOptions) return
-      if (typeof countryValue === "string" && countryValue) {
-        void fetchDynamicOptions(field, countryValue)
+      const asString = typeof dependentValue === "string" ? dependentValue : ""
+      const prev = prevDependsRef.current[path]
+
+      if (prev && prev !== asString) {
+        form.setValue(path, "", { shouldDirty: true, shouldValidate: true })
+      }
+      prevDependsRef.current[path] = asString
+
+      if (asString) {
+        void fetchDynamicOptions(field, asString)
+      } else {
+        setDynamicOptions((prevOpts) => ({ ...prevOpts, [field.id]: [] }))
       }
     })
-  }, [countryValue, formData, formId])
+  }, [watchedAll, formData, fetchDynamicOptions, form])
 
   const onSubmit = (values: FormValues) => {
+    if (!agreed) {
+      toast.error(copy.agreeRequired)
+      return
+    }
+
     submitForm(
       { data: { ...values, formId } },
       {
@@ -278,6 +323,7 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
           })
           clearDraft()
           form.reset()
+          setAgreed(false)
           push(`/${lang}/insurance/${formId}/confirmation?ref=${encodeURIComponent(applicationId)}`)
         },
         onError: () => {
@@ -296,6 +342,7 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
       return
     }
     saveDraft()
+    setAgreed(false)
     setFlowStep("review")
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -352,7 +399,7 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
     )
   }
 
-  const watched = form.watch()
+  const watched = watchedAll
   const filledCount = Object.values(watched).filter(
     (v) => v !== undefined && v !== null && v !== "",
   ).length
@@ -366,6 +413,11 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
     no: copy.no,
     locale: lang === "fa" ? "fa-IR" : "en-US",
   })
+  const quote = estimateMonthlyPremium(formId, watched)
+  const quoteLabel =
+    lang === "fa"
+      ? `${quote.toLocaleString("fa-IR")} تومان`
+      : `$${quote.toLocaleString("en-US")}`
 
   return (
     <div>
@@ -449,14 +501,16 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
 
               <p className="text-xs text-muted-foreground">{lastSaved ? copy.autosave : copy.secureNote}</p>
 
-              <div className="flex flex-wrap gap-3 border-t border-border pt-6">
-                <Button type="button" onClick={goToReview} className="gap-2">
-                  {copy.continueReview}
-                  <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
-                </Button>
-                <Button asChild variant="outline" type="button">
-                  <Link href={`/${lang}/`}>{copy.cancel}</Link>
-                </Button>
+              <div className="sticky bottom-0 z-10 -mx-4 border-t border-border bg-background/95 px-4 py-4 backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
+                <div className="flex flex-wrap gap-3">
+                  <Button type="button" onClick={goToReview} className="gap-2">
+                    {copy.continueReview}
+                    <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
+                  </Button>
+                  <Button asChild variant="outline" type="button">
+                    <Link href={`/${lang}/`}>{copy.cancel}</Link>
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
@@ -468,33 +522,58 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
                 <p className="text-sm text-muted-foreground">{copy.reviewSubtitle}</p>
               </div>
 
-              <div className="border border-border bg-background/60">
-                {reviewRows.length === 0 ? (
-                  <p className="p-6 text-sm text-muted-foreground">{copy.reviewEmpty}</p>
-                ) : (
-                  <dl className="divide-y divide-border">
-                    {reviewRows.map((row) => (
-                      <div
-                        key={row.path}
-                        className="grid gap-1 px-5 py-4 sm:grid-cols-[minmax(9rem,14rem)_1fr] sm:gap-6"
-                      >
-                        <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                          {row.label}
-                        </dt>
-                        <dd className="text-sm font-medium text-foreground">{row.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
+              <div className="grid gap-4 lg:grid-cols-[1.4fr_0.8fr]">
+                <div className="border border-border bg-background/60">
+                  {reviewRows.length === 0 ? (
+                    <p className="p-6 text-sm text-muted-foreground">{copy.reviewEmpty}</p>
+                  ) : (
+                    <dl className="divide-y divide-border">
+                      {reviewRows.map((row) => (
+                        <div
+                          key={row.path}
+                          className="grid gap-1 px-5 py-4 sm:grid-cols-[minmax(9rem,12rem)_1fr] sm:gap-6"
+                        >
+                          <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                            {row.label}
+                          </dt>
+                          <dd className="text-sm font-medium text-foreground">{row.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                </div>
+
+                <aside className="flex flex-col gap-4 border border-primary/25 bg-primary/5 p-5">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                      {copy.reserveQuote}
+                    </p>
+                    <p className="mt-2 font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight">
+                      {quoteLabel}
+                    </p>
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                      {copy.reserveQuoteHint}
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                    <p>{copy.secureNote}</p>
+                  </div>
+                </aside>
               </div>
 
-              <div className="flex items-start gap-3 border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                <p>{copy.secureNote}</p>
-              </div>
+              <label className="flex cursor-pointer items-start gap-3 border border-border bg-card/40 px-4 py-3 text-sm">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 accent-primary"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                />
+                <span>{copy.agreeLabel}</span>
+              </label>
 
-              <div className="flex flex-wrap gap-3 border-t border-border pt-6">
-                <Button type="submit" disabled={isSubmitingForm} className="gap-2">
+              <div className="sticky bottom-0 z-10 -mx-4 flex flex-wrap gap-3 border-t border-border bg-background/95 px-4 py-4 backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:backdrop-blur-none">
+                <Button type="submit" disabled={isSubmitingForm || !agreed} className="gap-2">
                   {isSubmitingForm ? copy.submitting : copy.submit}
                 </Button>
                 <Button
