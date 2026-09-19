@@ -46,15 +46,17 @@
       "backHome": "Back to home"
     },
     "confirmation": {
-      "title": "You're covered — almost",
-      "subtitle": "Your application is reserved in the portal. Keep this reference for tracking.",
+      "title": "Reservation confirmed",
+      "subtitle": "Your application is held in My policies as Pending. Use the reference below if you contact support.",
       "reference": "Reference",
-      "nextTitle": "What happens next",
-      "nextBody": "Review status on My policies, or start another product whenever you're ready.",
+      "nextTitle": "Next steps",
+      "nextBody": "Open My policies to track status, or reserve another product. In this demo nothing is charged.",
       "viewPolicies": "View my policies",
       "applyAnother": "Apply again",
       "backHome": "Back to home",
-      "stepLabel": "Reserved"
+      "stepLabel": "Reserved",
+      "statusPending": "Pending review",
+      "receiptTitle": "Reservation receipt"
     },
     "common": {
       "loading": "Loading…",
