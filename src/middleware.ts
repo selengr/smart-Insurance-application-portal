@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-import { i18n } from '../i18n.config'
+import { i18n } from "../i18n.config"
+import { isDemoAuthenticated } from "@/lib/auth-session"
 
-import { match as matchLocale } from '@formatjs/intl-localematcher'
-import Negotiator from 'negotiator'
+import { match as matchLocale } from "@formatjs/intl-localematcher"
+import Negotiator from "negotiator"
 
 function getLocale(request: NextRequest): string | undefined {
   const negotiatorHeaders: Record<string, string> = {}
@@ -19,22 +20,33 @@ function getLocale(request: NextRequest): string | undefined {
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
   )
 
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request)
     return NextResponse.redirect(
       new URL(
-        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
-        request.url
-      )
+        `/${locale}${pathname.startsWith("/") ? "" : "/"}${pathname}`,
+        request.url,
+      ),
     )
   }
 
-  return NextResponse.next()
+  const locale = i18n.locales.find(
+    (l) => pathname.startsWith(`/${l}/`) || pathname === `/${l}`,
+  )
+  const isPoliciesRoute = locale && pathname.includes(`/${locale}/purchased-insurances`)
+  if (isPoliciesRoute && !isDemoAuthenticated(request.headers.get("cookie"))) {
+    return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
+  }
+
+  const response = NextResponse.next()
+  response.headers.set("X-Content-Type-Options", "nosniff")
+  response.headers.set("X-Frame-Options", "DENY")
+  return response
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|fonts|icons|.*\\..*).*)'],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|fonts|icons|images|.*\\..*).*)"],
 }

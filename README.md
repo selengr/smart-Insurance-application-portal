@@ -13,8 +13,11 @@ A multilingual insurance application portal built with **Next.js 15**. Users can
 - Auto-save drafts to `localStorage`
 - English / Persian (FA) localization with route-based locales
 - Dark / light theme
+- Demo sign-in gate for policies
+- Application confirmation with reference id
 - Purchased insurance list with filtering
 - React Query for server state
+- Security headers + robots/sitemap
 
 ## Tech stack
 
@@ -30,19 +33,18 @@ A multilingual insurance application portal built with **Next.js 15**. Users can
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Optional env:
+In development, mock API is on by default. Force modes:
 
 ```bash
-NEXT_PUBLIC_HOST_API_KEY=https://assignment.devotel.io
 NEXT_PUBLIC_USE_MOCK_API=true
+NEXT_PUBLIC_HOST_API_KEY=https://assignment.devotel.io
 ```
-
-Set `NEXT_PUBLIC_USE_MOCK_API=true` to run fully offline with local fixtures (handy for demos and recruiters).
 
 ## Screenshots
 

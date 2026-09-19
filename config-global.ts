@@ -12,4 +12,8 @@ export const APP_KEYWORDS = ['هوشمند', 'بیمه', 'هوشمند بیمه'
 // API
 // ----------------------------------------------------------------------
 
-export const HOST_API_KEY = process.env.NEXT_PUBLIC_HOST_API_KEY || 'https://assignment.devotel.io';
+export const HOST_API_KEY =
+  process.env.NEXT_PUBLIC_HOST_API_KEY ||
+  (process.env.NODE_ENV === "production"
+    ? ""
+    : "https://assignment.devotel.io");

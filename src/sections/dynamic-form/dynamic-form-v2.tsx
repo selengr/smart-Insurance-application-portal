@@ -43,7 +43,7 @@ const processDraftDates = (draft: FormValues): FormValues => {
 }
 
 const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang }) => {
-  const { push, refresh } = useRouter()
+  const { push } = useRouter()
   const [dynamicOptions, setDynamicOptions] = useState<Record<string, string[]>>({})
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -160,17 +160,18 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang }) => {
     submitForm(
       { data: values },
       {
-        onSuccess: () => {
-          toast.success("Form Submitted", {
+        onSuccess: (result) => {
+          const applicationId =
+            (result as { data?: { applicationId?: string } })?.data?.applicationId ||
+            `APP-${Date.now().toString(36).toUpperCase()}`
+
+          toast.success("Application submitted", {
             description: "Your form has been successfully submitted.",
-            duration: 5000,
+            duration: 4000,
           })
-          refresh()
           clearDraft()
           form.reset()
-          setTimeout(() => {
-            push(`/${lang}/purchased-insurances`)
-          }, 200)
+          push(`/${lang}/insurance/${formId}/confirmation?ref=${encodeURIComponent(applicationId)}`)
         },
         onError: () => {
           toast.error("Submit failed", {
@@ -281,10 +282,10 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({ formId, lang }) => {
 
         <div className="flex flex-wrap gap-3">
           <Button className="cursor-pointer" type="submit" disabled={isSubmitingForm}>
-            {isSubmitingForm ? "Submitting…" : "Submit"}
+            {isSubmitingForm ? "Submitting…" : "Submit application"}
           </Button>
           <Link href={`/${lang}/`}>
-            <Button className="cursor-pointer" variant="destructive" type="button">
+            <Button className="cursor-pointer" variant="outline" type="button">
               Cancel
             </Button>
           </Link>

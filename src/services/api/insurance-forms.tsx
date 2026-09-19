@@ -16,8 +16,9 @@ export const insuranceFormsApi = async (formId: string): Promise<InsuranceForm |
     return mockInsuranceForms.find((f) => f.formId === formId);
   }
 
-  const response = await httpService.get(`/api/insurance/forms`);
-  return response.data.find((f: InsuranceForm) => f.formId === formId);
+  const response = await httpService.get<InsuranceForm[]>(`/api/insurance/forms`);
+  const forms = response.data as InsuranceForm[];
+  return forms.find((f) => f.formId === formId);
 };
 
 export const dynamicOptionsApi = async (field: InsuranceField, dependentValue: string) => {
@@ -37,13 +38,18 @@ export const dynamicOptionsApi = async (field: InsuranceField, dependentValue: s
     [field.dynamicOptions.dependsOn]: dependentValue,
   });
 
-  return response.data.states || [];
+  const payload = response.data as { states?: string[] };
+  return payload.states || [];
 };
 
 export const submitFormApi = async (data: IFormValues) => {
   if (isMockApiEnabled()) {
-    return { data: { ok: true, received: data }, status: 200 };
+    const applicationId = `APP-${Date.now().toString(36).toUpperCase()}`
+    return {
+      data: { ok: true, applicationId, received: data },
+      status: 200,
+    }
   }
 
-  return await httpService.post("/api/insurance/forms/submit", { data });
-};
+  return await httpService.post("/api/insurance/forms/submit", { data })
+}

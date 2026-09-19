@@ -17,7 +17,7 @@ import {
 import { useFetchPurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances";
 
 export function DynamicApplicationsList() {
-  const { data: apiResponse, isFetching } = useFetchPurchasedInsurances();
+  const { data: apiResponse, isFetching, isError, refetch } = useFetchPurchasedInsurances();
 
   const [apiData, setApiData] = useState<{
     columns: string[];
@@ -222,6 +222,21 @@ export function DynamicApplicationsList() {
 
 
   // if(!!!apiData.data) return <div> No applications found</div>
+
+  if (isError) {
+    return (
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center space-y-3" role="alert">
+        <p className="font-medium">Could not load applications</p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
