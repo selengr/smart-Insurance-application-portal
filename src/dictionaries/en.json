@@ -72,11 +72,11 @@
     "form": {
       "saveDraft": "Save draft",
       "saving": "Saving…",
-      "submit": "Confirm & submit",
-      "submitting": "Submitting…",
+      "submit": "Reserve application",
+      "submitting": "Reserving…",
       "cancel": "Cancel",
       "back": "Back",
-      "continueReview": "Continue to review",
+      "continueReview": "Continue to reserve",
       "editDetails": "Edit details",
       "progress": "Progress",
       "fieldsStarted": "fields started",
@@ -85,8 +85,8 @@
       "loadError": "Could not load this form",
       "notFound": "Form not found.",
       "connectionHint": "Please check your connection and try again.",
-      "submittedTitle": "Application submitted",
-      "submittedBody": "Your form has been successfully submitted.",
+      "submittedTitle": "Application reserved",
+      "submittedBody": "Your cover is reserved in the portal with a reference number.",
       "submitFailedTitle": "Submit failed",
       "submitFailedBody": "Something went wrong while sending your application. Please try again.",
       "draftSavedTitle": "Draft saved",
@@ -96,11 +96,11 @@
       "leaveConfirm": "You have unsaved changes. Leave this page?",
       "backProducts": "All products",
       "stepDetails": "Details",
-      "stepReview": "Review",
+      "stepReview": "Reserve",
       "stepConfirm": "Confirmed",
       "journeyLabel": "Application",
-      "reviewTitle": "Review your application",
-      "reviewSubtitle": "Check everything looks right before you reserve this cover.",
+      "reviewTitle": "Reserve your cover",
+      "reviewSubtitle": "Confirm the details below. This reserves your application in the portal — no payment is taken in the demo.",
       "reviewEmpty": "No answers yet",
       "secureNote": "Demo only — answers stay in this browser until you connect a real API.",
       "requiredHint": "Required fields must be completed before review.",
@@ -118,7 +118,11 @@
       "validationRequired": "This field is required",
       "validationNumber": "Enter a valid number",
       "validationMin": "Value is too small",
-      "validationMax": "Value is too large"
+      "validationMax": "Value is too large",
+      "reserveQuote": "Estimated monthly",
+      "reserveQuoteHint": "Demo estimate based on your selections. Final pricing comes from your insurer.",
+      "agreeLabel": "I confirm these details are correct and want to reserve this application.",
+      "agreeRequired": "Please confirm the details before reserving."
     },
     "footer": {
       "tagline": "Schema-driven insurance applications for modern teams.",
@@ -148,6 +152,14 @@
               },
               "age": {
                 "label": "Age"
+              },
+              "gender": {
+                "label": "Gender",
+                "options": {
+                  "Female": "Female",
+                  "Male": "Male",
+                  "Prefer not to say": "Prefer not to say"
+                }
               }
             }
           },
@@ -157,6 +169,21 @@
               "Basic": "Basic",
               "Standard": "Standard",
               "Premium": "Premium"
+            }
+          },
+          "network": {
+            "label": "Provider network",
+            "options": {
+              "In-network only": "In-network only",
+              "In + out of network": "In + out of network",
+              "International": "International"
+            }
+          },
+          "smoker": {
+            "label": "Do you smoke?",
+            "options": {
+              "No": "No",
+              "Yes": "Yes"
             }
           }
         }
@@ -179,20 +206,73 @@
                 "label": "City"
               }
             }
+          },
+          "property_type": {
+            "label": "Property type",
+            "options": {
+              "Apartment": "Apartment",
+              "House": "House",
+              "Villa": "Villa",
+              "Townhouse": "Townhouse"
+            }
+          },
+          "ownership": {
+            "label": "Ownership",
+            "options": {
+              "Owner": "Owner",
+              "Tenant": "Tenant"
+            }
+          },
+          "contents_cover": {
+            "label": "Contents cover",
+            "options": {
+              "None": "None",
+              "Standard": "Standard",
+              "High value": "High value"
+            }
           }
         }
       },
       "car_insurance_application": {
         "title": "Car Insurance Application",
         "fields": {
-          "make": {
-            "label": "Make"
+          "vehicle": {
+            "label": "Vehicle",
+            "fields": {
+              "make": {
+                "label": "Brand",
+                "options": {
+                  "Toyota": "Toyota",
+                  "Hyundai": "Hyundai",
+                  "BMW": "BMW",
+                  "Mercedes-Benz": "Mercedes-Benz",
+                  "Iran Khodro": "Iran Khodro",
+                  "Kia": "Kia"
+                }
+              },
+              "model": {
+                "label": "Model"
+              },
+              "year": {
+                "label": "Year"
+              }
+            }
           },
-          "model": {
-            "label": "Model"
+          "usage": {
+            "label": "Usage",
+            "options": {
+              "Personal": "Personal",
+              "Business": "Business",
+              "Ride-share": "Ride-share"
+            }
           },
-          "year": {
-            "label": "Year"
+          "coverage_level": {
+            "label": "Coverage level",
+            "options": {
+              "Third party": "Third party",
+              "Comprehensive": "Comprehensive",
+              "Full cover": "Full cover"
+            }
           }
         }
       },
@@ -201,6 +281,15 @@
         "fields": {
           "full_name": {
             "label": "Full name"
+          },
+          "age_band": {
+            "label": "Age band",
+            "options": {
+              "18–30": "18–30",
+              "31–45": "31–45",
+              "46–60": "46–60",
+              "61+": "61+"
+            }
           },
           "coverage_amount": {
             "label": "Coverage amount",
@@ -217,6 +306,22 @@
               "10 years": "10 years",
               "20 years": "20 years",
               "30 years": "30 years"
+            }
+          },
+          "smoker": {
+            "label": "Smoker status",
+            "options": {
+              "Non-smoker": "Non-smoker",
+              "Smoker": "Smoker"
+            }
+          },
+          "beneficiary": {
+            "label": "Primary beneficiary",
+            "options": {
+              "Spouse": "Spouse",
+              "Child": "Child",
+              "Parent": "Parent",
+              "Other": "Other"
             }
           }
         }
