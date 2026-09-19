@@ -43,7 +43,13 @@ export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, f
           <FormLabel>{field.label}</FormLabel>
           <Select
             onValueChange={formField.onChange}
-            value={formField.value || ""}
+            value={
+              formField.value !== undefined &&
+              formField.value !== null &&
+              formField.value !== ""
+                ? String(formField.value)
+                : undefined
+            }
             disabled={isDisabled}
           >
             <FormControl>

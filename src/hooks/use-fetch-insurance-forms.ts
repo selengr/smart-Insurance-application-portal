@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { generateZodSchema, type ValidationMessages } from "./use-create-field-schema"
 import { insuranceFormsApi } from "@/services/api/insurance-forms"
@@ -13,9 +14,19 @@ export const useFetchInsuranceForms = (
     enabled: !!formId,
   })
 
-  const schema = queryResult.data
-    ? generateZodSchema(queryResult.data.fields, messages)
-    : null
+  const messageKey = messages
+    ? [messages.required, messages.invalidNumber, messages.tooSmall, messages.tooBig].join("|")
+    : ""
+
+  const schema = useMemo(
+    () =>
+      queryResult.data
+        ? generateZodSchema(queryResult.data.fields, messages)
+        : null,
+    // messages object identity changes; messageKey captures content
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [queryResult.data, messageKey],
+  )
 
   return {
     ...queryResult,

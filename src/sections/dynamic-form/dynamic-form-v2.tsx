@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { FormValues, InsuranceField } from "@/types/insurance"
 import { renderFormField } from "./render-form-field"
 import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
 import { useSubmitForm } from "@/hooks/use-submit-form"
 import { dynamicOptionsApi } from "@/services/api/insurance-forms"
 import { useFetchInsuranceForms } from "@/hooks/use-fetch-insurance-forms"
@@ -107,6 +108,15 @@ interface IDynamicFormProps {
   formsCatalog?: FormsCatalog
 }
 
+type ReadyProps = {
+  formId: string
+  lang: string
+  copy: FormCopy
+  productBlurb?: string
+  formData: ReturnType<typeof localizeInsuranceForm>
+  formSchema: z.ZodTypeAny
+}
+
 const isIsoDateString = (value: string) =>
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)
 
@@ -150,12 +160,13 @@ function formatQuote(amount: number, lang: string) {
     : `$${amount.toLocaleString("en-US")}`
 }
 
-const DynamicForm: React.FC<IDynamicFormProps> = ({
+const DynamicFormReady: React.FC<ReadyProps> = ({
   formId,
   lang,
   copy,
   productBlurb,
-  formsCatalog,
+  formData,
+  formSchema,
 }) => {
   const { push } = useRouter()
   const [flowStep, setFlowStep] = useState<FlowStep>("details")
@@ -166,41 +177,14 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
   const [agreed, setAgreed] = useState(false)
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const prevDependsRef = useRef<Record<string, string>>({})
+  const draftLoadedRef = useRef(false)
 
-  const validationMessages = useMemo(
-    () => ({
-      required: copy.validationRequired,
-      invalidNumber: copy.validationNumber,
-      tooSmall: copy.validationMin,
-      tooBig: copy.validationMax,
-    }),
-    [
-      copy.validationRequired,
-      copy.validationNumber,
-      copy.validationMin,
-      copy.validationMax,
-    ],
-  )
-
-  const { data, isFetching: isLoading, isError, error, refetch } = useFetchInsuranceForms(
-    formId,
-    validationMessages,
-  )
-  const rawForm = data?.form || null
-  const formData = useMemo(
-    () => (rawForm ? localizeInsuranceForm(rawForm, formsCatalog) : null),
-    [rawForm, formsCatalog],
-  )
-  const formSchema = data?.schema || null
-  const sections = useMemo(
-    () => (formData ? buildFormSections(formData.fields) : []),
-    [formData],
-  )
+  const sections = useMemo(() => buildFormSections(formData.fields), [formData])
 
   const { mutate: submitForm, isPending: isSubmitingForm } = useSubmitForm()
 
   const form = useForm<FormValues>({
-    resolver: formSchema ? zodResolver(formSchema) : undefined,
+    resolver: zodResolver(formSchema),
     mode: "onBlur",
   })
 
@@ -216,7 +200,8 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
   }, [form.formState.isDirty, flowStep, copy.leaveConfirm])
 
   useEffect(() => {
-    if (!formData || !formSchema) return
+    if (draftLoadedRef.current) return
+    draftLoadedRef.current = true
 
     try {
       const savedDraft = localStorage.getItem(`form_draft_${formId}`)
@@ -236,7 +221,9 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
     } catch (err) {
       console.error("Error loading draft:", err)
     }
-  }, [formData, formId, form, formSchema, copy.draftRestoredBody, copy.draftRestoredTitle])
+    // Mount-once draft restore for this form instance
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formId])
 
   const saveDraft = useCallback(() => {
     if (!formData) return
@@ -285,10 +272,17 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
           dependentValue,
           response,
         )
-        setDynamicOptions((prev) => ({
-          ...prev,
-          [field.id]: localized,
-        }))
+        setDynamicOptions((prev) => {
+          const existing = prev[field.id]
+          if (
+            existing &&
+            existing.length === localized.length &&
+            existing.every((value, index) => value === localized[index])
+          ) {
+            return prev
+          }
+          return { ...prev, [field.id]: localized }
+        })
       } catch (err) {
         console.error(`Error fetching options for ${field.id}:`, err)
         toast.error(copy.optionsLoadError, {
@@ -301,9 +295,25 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
 
   const watchedAll = form.watch()
 
+  const dependsKey = useMemo(() => {
+    if (!formData) return ""
+    return collectDynamicFields(formData.fields)
+      .map(({ dependsPath }) => {
+        const value = dependsPath.split(".").reduce<unknown>((acc, key) => {
+          if (acc && typeof acc === "object" && !Array.isArray(acc)) {
+            return (acc as Record<string, unknown>)[key]
+          }
+          return undefined
+        }, watchedAll)
+        return `${dependsPath}:${typeof value === "string" ? value : ""}`
+      })
+      .join("|")
+  }, [formData, watchedAll])
+
   useEffect(() => {
     if (!formData) return
     const dynamics = collectDynamicFields(formData.fields)
+    if (dynamics.length === 0) return
 
     dynamics.forEach(({ field, path, dependsPath }) => {
       const dependentValue = dependsPath.split(".").reduce<unknown>((acc, key) => {
@@ -311,23 +321,28 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
           return (acc as Record<string, unknown>)[key]
         }
         return undefined
-      }, watchedAll)
+      }, form.getValues())
 
       const asString = typeof dependentValue === "string" ? dependentValue : ""
       const prev = prevDependsRef.current[path]
 
-      if (prev && prev !== asString) {
-        form.setValue(path, "", { shouldDirty: true, shouldValidate: true })
+      if (prev !== undefined && prev !== asString) {
+        form.setValue(path, undefined, { shouldDirty: true, shouldValidate: false })
       }
       prevDependsRef.current[path] = asString
 
       if (asString) {
         void fetchDynamicOptions(field, asString)
       } else {
-        setDynamicOptions((prevOpts) => ({ ...prevOpts, [field.id]: [] }))
+        setDynamicOptions((prevOpts) => {
+          if (!prevOpts[field.id]?.length) return prevOpts
+          return { ...prevOpts, [field.id]: [] }
+        })
       }
     })
-  }, [watchedAll, formData, fetchDynamicOptions, form])
+    // dependsKey tracks parent select changes without looping on every watch object identity
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dependsKey, formData, fetchDynamicOptions])
 
   const onSubmit = (values: FormValues) => {
     if (!agreed) {
@@ -424,43 +439,6 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
     { id: "review", label: copy.stepReview },
     { id: "confirm", label: copy.stepConfirm },
   ]
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6 animate-pulse" role="status" aria-live="polite">
-        <div className="h-40 w-full rounded bg-muted" />
-        <div className="h-8 w-1/2 rounded bg-muted" />
-        <div className="h-12 w-full rounded bg-muted" />
-        <div className="h-12 w-full rounded bg-muted" />
-        <span className="sr-only">{copy.loadingForm}</span>
-      </div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <div
-        className="border border-destructive/30 bg-destructive/5 p-8 text-center space-y-3"
-        role="alert"
-      >
-        <p className="font-medium">{copy.loadError}</p>
-        <p className="text-sm text-muted-foreground">
-          {error instanceof Error ? error.message : copy.connectionHint}
-        </p>
-        <Button type="button" variant="outline" onClick={() => refetch()}>
-          {copy.retry}
-        </Button>
-      </div>
-    )
-  }
-
-  if (!formData) {
-    return (
-      <div className="border p-8 text-center text-muted-foreground" role="status">
-        {copy.notFound}
-      </div>
-    )
-  }
 
   const watched = watchedAll
   const filledCount = Object.values(watched).filter(
@@ -759,4 +737,85 @@ const DynamicForm: React.FC<IDynamicFormProps> = ({
   )
 }
 
-export default DynamicForm
+export default function DynamicForm({
+  formId,
+  lang,
+  copy,
+  productBlurb,
+  formsCatalog,
+}: IDynamicFormProps) {
+  const validationMessages = useMemo(
+    () => ({
+      required: copy.validationRequired,
+      invalidNumber: copy.validationNumber,
+      tooSmall: copy.validationMin,
+      tooBig: copy.validationMax,
+    }),
+    [
+      copy.validationRequired,
+      copy.validationNumber,
+      copy.validationMin,
+      copy.validationMax,
+    ],
+  )
+
+  const { data, isFetching: isLoading, isError, error, refetch } = useFetchInsuranceForms(
+    formId,
+    validationMessages,
+  )
+  const rawForm = data?.form || null
+  const formData = useMemo(
+    () => (rawForm ? localizeInsuranceForm(rawForm, formsCatalog) : null),
+    [rawForm, formsCatalog],
+  )
+  const formSchema = data?.schema || null
+
+  if (isLoading && !formData) {
+    return (
+      <div className="space-y-6 animate-pulse" role="status" aria-live="polite">
+        <div className="h-40 w-full rounded bg-muted" />
+        <div className="h-8 w-1/2 rounded bg-muted" />
+        <div className="h-12 w-full rounded bg-muted" />
+        <div className="h-12 w-full rounded bg-muted" />
+        <span className="sr-only">{copy.loadingForm}</span>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div
+        className="border border-destructive/30 bg-destructive/5 p-8 text-center space-y-3"
+        role="alert"
+      >
+        <p className="font-medium">{copy.loadError}</p>
+        <p className="text-sm text-muted-foreground">
+          {error instanceof Error ? error.message : copy.connectionHint}
+        </p>
+        <Button type="button" variant="outline" onClick={() => refetch()}>
+          {copy.retry}
+        </Button>
+      </div>
+    )
+  }
+
+  if (!formData || !formSchema) {
+    return (
+      <div className="border p-8 text-center text-muted-foreground" role="status">
+        {copy.notFound}
+      </div>
+    )
+  }
+
+  return (
+    <DynamicFormReady
+      key={formId}
+      formId={formId}
+      lang={lang}
+      copy={copy}
+      productBlurb={productBlurb}
+      formData={formData}
+      formSchema={formSchema}
+    />
+  )
+}
