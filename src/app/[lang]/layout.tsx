@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Locale, i18n } from "../../../i18n.config";
 
 import Navbar from "@/sections/nav/navbar";
+import SiteFooter from "@/sections/footer/site-footer";
 import QueryProvider from "@/provider/QueryClientProvider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { estedad, displayFont, bodyFont } from "@/tailwind/font";
@@ -19,6 +20,17 @@ const metadataTranslations: Record<Locale, Metadata> = {
     },
     description: APP_DESCRIPTION_EN,
     keywords: APP_KEYWORDS,
+    openGraph: {
+      title: APP_DEFAULT_TITLE_EN,
+      description: APP_DESCRIPTION_EN,
+      type: "website",
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: APP_DEFAULT_TITLE_EN,
+      description: APP_DESCRIPTION_EN,
+    },
   },
   fa: {
     title: {
@@ -28,6 +40,17 @@ const metadataTranslations: Record<Locale, Metadata> = {
     },
     description: APP_DESCRIPTION_FA,
     keywords: APP_KEYWORDS,
+    openGraph: {
+      title: APP_DEFAULT_TITLE_FA,
+      description: APP_DESCRIPTION_FA,
+      type: "website",
+      locale: "fa_IR",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: APP_DEFAULT_TITLE_FA,
+      description: APP_DESCRIPTION_FA,
+    },
   },
 };
 
@@ -59,9 +82,12 @@ export default function RootLayout(props: {
         className={`${fontClass} antialiased min-h-screen transition-colors duration-300`}
       >
         <ThemeProvider defaultTheme="system" storageKey="theme">
-          <Navbar lang={lang} />
-          <div className="pt-16">
-            <QueryProvider>{props.children}</QueryProvider>
+          <div className="flex min-h-screen flex-col">
+            <Navbar lang={lang} />
+            <div className="flex-1 pt-16">
+              <QueryProvider>{props.children}</QueryProvider>
+            </div>
+            <SiteFooter lang={lang} />
           </div>
           <Toaster />
         </ThemeProvider>

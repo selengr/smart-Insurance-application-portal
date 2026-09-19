@@ -102,5 +102,10 @@ export const mockPurchasedRows = [
   },
 ];
 
-export const isMockApiEnabled = () =>
-  process.env.NEXT_PUBLIC_USE_MOCK_API === "true";
+export const isMockApiEnabled = () => {
+  const flag = process.env.NEXT_PUBLIC_USE_MOCK_API
+  if (flag === "true") return true
+  if (flag === "false") return false
+  // Local/dev default: offline-friendly fixtures so the app runs without the remote API
+  return process.env.NODE_ENV !== "production"
+}

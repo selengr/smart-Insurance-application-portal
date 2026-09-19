@@ -3,7 +3,9 @@
     "home": "Home",
     "products": "Products",
     "policies": "My policies",
-    "about": "About"
+    "about": "About",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
   },
   "page": {
     "home": {
@@ -25,6 +27,60 @@
     "about": {
       "title": "About",
       "description": "A multilingual smart insurance application portal with schema-driven forms."
+    },
+    "policies": {
+      "title": "Your applications",
+      "subtitle": "Track submitted policies and review status."
+    },
+    "login": {
+      "title": "Sign in to continue",
+      "subtitle": "Demo access for viewing your policies. No password required.",
+      "cta": "Continue as demo user",
+      "hint": "This sets a local session cookie for the portal demo."
+    },
+    "confirmation": {
+      "title": "Application submitted",
+      "subtitle": "We received your application. Keep this reference for your records.",
+      "reference": "Reference",
+      "viewPolicies": "View my policies",
+      "applyAnother": "Apply for another product",
+      "backHome": "Back to home"
+    },
+    "common": {
+      "loading": "Loading…",
+      "retry": "Retry",
+      "notFoundTitle": "Page not found",
+      "notFoundBody": "That page does not exist or the link is outdated.",
+      "errorTitle": "Something went wrong",
+      "errorBody": "Please try again. If the problem continues, come back later.",
+      "goHome": "Go home"
+    },
+    "form": {
+      "saveDraft": "Save draft",
+      "saving": "Saving…",
+      "submit": "Submit application",
+      "submitting": "Submitting…",
+      "cancel": "Cancel",
+      "progress": "Progress",
+      "fieldsStarted": "fields started",
+      "lastSaved": "Last saved",
+      "autosave": "Your progress is automatically saved every 30 seconds.",
+      "loadError": "Could not load this form",
+      "notFound": "Form not found.",
+      "connectionHint": "Please check your connection and try again.",
+      "submittedTitle": "Application submitted",
+      "submittedBody": "Your form has been successfully submitted.",
+      "submitFailedTitle": "Submit failed",
+      "submitFailedBody": "Something went wrong while sending your application. Please try again.",
+      "draftSavedTitle": "Draft saved",
+      "draftSavedBody": "Your progress has been saved.",
+      "leaveConfirm": "You have unsaved changes. Leave this page?"
+    },
+    "footer": {
+      "tagline": "Schema-driven insurance applications for modern teams.",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "rights": "All rights reserved."
     }
   }
 }
