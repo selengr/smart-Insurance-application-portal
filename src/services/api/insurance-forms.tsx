@@ -42,9 +42,14 @@ export const dynamicOptionsApi = async (field: InsuranceField, dependentValue: s
   return payload.states || [];
 };
 
-export const submitFormApi = async (data: IFormValues) => {
+export const submitFormApi = async (data: IFormValues & { formId?: string }) => {
   if (isMockApiEnabled()) {
     const applicationId = `APP-${Date.now().toString(36).toUpperCase()}`
+    if (typeof window !== "undefined" && data.formId) {
+      const { recordMockSubmission } = await import("@/lib/local-applications")
+      const { formId, ...payload } = data
+      recordMockSubmission(formId, payload, applicationId)
+    }
     return {
       data: { ok: true, applicationId, received: data },
       status: 200,

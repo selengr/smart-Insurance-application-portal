@@ -81,6 +81,13 @@
       "privacy": "Privacy",
       "terms": "Terms",
       "rights": "All rights reserved."
+    },
+    "legal": {
+      "privacyTitle": "Privacy",
+      "privacyBody": "This demo portal stores draft forms and demo session data in your browser only. No production personal data is collected or sold. Connect a real backend before handling genuine applicant information.",
+      "termsTitle": "Terms of use",
+      "termsBody": "This project is a portfolio demonstration. Demo sign-in is not real authentication. Do not submit sensitive personal or financial information. Features and fixtures may change without notice.",
+      "backHome": "Back to home"
     }
   }
 }
