@@ -30,7 +30,7 @@
     },
     "policies": {
       "title": "Your applications",
-      "subtitle": "Track submitted policies and review status."
+      "subtitle": "Track reserved and submitted policies in one place."
     },
     "login": {
       "title": "Sign in to continue",
@@ -39,12 +39,15 @@
       "hint": "This sets a local session cookie for the portal demo."
     },
     "confirmation": {
-      "title": "Application submitted",
-      "subtitle": "We received your application. Keep this reference for your records.",
+      "title": "You're covered — almost",
+      "subtitle": "Your application is reserved in the portal. Keep this reference for tracking.",
       "reference": "Reference",
+      "nextTitle": "What happens next",
+      "nextBody": "Review status on My policies, or start another product whenever you're ready.",
       "viewPolicies": "View my policies",
-      "applyAnother": "Apply for another product",
-      "backHome": "Back to home"
+      "applyAnother": "Apply again",
+      "backHome": "Back to home",
+      "stepLabel": "Reserved"
     },
     "common": {
       "loading": "Loading…",
@@ -58,9 +61,12 @@
     "form": {
       "saveDraft": "Save draft",
       "saving": "Saving…",
-      "submit": "Submit application",
+      "submit": "Confirm & submit",
       "submitting": "Submitting…",
       "cancel": "Cancel",
+      "back": "Back",
+      "continueReview": "Continue to review",
+      "editDetails": "Edit details",
       "progress": "Progress",
       "fieldsStarted": "fields started",
       "lastSaved": "Last saved",
@@ -74,7 +80,19 @@
       "submitFailedBody": "Something went wrong while sending your application. Please try again.",
       "draftSavedTitle": "Draft saved",
       "draftSavedBody": "Your progress has been saved.",
-      "leaveConfirm": "You have unsaved changes. Leave this page?"
+      "draftRestoredTitle": "Draft restored",
+      "draftRestoredBody": "Your previous progress has been restored.",
+      "leaveConfirm": "You have unsaved changes. Leave this page?",
+      "backProducts": "All products",
+      "stepDetails": "Details",
+      "stepReview": "Review",
+      "stepConfirm": "Confirmed",
+      "journeyLabel": "Application",
+      "reviewTitle": "Review your application",
+      "reviewSubtitle": "Check everything looks right before you reserve this cover.",
+      "reviewEmpty": "No answers yet",
+      "secureNote": "Demo only — answers stay in this browser until you connect a real API.",
+      "requiredHint": "Required fields must be completed before review."
     },
     "footer": {
       "tagline": "Schema-driven insurance applications for modern teams.",
