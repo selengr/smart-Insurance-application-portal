@@ -124,7 +124,18 @@
       "reserveQuote": "Estimated monthly",
       "reserveQuoteHint": "Demo estimate based on your selections. Final pricing comes from your insurer.",
       "agreeLabel": "I confirm these details are correct and want to reserve this application.",
-      "agreeRequired": "Please confirm the details before reserving."
+      "agreeRequired": "Please confirm the details before reserving.",
+      "nextSection": "Next section",
+      "prevSection": "Previous",
+      "sectionOf": "Section {current} of {total}",
+      "fillDemo": "Fill demo answers",
+      "fillDemoDone": "Demo answers loaded",
+      "fillDemoBody": "Review each section, then reserve when ready.",
+      "liveQuote": "Live estimate",
+      "liveQuoteEmpty": "Complete a few fields to see an estimate.",
+      "tipsHeading": "Helpful tips",
+      "almostThere": "Almost there — reserve to lock this application in.",
+      "sectionReady": "Section looks good"
     },
     "footer": {
       "tagline": "Schema-driven insurance applications for modern teams.",
