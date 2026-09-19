@@ -72,11 +72,11 @@
     "form": {
       "saveDraft": "ذخیره پیش‌نویس",
       "saving": "در حال ذخیره…",
-      "submit": "تأیید و ارسال",
-      "submitting": "در حال ارسال…",
+      "submit": "رزرو درخواست",
+      "submitting": "در حال رزرو…",
       "cancel": "انصراف",
       "back": "بازگشت",
-      "continueReview": "ادامه به بازبینی",
+      "continueReview": "ادامه برای رزرو",
       "editDetails": "ویرایش جزئیات",
       "progress": "پیشرفت",
       "fieldsStarted": "فیلد شروع‌شده",
@@ -85,8 +85,8 @@
       "loadError": "بارگذاری فرم ممکن نشد",
       "notFound": "فرم پیدا نشد.",
       "connectionHint": "اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.",
-      "submittedTitle": "درخواست ثبت شد",
-      "submittedBody": "فرم شما با موفقیت ارسال شد.",
+      "submittedTitle": "درخواست رزرو شد",
+      "submittedBody": "پوشش شما در پورتال با کد پیگیری رزرو شد.",
       "submitFailedTitle": "ارسال ناموفق بود",
       "submitFailedBody": "هنگام ارسال درخواست مشکلی پیش آمد. لطفا دوباره تلاش کنید.",
       "draftSavedTitle": "پیش‌نویس ذخیره شد",
@@ -96,11 +96,11 @@
       "leaveConfirm": "تغییرات ذخیره‌نشده دارید. صفحه را ترک می‌کنید؟",
       "backProducts": "همه محصولات",
       "stepDetails": "جزئیات",
-      "stepReview": "بازبینی",
+      "stepReview": "رزرو",
       "stepConfirm": "تأیید شده",
       "journeyLabel": "درخواست",
-      "reviewTitle": "بازبینی درخواست",
-      "reviewSubtitle": "قبل از رزرو پوشش، همه چیز را یک‌بار چک کنید.",
+      "reviewTitle": "رزرو پوشش",
+      "reviewSubtitle": "جزئیات زیر را تأیید کنید. در دمو فقط درخواست رزرو می‌شود و پرداختی گرفته نمی‌شود.",
       "reviewEmpty": "هنوز پاسخی نیست",
       "secureNote": "فقط دمو — پاسخ‌ها تا اتصال API واقعی در همین مرورگر می‌مانند.",
       "requiredHint": "قبل از بازبینی، فیلدهای الزامی را کامل کنید.",
@@ -118,7 +118,11 @@
       "validationRequired": "این فیلد الزامی است",
       "validationNumber": "عدد معتبر وارد کنید",
       "validationMin": "مقدار خیلی کوچک است",
-      "validationMax": "مقدار خیلی بزرگ است"
+      "validationMax": "مقدار خیلی بزرگ است",
+      "reserveQuote": "برآورد ماهانه",
+      "reserveQuoteHint": "برآورد نمایشی بر اساس انتخاب‌های شما. قیمت نهایی از بیمه‌گر می‌آید.",
+      "agreeLabel": "جزئیات را درست می‌دانم و می‌خواهم این درخواست را رزرو کنم.",
+      "agreeRequired": "قبل از رزرو، تأیید جزئیات لازم است."
     },
     "footer": {
       "tagline": "درخواست بیمه مبتنی بر اسکیما برای تیم‌های مدرن.",
@@ -148,6 +152,14 @@
               },
               "age": {
                 "label": "سن"
+              },
+              "gender": {
+                "label": "جنسیت",
+                "options": {
+                  "Female": "زن",
+                  "Male": "مرد",
+                  "Prefer not to say": "ترجیح می‌دهم نگویم"
+                }
               }
             }
           },
@@ -157,6 +169,21 @@
               "Basic": "پایه",
               "Standard": "استاندارد",
               "Premium": "ویژه"
+            }
+          },
+          "network": {
+            "label": "شبکه ارائه‌دهنده",
+            "options": {
+              "In-network only": "فقط طرف قرارداد",
+              "In + out of network": "طرف قرارداد و خارج",
+              "International": "بین‌المللی"
+            }
+          },
+          "smoker": {
+            "label": "آیا سیگار می‌کشید؟",
+            "options": {
+              "No": "خیر",
+              "Yes": "بله"
             }
           }
         }
@@ -179,20 +206,73 @@
                 "label": "شهر"
               }
             }
+          },
+          "property_type": {
+            "label": "نوع ملک",
+            "options": {
+              "Apartment": "آپارتمان",
+              "House": "خانه",
+              "Villa": "ویلا",
+              "Townhouse": "خانه شهری"
+            }
+          },
+          "ownership": {
+            "label": "مالکیت",
+            "options": {
+              "Owner": "مالک",
+              "Tenant": "مستأجر"
+            }
+          },
+          "contents_cover": {
+            "label": "پوشش اثاثیه",
+            "options": {
+              "None": "بدون",
+              "Standard": "استاندارد",
+              "High value": "ارزش بالا"
+            }
           }
         }
       },
       "car_insurance_application": {
         "title": "درخواست بیمه خودرو",
         "fields": {
-          "make": {
-            "label": "برند"
+          "vehicle": {
+            "label": "خودرو",
+            "fields": {
+              "make": {
+                "label": "برند",
+                "options": {
+                  "Toyota": "تویوتا",
+                  "Hyundai": "هیوندای",
+                  "BMW": "بی‌ام‌و",
+                  "Mercedes-Benz": "مرسدس بنز",
+                  "Iran Khodro": "ایران‌خودرو",
+                  "Kia": "کیا"
+                }
+              },
+              "model": {
+                "label": "مدل"
+              },
+              "year": {
+                "label": "سال ساخت"
+              }
+            }
           },
-          "model": {
-            "label": "مدل"
+          "usage": {
+            "label": "کاربری",
+            "options": {
+              "Personal": "شخصی",
+              "Business": "تجاری",
+              "Ride-share": "اسنپ/تپسی"
+            }
           },
-          "year": {
-            "label": "سال ساخت"
+          "coverage_level": {
+            "label": "سطح پوشش",
+            "options": {
+              "Third party": "شخص ثالث",
+              "Comprehensive": "بدنه",
+              "Full cover": "کامل"
+            }
           }
         }
       },
@@ -201,6 +281,15 @@
         "fields": {
           "full_name": {
             "label": "نام کامل"
+          },
+          "age_band": {
+            "label": "بازه سنی",
+            "options": {
+              "18–30": "۱۸–۳۰",
+              "31–45": "۳۱–۴۵",
+              "46–60": "۴۶–۶۰",
+              "61+": "۶۱+"
+            }
           },
           "coverage_amount": {
             "label": "مبلغ پوشش",
@@ -217,6 +306,22 @@
               "10 years": "۱۰ سال",
               "20 years": "۲۰ سال",
               "30 years": "۳۰ سال"
+            }
+          },
+          "smoker": {
+            "label": "وضعیت سیگار",
+            "options": {
+              "Non-smoker": "غیرسیگاری",
+              "Smoker": "سیگاری"
+            }
+          },
+          "beneficiary": {
+            "label": "ذی‌نفع اصلی",
+            "options": {
+              "Spouse": "همسر",
+              "Child": "فرزند",
+              "Parent": "والدین",
+              "Other": "سایر"
             }
           }
         }
