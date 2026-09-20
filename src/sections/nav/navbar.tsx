@@ -7,6 +7,7 @@ import { getDictionary } from "@/lib/dictionary"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { DEMO_SESSION_COOKIE } from "@/lib/auth-session"
 import { signOutDemo } from "@/lib/auth-actions"
+import { MobileNav } from "./mobile-nav"
 
 const Navbar = async ({ lang }: { lang: Locale }) => {
   const { navigation, page } = await getDictionary(lang)
@@ -33,6 +34,14 @@ const Navbar = async ({ lang }: { lang: Locale }) => {
         </div>
 
         <div className={styles.actions}>
+          <MobileNav
+            lang={lang}
+            products={navigation.products}
+            policies={navigation.policies}
+            about={navigation.about}
+            menuLabel={page.common.openMenu}
+            closeLabel={page.common.closeMenu}
+          />
           <LocaleSwitcher label={page.common.language} />
           {signedIn ? (
             <form action={signOutDemo.bind(null, lang)}>

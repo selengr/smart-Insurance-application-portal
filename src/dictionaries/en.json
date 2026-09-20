@@ -69,11 +69,16 @@
       "skipToContent": "Skip to content",
       "mainNav": "Main",
       "language": "Language",
-      "toggleTheme": "Toggle theme"
+      "toggleTheme": "Toggle theme",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
     },
     "form": {
       "saveDraft": "Save draft",
       "saving": "Saving…",
+      "discardDraft": "Discard draft",
+      "discardDraftDone": "Draft discarded",
+      "discardDraftConfirm": "Discard this draft and clear all answers?",
       "submit": "Reserve application",
       "submitting": "Reserving…",
       "cancel": "Cancel",
@@ -383,7 +388,21 @@
       "prevPage": "Previous page",
       "nextPage": "Next page",
       "lastPage": "Last page",
-      "loadingApps": "Loading applications…"
+      "loadingApps": "Loading applications…",
+      "viewDetails": "View details",
+      "openPolicy": "Open policy"
+    },
+    "policyDetail": {
+      "eyebrow": "Policy application",
+      "applicant": "Applicant",
+      "submitted": "Submitted",
+      "status": "Status",
+      "estimate": "Monthly estimate",
+      "answersTitle": "Application answers",
+      "noAnswers": "No stored answers for this application.",
+      "backToList": "Back to policies",
+      "notFound": "Application not found",
+      "notFoundBody": "This reference is missing from local demo storage, or the link is outdated."
     },
     "aboutPage": {
       "title": "About this portal",

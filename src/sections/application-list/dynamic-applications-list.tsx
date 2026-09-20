@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { AnimatePresence } from "motion/react";
 import { useState, useMemo, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ITabelRow, TColumnDef } from "@/types/purchased-insurances";
 import {
   ChevronDown,
@@ -57,10 +58,13 @@ export function DynamicApplicationsList({
     nextPage: string
     lastPage: string
     loadingApps: string
+    viewDetails: string
+    openPolicy: string
   }
   productTitles?: Record<string, string>
   lang: string
 }) {
+  const router = useRouter();
   const { data: apiResponse, isFetching, isError, refetch } = useFetchPurchasedInsurances();
 
   const [apiData, setApiData] = useState<{
@@ -130,7 +134,7 @@ export function DynamicApplicationsList({
   }, [apiData.columns]);
 
   const columns = useMemo<TColumnDef[]>(() => {
-    return apiData.columns.map((column) => {
+    const defs = apiData.columns.map((column) => {
       if (column === "Status") {
         return {
           id: column,
@@ -138,31 +142,44 @@ export function DynamicApplicationsList({
           accessorKey: column,
           sortable: true,
           filterable: true,
-          cell: (value, row) => {
+          cell: (value: unknown, row: ITabelRow) => {
             const statusKey = String(row._statusKey ?? value)
             const statusStyles: Record<string, string> = {
               Pending:
-                "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+                "bg-amber-100 text-amber-900 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-950 dark:text-amber-200 dark:ring-amber-400/30",
               Approved:
-                "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+                "bg-emerald-100 text-emerald-900 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-950 dark:text-emerald-200 dark:ring-emerald-400/30",
               Rejected:
-                "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+                "bg-rose-100 text-rose-900 ring-1 ring-inset ring-rose-600/20 dark:bg-rose-950 dark:text-rose-200 dark:ring-rose-400/30",
               "In Review":
-                "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+                "bg-sky-100 text-sky-900 ring-1 ring-inset ring-sky-600/20 dark:bg-sky-950 dark:text-sky-200 dark:ring-sky-400/30",
             };
 
             const style =
               statusStyles[statusKey] ||
-              "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
+              "bg-muted text-muted-foreground ring-1 ring-inset ring-border";
 
             return (
               <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${style}`}
+                className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold tracking-wide ${style}`}
               >
-                {value}
+                {String(value)}
               </span>
             );
           },
+        };
+      }
+
+      if (column === "id") {
+        return {
+          id: column,
+          header: labels.columns[column] ?? column,
+          accessorKey: column,
+          sortable: true,
+          filterable: true,
+          cell: (value: unknown) => (
+            <span className="font-mono text-sm text-primary">{String(value)}</span>
+          ),
         };
       }
 
@@ -174,7 +191,28 @@ export function DynamicApplicationsList({
         filterable: true,
       };
     });
-  }, [apiData.columns, labels.columns]);
+
+    return [
+      ...defs,
+      {
+        id: "_actions",
+        header: "",
+        accessorKey: "id",
+        sortable: false,
+        filterable: false,
+        cell: (_value: unknown, row: ITabelRow) => (
+          <Link
+            href={`/${lang}/purchased-insurances/${row.id}`}
+            className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+            aria-label={`${labels.openPolicy} ${row.id}`}
+          >
+            {labels.viewDetails}
+            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+          </Link>
+        ),
+      },
+    ];
+  }, [apiData.columns, labels.columns, labels.viewDetails, labels.openPolicy, lang]);
 
   const handleSort = useCallback((column: string) => {
     setSorting((prev) => ({
@@ -277,7 +315,11 @@ export function DynamicApplicationsList({
   );
 
   const visibleColumnDefs = useMemo(() => {
-    return columns.filter((column) => visibleColumns.includes(column.id));
+    const base = columns.filter(
+      (column) => column.id !== "_actions" && visibleColumns.includes(column.id),
+    );
+    const actions = columns.find((column) => column.id === "_actions");
+    return actions ? [...base, actions] : base;
   }, [columns, visibleColumns]);
 
 
@@ -404,7 +446,15 @@ export function DynamicApplicationsList({
               <AnimatePresence>
                 {paginatedData.length > 0 ? (
                   paginatedData.map((row) => (
-                    <tr key={row.id} className={`hover:bg-muted/50`}>
+                    <tr
+                      key={row.id}
+                      className="group cursor-pointer hover:bg-muted/50"
+                      onClick={(event) => {
+                        const target = event.target as HTMLElement
+                        if (target.closest("a,button,input,select,label")) return
+                        router.push(`/${lang}/purchased-insurances/${row.id}`)
+                      }}
+                    >
                       {visibleColumnDefs?.map((column,index) => (
                         <td key={`${column.id}.table.${index}`} className="px-4 py-3">
                           {column.cell
@@ -558,7 +608,9 @@ export function DynamicApplicationsList({
               </button>
             </div>
             <div className="space-y-2">
-              {columns.map((column) => (
+              {columns
+                .filter((column) => column.id !== "_actions")
+                .map((column) => (
                 <div key={column.id} className="flex items-center">
                   <input
                     type="checkbox"

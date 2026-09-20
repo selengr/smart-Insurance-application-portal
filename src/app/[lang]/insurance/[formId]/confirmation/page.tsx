@@ -90,7 +90,14 @@ export default async function ConfirmationPage({
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button asChild>
-              <Link href={`/${lang}/purchased-insurances`} className="gap-2">
+              <Link
+                href={
+                  ref
+                    ? `/${lang}/purchased-insurances/${reference}`
+                    : `/${lang}/purchased-insurances`
+                }
+                className="gap-2"
+              >
                 <FolderOpen className="h-4 w-4" aria-hidden />
                 {page.confirmation.viewPolicies}
               </Link>

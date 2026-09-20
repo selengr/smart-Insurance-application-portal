@@ -69,11 +69,16 @@
       "skipToContent": "پرش به محتوا",
       "mainNav": "منوی اصلی",
       "language": "زبان",
-      "toggleTheme": "تغییر تم"
+      "toggleTheme": "تغییر تم",
+      "openMenu": "باز کردن منو",
+      "closeMenu": "بستن منو"
     },
     "form": {
       "saveDraft": "ذخیره پیش‌نویس",
       "saving": "در حال ذخیره…",
+      "discardDraft": "حذف پیش‌نویس",
+      "discardDraftDone": "پیش‌نویس حذف شد",
+      "discardDraftConfirm": "این پیش‌نویس حذف و همه پاسخ‌ها پاک شود؟",
       "submit": "رزرو درخواست",
       "submitting": "در حال رزرو…",
       "cancel": "انصراف",
@@ -383,7 +388,21 @@
       "prevPage": "صفحه قبل",
       "nextPage": "صفحه بعد",
       "lastPage": "صفحه آخر",
-      "loadingApps": "در حال بارگذاری درخواست‌ها…"
+      "loadingApps": "در حال بارگذاری درخواست‌ها…",
+      "viewDetails": "مشاهده جزئیات",
+      "openPolicy": "باز کردن بیمه"
+    },
+    "policyDetail": {
+      "eyebrow": "درخواست بیمه",
+      "applicant": "متقاضی",
+      "submitted": "تاریخ ارسال",
+      "status": "وضعیت",
+      "estimate": "برآورد ماهانه",
+      "answersTitle": "پاسخ‌های درخواست",
+      "noAnswers": "پاسخی برای این درخواست ذخیره نشده است.",
+      "backToList": "بازگشت به بیمه‌ها",
+      "notFound": "درخواست پیدا نشد",
+      "notFoundBody": "این کد پیگیری در حافظه محلی دمو نیست یا لینک منقضی شده است."
     },
     "aboutPage": {
       "title": "درباره این پورتال",

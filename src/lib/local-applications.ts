@@ -7,6 +7,9 @@ export type LocalApplication = {
   "Submitted At": string
   Status: string
   formId?: string
+  answers?: Record<string, unknown>
+  monthlyEstimate?: number
+  reservedAt?: string
 }
 
 const FORM_LABELS: Record<string, string> = {
@@ -30,6 +33,10 @@ function readStorage(): LocalApplication[] {
 
 export function getLocalApplications(): LocalApplication[] {
   return readStorage()
+}
+
+export function getLocalApplicationById(id: string): LocalApplication | undefined {
+  return readStorage().find((row) => row.id === id)
 }
 
 export function insuranceTypeFromFormId(
@@ -57,7 +64,13 @@ export function saveLocalApplication(app: LocalApplication) {
   localStorage.setItem(LOCAL_APPS_KEY, JSON.stringify([app, ...existing]))
 }
 
-export function recordMockSubmission(formId: string, data: Record<string, unknown>, applicationId: string) {
+export function recordMockSubmission(
+  formId: string,
+  data: Record<string, unknown>,
+  applicationId: string,
+  extras?: { monthlyEstimate?: number },
+) {
+  const { formId: _omit, ...answers } = data
   saveLocalApplication({
     id: applicationId,
     "Insurance Type": insuranceTypeFromFormId(formId),
@@ -65,5 +78,8 @@ export function recordMockSubmission(formId: string, data: Record<string, unknow
     "Submitted At": new Date().toISOString().slice(0, 10),
     Status: "Pending",
     formId,
+    answers,
+    monthlyEstimate: extras?.monthlyEstimate,
+    reservedAt: new Date().toISOString(),
   })
 }

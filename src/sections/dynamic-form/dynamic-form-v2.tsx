@@ -98,6 +98,9 @@ type FormCopy = {
   tipsHeading: string
   almostThere: string
   sectionReady: string
+  discardDraft: string
+  discardDraftDone: string
+  discardDraftConfirm: string
 }
 
 interface IDynamicFormProps {
@@ -350,8 +353,10 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
       return
     }
 
+    const monthlyEstimate = estimateMonthlyPremium(formId, values)
+
     submitForm(
-      { data: { ...values, formId } },
+      { data: { ...values, formId, monthlyEstimate } },
       {
         onSuccess: (result) => {
           const applicationId =
@@ -421,11 +426,22 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
     })
   }
 
+  const discardDraft = () => {
+    if (typeof window !== "undefined" && !window.confirm(copy.discardDraftConfirm)) {
+      return
+    }
+    clearDraft()
+    form.reset({})
+    setSectionIndex(0)
+    setFlowStep("details")
+    setAgreed(false)
+    toast.success(copy.discardDraftDone)
+  }
+
   const fillDemo = async () => {
     const preset = getDemoPreset(formId, lang)
     if (!preset) return
     form.reset(preset)
-    // Load dependent options after preset (city/model)
     await new Promise((r) => setTimeout(r, 50))
     saveDraft()
     setSectionIndex(0)
@@ -549,6 +565,17 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
                       <Save className="h-4 w-4" />
                       {isSaving ? copy.saving : copy.saveDraft}
                     </Button>
+                    {lastSaved ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={discardDraft}
+                        className="gap-1.5 text-destructive hover:text-destructive"
+                      >
+                        {copy.discardDraft}
+                      </Button>
+                    ) : null}
                   </div>
                 </div>
 

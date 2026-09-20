@@ -9,7 +9,14 @@ import { getLocalApplications } from "@/lib/local-applications";
 
 export const purchasedInsurancesApi = async (): Promise<ITabelData> => {
   if (isMockApiEnabled()) {
-    const local = getLocalApplications();
+    const local = getLocalApplications().map((row) => ({
+      id: row.id,
+      "Insurance Type": row["Insurance Type"],
+      Applicant: row.Applicant,
+      "Submitted At": row["Submitted At"],
+      Status: row.Status,
+      ...(row.formId ? { formId: row.formId } : {}),
+    }))
     const merged = [
       ...local,
       ...mockPurchasedRows.filter(
