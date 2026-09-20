@@ -123,3 +123,31 @@
   }
 }
 
+@media print {
+  nav,
+  footer,
+  .print\:hidden,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  #main-content {
+    padding-top: 0 !important;
+  }
+
+  .print-receipt {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .print-receipt img {
+    display: none !important;
+  }
+}
+
+

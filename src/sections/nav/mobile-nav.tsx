@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
 import styles from "./nav.module.css"
 import { signOutDemo } from "@/lib/auth-actions"
@@ -30,25 +30,52 @@ export function MobileNav({
   signOutLabel,
 }: Props) {
   const [open, setOpen] = useState(false)
+  const panelId = useId()
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false)
+        buttonRef.current?.focus()
+      }
+    }
+
+    const firstLink = panelRef.current?.querySelector<HTMLElement>("a,button")
+    firstLink?.focus()
+
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [open])
 
   return (
     <div className={styles.mobileNav}>
       <button
+        ref={buttonRef}
         type="button"
         className={styles.menuButton}
         aria-expanded={open}
-        aria-controls="mobile-nav-panel"
+        aria-controls={panelId}
         aria-label={open ? closeLabel : menuLabel}
         onClick={() => setOpen((value) => !value)}
       >
-        {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {open ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
       </button>
 
       {open ? (
-        <div id="mobile-nav-panel" className={styles.mobilePanel}>
+        <div
+          ref={panelRef}
+          id={panelId}
+          className={styles.mobilePanel}
+          role="menu"
+        >
           <a
             href={`/${lang}#products`}
             className={styles.mobileLink}
+            role="menuitem"
             onClick={() => setOpen(false)}
           >
             {products}
@@ -56,6 +83,7 @@ export function MobileNav({
           <Link
             href={`/${lang}/purchased-insurances`}
             className={styles.mobileLink}
+            role="menuitem"
             onClick={() => setOpen(false)}
           >
             {policies}
@@ -63,14 +91,15 @@ export function MobileNav({
           <Link
             href={`/${lang}/about`}
             className={styles.mobileLink}
+            role="menuitem"
             onClick={() => setOpen(false)}
           >
             {about}
           </Link>
-          <div className={styles.mobileDivider} />
+          <div className={styles.mobileDivider} aria-hidden />
           {signedIn ? (
             <form action={signOutDemo.bind(null, lang)}>
-              <button type="submit" className={styles.mobileLink}>
+              <button type="submit" className={styles.mobileLink} role="menuitem">
                 {signOutLabel}
               </button>
             </form>
@@ -78,6 +107,7 @@ export function MobileNav({
             <Link
               href={`/${lang}/login`}
               className={styles.mobileLink}
+              role="menuitem"
               onClick={() => setOpen(false)}
             >
               {signInLabel}

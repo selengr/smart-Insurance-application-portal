@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test scripts/test-schema.mjs"
+    "test": "node --test scripts/test-schema.mjs scripts/test-status.mjs scripts/test-quote.mjs",
+    "ci": "npm test && npm run typecheck && npm run lint"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.6.0",

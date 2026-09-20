@@ -11,6 +11,7 @@ import { statusChipClass } from "@/lib/status-styles"
 import { CopyReferenceButton } from "@/components/copy-reference-button"
 import { ConfirmationEstimate } from "@/sections/application/confirmation-estimate"
 import { ConfirmationMotion } from "@/sections/application/confirmation-motion"
+import { PrintReceiptButton } from "@/components/print-receipt-button"
 
 export default async function ConfirmationPage({
   params,
@@ -44,11 +45,11 @@ export default async function ConfirmationPage({
         aria-hidden
       />
 
-      <div className="mb-8 border border-border/80 bg-card/50 px-4 py-4 sm:px-6">
-        <ApplicationStepper steps={steps} currentIndex={2} />
+      <div className="mb-8 border border-border/80 bg-card/50 px-4 py-4 sm:px-6" data-print-hide>
+        <ApplicationStepper steps={steps} currentIndex={2} ariaLabel={page.form.journeyLabel} />
       </div>
 
-      <div className="relative overflow-hidden border border-border">
+      <div className="print-receipt relative overflow-hidden border border-border">
         <div className="absolute inset-0">
           <Image src={visual.src} alt="" fill className="object-cover opacity-30" sizes="100vw" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/95 to-background" />
@@ -121,7 +122,7 @@ export default async function ConfirmationPage({
             <p className="mt-2 text-sm text-muted-foreground">{page.confirmation.nextBody}</p>
           </div>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center" data-print-hide>
             <Button asChild>
               <Link
                 href={
@@ -135,6 +136,7 @@ export default async function ConfirmationPage({
                 {page.confirmation.viewPolicies}
               </Link>
             </Button>
+            <PrintReceiptButton label={page.confirmation.printReceipt} />
             <Button asChild variant="outline">
               <Link href={`/${lang}/insurance/${formId}`}>{page.confirmation.applyAnother}</Link>
             </Button>
@@ -142,6 +144,7 @@ export default async function ConfirmationPage({
 
           <Link
             href={`/${lang}`}
+            data-print-hide
             className="mt-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:underline"
           >
             <Home className="h-3.5 w-3.5" aria-hidden />

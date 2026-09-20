@@ -189,6 +189,7 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const prevDependsRef = useRef<Record<string, string>>({})
   const draftLoadedRef = useRef(false)
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null)
 
   const sections = useMemo(() => buildFormSections(formData.fields), [formData])
 
@@ -384,10 +385,30 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
     )
   }
 
+  const focusFirstInvalid = () => {
+    window.requestAnimationFrame(() => {
+      const invalid = document.querySelector<HTMLElement>(
+        '[aria-invalid="true"], [data-invalid="true"]',
+      )
+      invalid?.focus()
+    })
+  }
+
+  const focusStepHeading = () => {
+    window.requestAnimationFrame(() => {
+      stepHeadingRef.current?.focus({ preventScroll: true })
+    })
+  }
+
+  useEffect(() => {
+    focusStepHeading()
+  }, [sectionIndex, flowStep])
+
   const goToReview = async () => {
     const valid = await form.trigger()
     if (!valid) {
       toast.error(copy.requiredHint)
+      focusFirstInvalid()
       return
     }
     saveDraft()
@@ -403,6 +424,7 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
     const valid = await form.trigger(paths as never)
     if (!valid) {
       toast.error(copy.requiredHint)
+      focusFirstInvalid()
       return
     }
     toast.success(copy.sectionReady, { duration: 1600 })
@@ -528,6 +550,7 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
         <ApplicationStepper
           steps={steps}
           currentIndex={journeyIndex}
+          ariaLabel={copy.journeyLabel}
           onStepSelect={(index) => {
             if (index === 0 && flowStep === "review") {
               setFlowStep("details")
@@ -605,7 +628,11 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
                     <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-primary">
                       {sectionLabel}
                     </p>
-                    <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight">
+                    <h2
+                      ref={stepHeadingRef}
+                      tabIndex={-1}
+                      className="mt-1 font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight outline-none"
+                    >
                       {currentSection?.label}
                     </h2>
                     <p className="mt-2 text-sm text-muted-foreground">
@@ -769,7 +796,11 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
           ) : (
             <>
               <div className="space-y-2">
-                <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight">
+                <h2
+                  ref={stepHeadingRef}
+                  tabIndex={-1}
+                  className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight outline-none"
+                >
                   {copy.reviewTitle}
                 </h2>
                 <p className="text-sm text-muted-foreground">{copy.reviewSubtitle}</p>

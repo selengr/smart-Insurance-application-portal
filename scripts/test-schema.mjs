@@ -106,3 +106,27 @@ test("optional fields can be omitted", () => {
   });
   assert.equal(parsed.success, true);
 });
+
+test("nested group fields validate", () => {
+  const schema = generateZodSchema([
+    {
+      id: "personal_info",
+      label: "Personal",
+      type: "group",
+      fields: [
+        { id: "first_name", label: "First", type: "text", required: true },
+        { id: "age", label: "Age", type: "number", required: true, validation: { min: 0, max: 120 } },
+      ],
+    },
+  ]);
+  const ok = schema.safeParse({ personal_info: { first_name: "Sam", age: 30 } });
+  const bad = schema.safeParse({ personal_info: { first_name: "Sam", age: 200 } });
+  assert.equal(ok.success, true);
+  assert.equal(bad.success, false);
+});
+
+test("required text cannot be empty", () => {
+  const schema = generateZodSchema(fields);
+  const parsed = schema.safeParse({ full_name: "", age: 28 });
+  assert.equal(parsed.success, false);
+});
