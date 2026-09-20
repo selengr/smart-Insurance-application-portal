@@ -12,6 +12,7 @@ import { CopyReferenceButton } from "@/components/copy-reference-button"
 import { ConfirmationEstimate } from "@/sections/application/confirmation-estimate"
 import { ConfirmationMotion } from "@/sections/application/confirmation-motion"
 import { PrintReceiptButton } from "@/components/print-receipt-button"
+import { ConfirmationRecentTracker } from "@/components/confirmation-recent-tracker"
 
 export default async function ConfirmationPage({
   params,
@@ -40,6 +41,7 @@ export default async function ConfirmationPage({
 
   return (
     <main className="relative mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+      {reference ? <ConfirmationRecentTracker reference={reference} /> : null}
       <div
         className="pointer-events-none absolute inset-x-0 -top-10 -z-10 h-56 bg-[radial-gradient(ellipse_at_top,_oklch(0.72_0.06_195_/_0.16),_transparent_70%)]"
         aria-hidden

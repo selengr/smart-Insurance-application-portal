@@ -250,7 +250,8 @@ export function recordMockSubmission(
   applicationId: string,
   extras?: { monthlyEstimate?: number },
 ) {
-  const { formId: _omit, ...answers } = data
+  const answers = { ...data }
+  delete answers.formId
   const reservedAt = new Date().toISOString()
   saveLocalApplication({
     id: applicationId,

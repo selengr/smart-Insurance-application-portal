@@ -125,7 +125,9 @@
       "browseProducts": "Browse products",
       "viewPolicies": "My policies",
       "errorRecover": "Retry this page, or head home and continue from products.",
-      "notFoundRecover": "Check the link, or open products and My policies from here."
+      "notFoundRecover": "Check the link, or open products and My policies from here.",
+      "offline": "You’re offline. Drafts stay on this device — reconnect to sync the list.",
+      "backOnline": "You’re back online. Refreshing local data…"
     },
     "form": {
       "saveDraft": "Save draft",
