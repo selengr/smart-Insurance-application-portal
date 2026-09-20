@@ -6,6 +6,7 @@ import { getDictionary } from "@/lib/dictionary"
 import { fetchInsuranceTypes } from "@/services/api/home"
 import { PRODUCT_VISUAL, productTitle } from "@/lib/product-visuals"
 import { ArrowUpRight, FolderOpen } from "lucide-react"
+import { HomeDraftsPanel, ProductDraftBadge } from "@/sections/home-page/home-drafts"
 
 interface HomeProps {
   lang: Locale
@@ -21,11 +22,20 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
     emptyProducts: string
     heroCaption: string
     estimateHint?: string
+    draftsTitle?: string
+    draftsBody?: string
+    continueDraft?: string
+    draftBadge?: string
     productMeta: Record<string, string>
     productTitles?: Record<string, string>
     productHighlights?: Record<string, string[]>
   }
   const items = insuranceTypes?.data ?? []
+  const draftProducts = items.map((insurance) => ({
+    formId: insurance.formId,
+    title:
+      home.productTitles?.[insurance.formId] ?? productTitle(insurance.title),
+  }))
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-20 pt-10 sm:px-6 sm:pb-28 sm:pt-14">
@@ -74,6 +84,18 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
         </div>
       </section>
 
+      <HomeDraftsPanel
+        lang={lang}
+        products={draftProducts}
+        title={home.draftsTitle ?? "Continue a draft"}
+        body={
+          home.draftsBody ??
+          "Pick up where you left off — drafts stay in this browser until you reserve."
+        }
+        continueLabel={home.continueDraft ?? "Continue"}
+        draftBadge={home.draftBadge ?? "Draft"}
+      />
+
       <section id="products" aria-labelledby="products-heading" className="scroll-mt-28">
         <div className="mb-7 flex items-end justify-between gap-4 border-b border-border pb-3">
           <h2
@@ -109,10 +131,14 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
                 <li key={insurance.formId}>
                   <Link
                     href={`/${lang}/insurance/${insurance.formId}`}
-                    className="group flex h-full flex-col overflow-hidden border border-border bg-card/80 transition duration-300 hover:-translate-y-1 hover:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="group relative flex h-full flex-col overflow-hidden border border-border bg-card/80 transition duration-300 hover:-translate-y-1 hover:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     aria-label={`${home.InsuranceLink}: ${insurance.title}`}
                   >
                     <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
+                      <ProductDraftBadge
+                        formId={insurance.formId}
+                        label={home.draftBadge ?? "Draft"}
+                      />
                       <Image
                         src={visual.src}
                         alt={visual.alt}

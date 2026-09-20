@@ -4,6 +4,7 @@ import { Locale } from "../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import { DynamicApplicationsList } from "@/sections/application-list/dynamic-applications-list"
 import { SessionContinuityBanner } from "@/components/session-continuity-banner"
+import { ExportApplicationsButton } from "@/components/export-applications-button"
 import { DEMO_SESSION_COOKIE } from "@/lib/auth-session"
 import { ArrowUpRight } from "lucide-react"
 
@@ -33,13 +34,20 @@ export default async function PurchasedInsurancesPage({
           </h1>
           <p className="mt-2 max-w-xl text-muted-foreground">{page.policies.subtitle}</p>
         </div>
-        <Link
-          href={`/${lang}#products`}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-        >
-          {page.home.InsuranceTypes}
-          <ArrowUpRight className="h-4 w-4" aria-hidden />
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <ExportApplicationsButton
+            label={page.policies.exportLabel}
+            emptyLabel={page.policies.exportEmpty}
+            doneLabel={page.policies.exportDone}
+          />
+          <Link
+            href={`/${lang}#products`}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+          >
+            {page.home.InsuranceTypes}
+            <ArrowUpRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </div>
       </header>
 
       <SessionContinuityBanner
