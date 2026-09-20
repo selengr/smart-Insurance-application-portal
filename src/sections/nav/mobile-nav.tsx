@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useId, useState } from "react"
+import { useEffect, useId, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { useFocusTrap } from "@/hooks/use-focus-trap"
 import styles from "./nav.module.css"
@@ -33,6 +33,31 @@ export function MobileNav({
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const containerRef = useFocusTrap(open, () => setOpen(false))
+
+  useEffect(() => {
+    if (!open) return
+
+    const onPointerDown = (event: PointerEvent) => {
+      const root = containerRef.current
+      if (!root) return
+      if (event.target instanceof Node && !root.contains(event.target)) {
+        setOpen(false)
+      }
+    }
+
+    document.addEventListener("pointerdown", onPointerDown)
+    return () => document.removeEventListener("pointerdown", onPointerDown)
+  }, [open, containerRef])
+
+  useEffect(() => {
+    if (!open) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [open])
 
   return (
     <div ref={containerRef} className={styles.mobileNav}>
