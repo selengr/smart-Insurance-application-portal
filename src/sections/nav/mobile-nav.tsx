@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useId, useRef, useState } from "react"
+import { useId, useState } from "react"
 import { Menu, X } from "lucide-react"
+import { useFocusTrap } from "@/hooks/use-focus-trap"
 import styles from "./nav.module.css"
 import { signOutDemo } from "@/lib/auth-actions"
 
@@ -31,30 +32,11 @@ export function MobileNav({
 }: Props) {
   const [open, setOpen] = useState(false)
   const panelId = useId()
-  const buttonRef = useRef<HTMLButtonElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false)
-        buttonRef.current?.focus()
-      }
-    }
-
-    const firstLink = panelRef.current?.querySelector<HTMLElement>("a,button")
-    firstLink?.focus()
-
-    window.addEventListener("keydown", onKeyDown)
-    return () => window.removeEventListener("keydown", onKeyDown)
-  }, [open])
+  const containerRef = useFocusTrap(open, () => setOpen(false))
 
   return (
-    <div className={styles.mobileNav}>
+    <div ref={containerRef} className={styles.mobileNav}>
       <button
-        ref={buttonRef}
         type="button"
         className={styles.menuButton}
         aria-expanded={open}
@@ -67,7 +49,6 @@ export function MobileNav({
 
       {open ? (
         <div
-          ref={panelRef}
           id={panelId}
           className={styles.mobilePanel}
           role="menu"
@@ -76,6 +57,7 @@ export function MobileNav({
             href={`/${lang}#products`}
             className={styles.mobileLink}
             role="menuitem"
+            data-autofocus
             onClick={() => setOpen(false)}
           >
             {products}
