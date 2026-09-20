@@ -8,6 +8,7 @@ import Navbar from "@/sections/nav/navbar";
 import SiteFooter from "@/sections/footer/site-footer";
 import QueryProvider from "@/provider/QueryClientProvider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { OfflineBanner } from "@/components/offline-banner";
 import { estedad, displayFont, bodyFont } from "@/tailwind/font";
 import { getDictionary } from "@/lib/dictionary";
 import { APP_DEFAULT_TITLE_EN, APP_DESCRIPTION_EN, APP_TITLE_TEMPLATE_EN, APP_DEFAULT_TITLE_FA, APP_DESCRIPTION_FA, APP_TITLE_TEMPLATE_FA, APP_KEYWORDS } from "../../../config-global";
@@ -101,6 +102,10 @@ export default function RootLayout(props: {
           <div className="flex min-h-screen flex-col">
             <Navbar lang={lang} />
             <div id="main-content" className="flex-1 pt-16" tabIndex={-1}>
+              <OfflineBanner
+                offlineLabel={page.common.offline}
+                backOnlineLabel={page.common.backOnline}
+              />
               <QueryProvider>{props.children}</QueryProvider>
             </div>
             <SiteFooter lang={lang} />

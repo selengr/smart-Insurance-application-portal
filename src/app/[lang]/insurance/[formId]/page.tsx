@@ -3,8 +3,17 @@ import { Locale } from "../../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import DynamicFormV2 from "@/sections/dynamic-form/dynamic-form-v2"
 import { insuranceTypeFromFormId } from "@/lib/local-applications"
+import { mockInsuranceForms } from "@/mocks/fixtures"
 
 type Params = Promise<{ formId: string; lang: Locale }>
+
+const FORM_IDS = [
+  ...new Set(mockInsuranceForms.map((form) => form.formId)),
+]
+
+export function generateStaticParams() {
+  return FORM_IDS.map((formId) => ({ formId }))
+}
 
 export async function generateMetadata({
   params,
