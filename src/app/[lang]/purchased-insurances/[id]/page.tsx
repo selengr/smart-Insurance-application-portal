@@ -18,6 +18,7 @@ import { PRODUCT_VISUAL } from "@/lib/product-visuals"
 import { statusChipClass } from "@/lib/status-styles"
 import { Button } from "@/components/ui/button"
 import { CopyReferenceButton } from "@/components/copy-reference-button"
+import { ShareLinkButton } from "@/components/share-link-button"
 import en from "@/dictionaries/en.json"
 import fa from "@/dictionaries/fa.json"
 import { toast } from "sonner"
@@ -204,6 +205,11 @@ export default function PolicyDetailPage() {
               value={app.id}
               copyLabel={copy.copyReference}
               copiedLabel={copy.copiedReference}
+            />
+            <ShareLinkButton
+              path={`/${lang}/purchased-insurances/${app.id}`}
+              copyLabel={copy.shareLink}
+              copiedLabel={copy.shareLinkDone}
             />
           </div>
           {estimate ? (

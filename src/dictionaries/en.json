@@ -106,7 +106,11 @@
       "language": "Language",
       "toggleTheme": "Toggle theme",
       "openMenu": "Open menu",
-      "closeMenu": "Close menu"
+      "closeMenu": "Close menu",
+      "browseProducts": "Browse products",
+      "viewPolicies": "My policies",
+      "errorRecover": "Retry this page, or head home and continue from products.",
+      "notFoundRecover": "Check the link, or open products and My policies from here."
     },
     "form": {
       "saveDraft": "Save draft",
@@ -451,7 +455,11 @@
       "lastPage": "Last page",
       "loadingApps": "Loading applications…",
       "viewDetails": "View details",
-      "openPolicy": "Open policy"
+      "openPolicy": "Open policy",
+      "searchPlaceholder": "Search by id, product, applicant…",
+      "searchLabel": "Search applications",
+      "filterAll": "All",
+      "noFilterMatches": "No applications match this search or status filter."
     },
     "policyDetail": {
       "eyebrow": "Policy application",
@@ -467,6 +475,8 @@
       "notFoundRecover": "Open My policies for the latest list, or reserve a new application from products.",
       "copyReference": "Copy reference",
       "copiedReference": "Copied",
+      "shareLink": "Copy link",
+      "shareLinkDone": "Link copied",
       "applyAgain": "Apply again",
       "timelineTitle": "Status timeline",
       "advanceStatus": "Advance to {status}",
