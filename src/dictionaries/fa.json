@@ -106,7 +106,11 @@
       "language": "زبان",
       "toggleTheme": "تغییر تم",
       "openMenu": "باز کردن منو",
-      "closeMenu": "بستن منو"
+      "closeMenu": "بستن منو",
+      "browseProducts": "مشاهده محصولات",
+      "viewPolicies": "بیمه‌های من",
+      "errorRecover": "این صفحه را دوباره تلاش کنید، یا به خانه بروید و از محصولات ادامه دهید.",
+      "notFoundRecover": "لینک را بررسی کنید، یا از اینجا به محصولات و بیمه‌های من بروید."
     },
     "form": {
       "saveDraft": "ذخیره پیش‌نویس",
@@ -451,7 +455,11 @@
       "lastPage": "صفحه آخر",
       "loadingApps": "در حال بارگذاری درخواست‌ها…",
       "viewDetails": "مشاهده جزئیات",
-      "openPolicy": "باز کردن بیمه"
+      "openPolicy": "باز کردن بیمه",
+      "searchPlaceholder": "جستجو با شناسه، محصول، متقاضی…",
+      "searchLabel": "جستجوی درخواست‌ها",
+      "filterAll": "همه",
+      "noFilterMatches": "هیچ درخواستی با این جستجو یا فیلتر وضعیت هم‌خوانی ندارد."
     },
     "policyDetail": {
       "eyebrow": "درخواست بیمه",
@@ -467,6 +475,8 @@
       "notFoundRecover": "برای فهرست به‌روز بیمه‌های من را باز کنید، یا از محصولات درخواست تازه‌ای رزرو کنید.",
       "copyReference": "کپی کد پیگیری",
       "copiedReference": "کپی شد",
+      "shareLink": "کپی لینک",
+      "shareLinkDone": "لینک کپی شد",
       "applyAgain": "درخواست دوباره",
       "timelineTitle": "جدول زمانی وضعیت",
       "advanceStatus": "پیشبرد به {status}",

@@ -16,6 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowUpRight,
+  Search,
 } from "lucide-react";
 import { useFetchPurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances";
 import {
@@ -25,7 +26,7 @@ import {
 } from "@/lib/local-applications";
 import { PRODUCT_VISUAL } from "@/lib/product-visuals";
 import { statusChipClass } from "@/lib/status-styles";
-import { PoliciesSummary } from "@/components/policies-summary";
+import { PoliciesSummary, type StatusFilterKey } from "@/components/policies-summary";
 import Image from "next/image";
 
 export function DynamicApplicationsList({
@@ -74,6 +75,10 @@ export function DynamicApplicationsList({
     summaryRejected: string
     loadErrorHint: string
     noAppsRecover: string
+    searchPlaceholder: string
+    searchLabel: string
+    filterAll: string
+    noFilterMatches: string
   }
   productTitles?: Record<string, string>
   lang: string
@@ -113,6 +118,8 @@ export function DynamicApplicationsList({
   });
 
   const [filters, setFilters] = useState<Record<string, string>>({});
+  const [statusFilter, setStatusFilter] = useState<StatusFilterKey>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
     apiData.columns
   );
@@ -269,6 +276,27 @@ export function DynamicApplicationsList({
   const filteredData = useMemo(() => {
     let result = [...apiData.data];
 
+    if (statusFilter !== "all") {
+      result = result.filter((row) => String(row._statusKey ?? row.Status) === statusFilter)
+    }
+
+    const query = searchQuery.trim().toLowerCase()
+    if (query) {
+      result = result.filter((row) => {
+        const haystack = [
+          row.id,
+          row["Insurance Type"],
+          row.Applicant,
+          row.Status,
+          row["Submitted At"],
+          row.formId,
+        ]
+          .map((value) => String(value ?? "").toLowerCase())
+          .join(" ")
+        return haystack.includes(query)
+      })
+    }
+
     Object.entries(filters).forEach(([column, value]) => {
       result = result.filter((row) => {
         const cellValue = String(row[column] || "").toLowerCase();
@@ -306,7 +334,7 @@ export function DynamicApplicationsList({
     }
 
     return result;
-  }, [apiData.data, filters, sorting]);
+  }, [apiData.data, filters, sorting, statusFilter, searchQuery]);
 
   const totalPages = Math.ceil(filteredData.length / pageSize);
 
@@ -339,12 +367,17 @@ export function DynamicApplicationsList({
   const statusCounts = useMemo(
     () =>
       summarizeStatuses(
-        filteredData.map((row) => ({
+        apiData.data.map((row) => ({
           Status: String(row._statusKey ?? row.Status ?? "Pending"),
         })),
       ),
-    [filteredData],
+    [apiData.data],
   );
+
+  const onStatusSelect = useCallback((key: StatusFilterKey) => {
+    setStatusFilter(key)
+    setCurrentPage(1)
+  }, [])
 
   if (isError) {
     return (
@@ -374,36 +407,75 @@ export function DynamicApplicationsList({
     <div className="w-full">
       <PoliciesSummary
         counts={statusCounts}
+        active={statusFilter}
+        onSelect={onStatusSelect}
         labels={{
+          all: labels.filterAll,
           pending: labels.summaryPending,
           inReview: labels.summaryInReview,
           approved: labels.summaryApproved,
           rejected: labels.summaryRejected,
-          total: labels.applications,
         }}
       />
 
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          {labels.applications} · {filteredData.length}
-        </p>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setShowFilterModal(true)}
-            className="px-3 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
-          >
-            <Filter className="w-4 h-4" />
-            <span className="sr-only">{labels.filter}</span>
-          </button>
-          <button
-            onClick={() => setShowColumnCustomizer(true)}
-            className="px-3 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
-          >
-            <Settings className="w-4 h-4" />
-            <span className="sr-only">{labels.customize}</span>
-          </button>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative min-w-0 flex-1 sm:max-w-sm">
+          <Search
+            className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => {
+              setSearchQuery(event.target.value)
+              setCurrentPage(1)
+            }}
+            placeholder={labels.searchPlaceholder}
+            aria-label={labels.searchLabel}
+            className="w-full border border-input bg-background py-2 pe-3 ps-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        </div>
+        <div className="flex items-center justify-between gap-3 sm:justify-end">
+          <p className="text-sm text-muted-foreground">
+            {labels.applications} · {filteredData.length}
+          </p>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setShowFilterModal(true)}
+              className="px-3 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+            >
+              <Filter className="w-4 h-4" />
+              <span className="sr-only">{labels.filter}</span>
+            </button>
+            <button
+              onClick={() => setShowColumnCustomizer(true)}
+              className="px-3 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="sr-only">{labels.customize}</span>
+            </button>
+          </div>
         </div>
       </div>
+
+      {apiData.data.length > 0 && filteredData.length === 0 ? (
+        <div className="mb-4 border border-dashed border-border px-4 py-8 text-center">
+          <p className="text-sm font-medium">{labels.noFilterMatches}</p>
+          <button
+            type="button"
+            className="mt-3 text-sm font-semibold text-primary hover:underline"
+            onClick={() => {
+              setStatusFilter("all")
+              setSearchQuery("")
+              setFilters({})
+              setCurrentPage(1)
+            }}
+          >
+            {labels.clearAll}
+          </button>
+        </div>
+      ) : null}
 
       {Object.keys(filters).length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
