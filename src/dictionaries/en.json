@@ -59,7 +59,12 @@
     },
     "policies": {
       "title": "Your applications",
-      "subtitle": "Track reserved and submitted policies in one place."
+      "subtitle": "Track reserved and submitted policies in one place.",
+      "guestTitle": "Browsing as a guest",
+      "guestBody": "You can still view and reserve applications. Sign in to keep a demo session cookie across visits.",
+      "guestCta": "Continue as demo user",
+      "signedInLabel": "Demo session active",
+      "storageNote": "Reservations and drafts are stored in this browser only."
     },
     "login": {
       "title": "Sign in to continue",
@@ -119,6 +124,7 @@
       "lastSaved": "Last saved",
       "autosave": "Your progress is automatically saved every 30 seconds.",
       "loadError": "Could not load this form",
+      "loadErrorRecover": "Check your connection, then retry — or go back and pick another product.",
       "notFound": "Form not found.",
       "connectionHint": "Please check your connection and try again.",
       "submittedTitle": "Application reserved",
@@ -413,7 +419,13 @@
       "clearAll": "Clear all",
       "noApps": "No applications found",
       "noAppsHint": "Submit an insurance form to see it listed here.",
+      "noAppsRecover": "Start from Choose a product, reserve once, then return here to track status.",
       "loadError": "Could not load applications",
+      "loadErrorHint": "Retry the list, or start a new application if the problem continues.",
+      "summaryPending": "Pending",
+      "summaryInReview": "In review",
+      "summaryApproved": "Approved",
+      "summaryRejected": "Rejected",
       "retry": "Retry",
       "showing": "Showing",
       "to": "to",
@@ -451,9 +463,15 @@
       "backToList": "Back to policies",
       "notFound": "Application not found",
       "notFoundBody": "This reference is missing from local demo storage, or the link is outdated.",
+      "notFoundRecover": "Open My policies for the latest list, or reserve a new application from products.",
       "copyReference": "Copy reference",
       "copiedReference": "Copied",
-      "applyAgain": "Apply again"
+      "applyAgain": "Apply again",
+      "timelineTitle": "Status timeline",
+      "advanceStatus": "Advance to {status}",
+      "advanceHint": "Demo only — simulate underwriting progress for applications reserved in this browser.",
+      "advancedTitle": "Status updated",
+      "advancedBody": "Moved to {status}."
     },
     "aboutPage": {
       "title": "About this portal",

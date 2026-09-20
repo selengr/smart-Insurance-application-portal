@@ -47,6 +47,7 @@ type FormCopy = {
   lastSaved: string
   autosave: string
   loadError: string
+  loadErrorRecover: string
   notFound: string
   connectionHint: string
   submittedTitle: string
@@ -930,17 +931,26 @@ export default function DynamicForm({
         <p className="text-sm text-muted-foreground">
           {error instanceof Error ? error.message : copy.connectionHint}
         </p>
-        <Button type="button" variant="outline" onClick={() => refetch()}>
-          {copy.retry}
-        </Button>
+        <p className="text-xs text-muted-foreground">{copy.loadErrorRecover}</p>
+        <div className="flex flex-wrap justify-center gap-2 pt-1">
+          <Button type="button" variant="outline" onClick={() => refetch()}>
+            {copy.retry}
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={`/${lang}`}>{copy.backProducts}</Link>
+          </Button>
+        </div>
       </div>
     )
   }
 
   if (!formData || !formSchema) {
     return (
-      <div className="border p-8 text-center text-muted-foreground" role="status">
-        {copy.notFound}
+      <div className="border border-border p-8 text-center space-y-3" role="status">
+        <p className="text-muted-foreground">{copy.notFound}</p>
+        <Button asChild variant="outline">
+          <Link href={`/${lang}`}>{copy.backProducts}</Link>
+        </Button>
       </div>
     )
   }

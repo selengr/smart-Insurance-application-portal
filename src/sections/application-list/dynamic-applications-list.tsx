@@ -18,9 +18,14 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { useFetchPurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances";
-import { insuranceTypeFromFormId } from "@/lib/local-applications";
+import {
+  applyDemoStatusProgress,
+  insuranceTypeFromFormId,
+  summarizeStatuses,
+} from "@/lib/local-applications";
 import { PRODUCT_VISUAL } from "@/lib/product-visuals";
 import { statusChipClass } from "@/lib/status-styles";
+import { PoliciesSummary } from "@/components/policies-summary";
 import Image from "next/image";
 
 export function DynamicApplicationsList({
@@ -63,12 +68,33 @@ export function DynamicApplicationsList({
     loadingApps: string
     viewDetails: string
     openPolicy: string
+    summaryPending: string
+    summaryInReview: string
+    summaryApproved: string
+    summaryRejected: string
+    loadErrorHint: string
+    noAppsRecover: string
   }
   productTitles?: Record<string, string>
   lang: string
 }) {
   const router = useRouter();
   const { data: apiResponse, isFetching, isError, refetch } = useFetchPurchasedInsurances();
+
+  useEffect(() => {
+    if (applyDemoStatusProgress()) {
+      void refetch()
+    }
+    const onChanged = () => {
+      void refetch()
+    }
+    window.addEventListener("sip:applications-changed", onChanged)
+    window.addEventListener("storage", onChanged)
+    return () => {
+      window.removeEventListener("sip:applications-changed", onChanged)
+      window.removeEventListener("storage", onChanged)
+    }
+  }, [refetch])
 
   const [apiData, setApiData] = useState<{
     columns: string[];
@@ -310,24 +336,53 @@ export function DynamicApplicationsList({
     return actions ? [...base, actions] : base;
   }, [columns, visibleColumns]);
 
+  const statusCounts = useMemo(
+    () =>
+      summarizeStatuses(
+        filteredData.map((row) => ({
+          Status: String(row._statusKey ?? row.Status ?? "Pending"),
+        })),
+      ),
+    [filteredData],
+  );
 
   if (isError) {
     return (
-      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center space-y-3" role="alert">
+      <div className="border border-destructive/30 bg-destructive/5 p-6 text-center space-y-3" role="alert">
         <p className="font-medium">{labels.loadError}</p>
-        <button
-          type="button"
-          onClick={() => refetch()}
-          className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
-        >
-          {labels.retry}
-        </button>
+        <p className="text-sm text-muted-foreground">{labels.loadErrorHint}</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
+          >
+            {labels.retry}
+          </button>
+          <Link
+            href={`/${lang}#products`}
+            className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
+          >
+            {labels.applyNew}
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="w-full">
+      <PoliciesSummary
+        counts={statusCounts}
+        labels={{
+          pending: labels.summaryPending,
+          inReview: labels.summaryInReview,
+          approved: labels.summaryApproved,
+          rejected: labels.summaryRejected,
+          total: labels.applications,
+        }}
+      />
+
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
           {labels.applications} · {filteredData.length}
@@ -437,6 +492,9 @@ export function DynamicApplicationsList({
             <div className="border border-dashed border-border px-4 py-10 text-center">
               <p className="text-base font-medium">{labels.noApps}</p>
               <p className="mt-1 text-sm text-muted-foreground">{labels.noAppsHint}</p>
+              <p className="mx-auto mt-2 max-w-sm text-xs text-muted-foreground">
+                {labels.noAppsRecover}
+              </p>
               <Link
                 href={`/${lang}#products`}
                 className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
@@ -547,6 +605,9 @@ export function DynamicApplicationsList({
                           <p className="text-base font-medium">{labels.noApps}</p>
                           <p className="mt-1 text-sm text-muted-foreground">
                             {labels.noAppsHint}
+                          </p>
+                          <p className="mx-auto mt-2 max-w-sm text-xs text-muted-foreground">
+                            {labels.noAppsRecover}
                           </p>
                           <Link
                             href={`/${lang}#products`}
