@@ -53,7 +53,11 @@ export default async function Page({ params }: { params: Params }) {
       <DynamicFormV2
         formId={formId}
         lang={lang}
-        copy={page.form}
+        copy={{
+          ...page.form,
+          tomanSuffix: page.common.tomanSuffix,
+          perMonthSuffix: page.common.perMonthSuffix,
+        }}
         productBlurb={productBlurb}
         formsCatalog={page.forms}
       />

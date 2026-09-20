@@ -100,13 +100,10 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
       <HomeDraftsPanel
         lang={lang}
         products={draftProducts}
-        title={home.draftsTitle ?? "Continue a draft"}
-        body={
-          home.draftsBody ??
-          "Pick up where you left off — drafts stay in this browser until you reserve."
-        }
-        continueLabel={home.continueDraft ?? "Continue"}
-        draftBadge={home.draftBadge ?? "Draft"}
+        title={home.draftsTitle}
+        body={home.draftsBody}
+        continueLabel={home.continueDraft}
+        draftBadge={home.draftBadge}
       />
 
       <RecentApplications
@@ -153,7 +150,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
                     <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
                       <ProductDraftBadge
                         formId={insurance.formId}
-                        label={home.draftBadge ?? "Draft"}
+                        label={home.draftBadge}
                       />
                       <Image
                         src={visual.src}

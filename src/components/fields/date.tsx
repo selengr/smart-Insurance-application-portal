@@ -55,7 +55,7 @@ export const DateField: React.FC<IDateFieldProps> = ({
                       locale: isFa ? faIR : undefined,
                     })
                   ) : (
-                    <span>{pickDate ?? "Pick a date"}</span>
+                    <span>{pickDate ?? ""}</span>
                   )}
                   <CalendarIcon className="ms-auto h-4 w-4 opacity-50" />
                 </Button>
@@ -70,6 +70,7 @@ export const DateField: React.FC<IDateFieldProps> = ({
                   setOpen(false)
                 }}
                 disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                locale={isFa ? faIR : undefined}
                 initialFocus
               />
             </PopoverContent>

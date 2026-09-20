@@ -132,6 +132,8 @@ export default async function ConfirmationPage({
                   applicationId={reference}
                   label={page.confirmation.estimate}
                   lang={lang}
+                  perMonthSuffix={page.common.perMonthSuffix}
+                  tomanSuffix={page.common.tomanSuffix}
                 />
               ) : null}
             </div>

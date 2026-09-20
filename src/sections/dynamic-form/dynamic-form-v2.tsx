@@ -104,9 +104,12 @@ type FormCopy = {
   tipsHeading: string
   almostThere: string
   sectionReady: string
+  tips: Record<string, { title: string; body: string }[]>
   discardDraft: string
   discardDraftDone: string
   discardDraftConfirm: string
+  tomanSuffix: string
+  perMonthSuffix: string
 }
 
 interface IDynamicFormProps {
@@ -163,9 +166,9 @@ function collectDynamicFields(fields: InsuranceField[], parentPath = "") {
   return found
 }
 
-function formatQuote(amount: number, lang: string) {
+function formatQuote(amount: number, lang: string, tomanSuffix: string) {
   return lang === "fa"
-    ? `${amount.toLocaleString("fa-IR")} تومان`
+    ? `${amount.toLocaleString("fa-IR")} ${tomanSuffix}`
     : `$${amount.toLocaleString("en-US")}`
 }
 
@@ -528,7 +531,7 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
     }))
     .filter((entry) => entry.rows.length > 0)
   const quote = estimateMonthlyPremium(formId, watched)
-  const quoteLabel = formatQuote(quote, lang)
+  const quoteLabel = formatQuote(quote, lang, copy.tomanSuffix)
   const currentSection = sections[sectionIndex]
   const sectionLabel = copy.sectionOf
     .replace("{current}", String(sectionIndex + 1))
@@ -790,7 +793,10 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
                     </>
                   )}
                 </div>
-                <ApplicationTips formId={formId} lang={lang} heading={copy.tipsHeading} />
+                <ApplicationTips
+                  tips={copy.tips?.[formId] ?? []}
+                  heading={copy.tipsHeading}
+                />
               </div>
             </div>
           ) : (

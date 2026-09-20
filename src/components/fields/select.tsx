@@ -30,8 +30,9 @@ export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, f
     : ""
   const dependentValue = dependsOnPath ? watch(dependsOnPath) : null
   const isDisabled = Boolean(dependsOn) && !dependentValue
-  const selectAnOption = placeholders?.selectPlaceholder ?? "Select an option"
-  const selectDepends = placeholders?.selectDepends ?? `Select a ${dependsOn} first`
+  const selectAnOption = placeholders?.selectPlaceholder ?? ""
+  const selectDepends =
+    placeholders?.selectDepends?.replace("{field}", dependsOn || "") ?? ""
 
   return (
     <UIFormField
@@ -57,7 +58,7 @@ export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, f
                 <SelectValue
                   placeholder={
                     isDisabled
-                      ? selectDepends.replace("{field}", dependsOn || "")
+                      ? selectDepends
                       : selectAnOption
                   }
                 />
@@ -66,11 +67,11 @@ export const SelectField: React.FC<ISelectFieldProps> = ({ fieldPath, control, f
             <SelectContent>
               {options.length === 0 && dependsOn && dependentValue ? (
                 <div className="p-2 text-center text-muted-foreground">
-                  {placeholders?.loadingOptions ?? "Loading…"}
+                  {placeholders?.loadingOptions ?? ""}
                 </div>
               ) : options.length === 0 ? (
                 <div className="p-2 text-center text-muted-foreground">
-                  {placeholders?.noOptions ?? "No options available"}
+                  {placeholders?.noOptions ?? ""}
                 </div>
               ) : (
                 options.map((option: string) => (

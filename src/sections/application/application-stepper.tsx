@@ -12,12 +12,12 @@ export function ApplicationStepper({
   steps,
   currentIndex,
   onStepSelect,
-  ariaLabel = "Application steps",
+  ariaLabel,
 }: {
   steps: Step[]
   currentIndex: number
   onStepSelect?: (index: number) => void
-  ariaLabel?: string
+  ariaLabel: string
 }) {
   return (
     <nav aria-label={ariaLabel}>
