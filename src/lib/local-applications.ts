@@ -39,6 +39,53 @@ export function getLocalApplicationById(id: string): LocalApplication | undefine
   return readStorage().find((row) => row.id === id)
 }
 
+/** Resolve a policy from local submissions or seeded demo fixtures. */
+export function resolveApplicationById(id: string): LocalApplication | undefined {
+  const local = getLocalApplicationById(id)
+  if (local) return local
+  return DEMO_APPLICATIONS.find((row) => row.id === id)
+}
+
+export const DEMO_APPLICATIONS: LocalApplication[] = [
+  {
+    id: "app-1",
+    "Insurance Type": "Health",
+    Applicant: "Demo User",
+    "Submitted At": "2026-01-12",
+    Status: "Approved",
+    formId: "health_insurance_application",
+    monthlyEstimate: 186,
+    reservedAt: "2026-01-12T09:20:00.000Z",
+    answers: {
+      personal_info: {
+        first_name: "Alex",
+        last_name: "Rivera",
+        age: 34,
+        gender: "Prefer not to say",
+      },
+      coverage: "Standard",
+      smoker: false,
+      dependents: 1,
+    },
+  },
+  {
+    id: "app-2",
+    "Insurance Type": "Home",
+    Applicant: "Demo User",
+    "Submitted At": "2026-02-03",
+    Status: "In Review",
+    formId: "home_insurance_application",
+    monthlyEstimate: 94,
+    reservedAt: "2026-02-03T14:05:00.000Z",
+    answers: {
+      property_address: "128 Cedar Lane",
+      property_type: "Apartment",
+      year_built: 2012,
+      security_system: true,
+    },
+  },
+]
+
 export function insuranceTypeFromFormId(
   formId: string,
   titles?: Record<string, string>,

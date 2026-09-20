@@ -19,6 +19,9 @@ import {
 } from "lucide-react";
 import { useFetchPurchasedInsurances } from "@/hooks/use-fetch-purchased-insurances";
 import { insuranceTypeFromFormId } from "@/lib/local-applications";
+import { PRODUCT_VISUAL } from "@/lib/product-visuals";
+import { statusChipClass } from "@/lib/status-styles";
+import Image from "next/image";
 
 export function DynamicApplicationsList({
   labels,
@@ -142,26 +145,11 @@ export function DynamicApplicationsList({
           accessorKey: column,
           sortable: true,
           filterable: true,
-          cell: (value: unknown, row: ITabelRow) => {
+          cell: (value: string | number, row: ITabelRow) => {
             const statusKey = String(row._statusKey ?? value)
-            const statusStyles: Record<string, string> = {
-              Pending:
-                "bg-amber-100 text-amber-900 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-950 dark:text-amber-200 dark:ring-amber-400/30",
-              Approved:
-                "bg-emerald-100 text-emerald-900 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-950 dark:text-emerald-200 dark:ring-emerald-400/30",
-              Rejected:
-                "bg-rose-100 text-rose-900 ring-1 ring-inset ring-rose-600/20 dark:bg-rose-950 dark:text-rose-200 dark:ring-rose-400/30",
-              "In Review":
-                "bg-sky-100 text-sky-900 ring-1 ring-inset ring-sky-600/20 dark:bg-sky-950 dark:text-sky-200 dark:ring-sky-400/30",
-            };
-
-            const style =
-              statusStyles[statusKey] ||
-              "bg-muted text-muted-foreground ring-1 ring-inset ring-border";
-
             return (
               <span
-                className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold tracking-wide ${style}`}
+                className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold tracking-wide ${statusChipClass(statusKey)}`}
               >
                 {String(value)}
               </span>
@@ -177,7 +165,7 @@ export function DynamicApplicationsList({
           accessorKey: column,
           sortable: true,
           filterable: true,
-          cell: (value: unknown) => (
+          cell: (value: string | number) => (
             <span className="font-mono text-sm text-primary">{String(value)}</span>
           ),
         };
@@ -200,7 +188,7 @@ export function DynamicApplicationsList({
         accessorKey: "id",
         sortable: false,
         filterable: false,
-        cell: (_value: unknown, row: ITabelRow) => (
+        cell: (_value: string | number, row: ITabelRow) => (
           <Link
             href={`/${lang}/purchased-insurances/${row.id}`}
             className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
@@ -390,15 +378,84 @@ export function DynamicApplicationsList({
         </div>
       )}
 
-      <div className="border border-border rounded-md overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="border border-border overflow-hidden md:rounded-md">
+        {/* Mobile portal cards */}
+        <div className="space-y-3 p-3 md:hidden">
+          {isFetching && paginatedData.length === 0 ? (
+            <div className="space-y-3" role="status" aria-live="polite">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-28 animate-pulse border border-border bg-muted/40" />
+              ))}
+              <span className="sr-only">{labels.loadingApps}</span>
+            </div>
+          ) : paginatedData.length > 0 ? (
+            paginatedData.map((row) => {
+              const formId = typeof row.formId === "string" ? row.formId : ""
+              const visual =
+                PRODUCT_VISUAL[formId] ?? {
+                  src: "/images/product-home.jpg",
+                  alt: String(row["Insurance Type"]),
+                }
+              const statusKey = String(row._statusKey ?? row.Status)
+              return (
+                <Link
+                  key={row.id}
+                  href={`/${lang}/purchased-insurances/${row.id}`}
+                  className="flex gap-3 border border-border bg-card/70 p-3 transition hover:border-primary/40"
+                >
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden bg-muted">
+                    <Image
+                      src={visual.src}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-[family-name:var(--font-display)] text-base font-bold leading-tight">
+                        {row["Insurance Type"]}
+                      </p>
+                      <span
+                        className={`shrink-0 inline-flex items-center px-2 py-0.5 text-[0.65rem] font-semibold ${statusChipClass(statusKey)}`}
+                      >
+                        {row.Status}
+                      </span>
+                    </div>
+                    <p className="mt-1 truncate text-sm text-muted-foreground">
+                      {row.Applicant}
+                    </p>
+                    <p className="mt-1 font-mono text-xs text-muted-foreground">
+                      {row.id} · {row["Submitted At"]}
+                    </p>
+                  </div>
+                </Link>
+              )
+            })
+          ) : (
+            <div className="border border-dashed border-border px-4 py-10 text-center">
+              <p className="text-base font-medium">{labels.noApps}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{labels.noAppsHint}</p>
+              <Link
+                href={`/${lang}#products`}
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+              >
+                {labels.applyNew}
+                <ArrowUpRight className="h-4 w-4" aria-hidden />
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full">
             <thead className="bg-muted">
               <tr>
                 {visibleColumnDefs?.map((column,index) => (
                   <th
                     key={`${column.id}.${index}`}
-                    className="px-4 py-3 text-left font-medium text-sm"
+                    className="px-4 py-3 text-start font-medium text-sm"
                   >
                     <div className="flex items-center space-x-1">
                       <span>{column.header}</span>

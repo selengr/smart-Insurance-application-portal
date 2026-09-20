@@ -41,6 +41,9 @@ const Navbar = async ({ lang }: { lang: Locale }) => {
             about={navigation.about}
             menuLabel={page.common.openMenu}
             closeLabel={page.common.closeMenu}
+            signedIn={signedIn}
+            signInLabel={navigation.signIn}
+            signOutLabel={navigation.signOut}
           />
           <LocaleSwitcher label={page.common.language} />
           {signedIn ? (

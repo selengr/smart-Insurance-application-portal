@@ -17,11 +17,34 @@
       "description": "Health, Home, Car, and Life — guided forms, auto-saved drafts, bilingual from day one.",
       "emptyProducts": "No insurance products available right now.",
       "heroCaption": "Protection designed for real life",
+      "estimateHint": "See a live estimate as you answer",
       "productMeta": {
         "health_insurance_application": "Medical & wellness cover",
         "home_insurance_application": "Property & belongings",
         "car_insurance_application": "Vehicle protection",
         "life_insurance_application": "Family & future planning"
+      },
+      "productHighlights": {
+        "health_insurance_application": [
+          "Doctor visits & prescriptions",
+          "Optional dental & vision",
+          "Family dependents"
+        ],
+        "home_insurance_application": [
+          "Building & contents",
+          "Theft & fire cover",
+          "Liability protection"
+        ],
+        "car_insurance_application": [
+          "Collision & liability",
+          "Roadside assistance",
+          "Flexible deductibles"
+        ],
+        "life_insurance_application": [
+          "Term or whole life",
+          "Beneficiary planning",
+          "Income protection"
+        ]
       },
       "productTitles": {
         "health_insurance_application": "Health",
@@ -43,7 +66,9 @@
       "subtitle": "Demo access for viewing your policies. No password required.",
       "cta": "Continue as demo user",
       "hint": "This sets a local session cookie for the portal demo.",
-      "backHome": "Back to home"
+      "trust": "Your drafts and reservations stay in this browser until you connect a real backend.",
+      "backHome": "Back to home",
+      "viewPolicies": "Skip to my policies"
     },
     "confirmation": {
       "title": "Reservation confirmed",
@@ -56,7 +81,11 @@
       "backHome": "Back to home",
       "stepLabel": "Reserved",
       "statusPending": "Pending review",
-      "receiptTitle": "Reservation receipt"
+      "receiptTitle": "Reservation receipt",
+      "estimate": "Estimated monthly",
+      "copyReference": "Copy",
+      "copiedReference": "Copied",
+      "missingReference": "No reference was returned. Open My policies to find your latest application."
     },
     "common": {
       "loading": "Loading…",
@@ -402,13 +431,31 @@
       "noAnswers": "No stored answers for this application.",
       "backToList": "Back to policies",
       "notFound": "Application not found",
-      "notFoundBody": "This reference is missing from local demo storage, or the link is outdated."
+      "notFoundBody": "This reference is missing from local demo storage, or the link is outdated.",
+      "copyReference": "Copy reference",
+      "copiedReference": "Copied",
+      "applyAgain": "Apply again"
     },
     "aboutPage": {
       "title": "About this portal",
       "lead": "A bilingual, schema-driven insurance application demo built for real product flows.",
       "body": "Apply for Health, Home, Car, or Life cover with auto-saved drafts, a review step before submit, and a policies list that tracks reserved applications in your browser.",
-      "cta": "Browse products"
+      "cta": "Browse products",
+      "howTitle": "How it works",
+      "steps": [
+        {
+          "title": "Choose cover",
+          "body": "Pick Health, Home, Car, or Life and start a guided application."
+        },
+        {
+          "title": "Reserve",
+          "body": "Review answers, confirm details, and reserve with a live estimate."
+        },
+        {
+          "title": "Track",
+          "body": "Open My policies anytime to follow status and open the receipt."
+        }
+      ]
     }
   }
 }
