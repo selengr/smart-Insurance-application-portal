@@ -1,5 +1,5 @@
 import "./globals.css";
-import { use } from 'react'
+import { use, type CSSProperties } from 'react'
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
 import { Locale, i18n } from "../../../i18n.config";
@@ -75,11 +75,19 @@ export default function RootLayout(props: {
 
   const fontClass =
     lang === "fa"
-      ? `${estedad.className}`
+      ? `${estedad.className} ${estedad.variable}`
       : `${displayFont.variable} ${bodyFont.variable} font-[family-name:var(--font-body)]`;
 
   return (
-    <html lang={lang} dir={lang === "fa" ? "rtl" : "ltr"}>
+    <html
+      lang={lang}
+      dir={lang === "fa" ? "rtl" : "ltr"}
+      style={
+        lang === "fa"
+          ? ({ ["--font-body"]: "var(--font-display)" } as CSSProperties)
+          : undefined
+      }
+    >
       <body
         className={`${fontClass} antialiased min-h-screen transition-colors duration-300`}
       >

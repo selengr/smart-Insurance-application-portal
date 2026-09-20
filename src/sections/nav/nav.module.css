@@ -125,8 +125,21 @@
   font-weight: 500;
   color: var(--foreground);
   text-decoration: none;
+  width: 100%;
+  display: block;
+  text-align: start;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .mobileLink:hover {
   background: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+
+.mobileDivider {
+  height: 1px;
+  margin-block: 0.35rem;
+  background: var(--border);
 }

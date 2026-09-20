@@ -29,6 +29,7 @@ export const estedad = localFont({
       style: 'normal',
     },
   ],
+  variable: "--font-display",
 });
 
 /** Display — bold postmodern headlines (EN) */

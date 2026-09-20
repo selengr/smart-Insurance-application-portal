@@ -50,6 +50,15 @@ export default async function LoginPage({
           </Button>
           <p className="text-xs text-muted-foreground">{page.login.hint}</p>
         </form>
+        <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
+          {page.login.trust}
+        </p>
+        <Link
+          href={`/${lang}/purchased-insurances`}
+          className="mt-4 inline-flex text-sm font-semibold text-primary hover:underline"
+        >
+          {page.login.viewPolicies}
+        </Link>
       </div>
     </main>
   )

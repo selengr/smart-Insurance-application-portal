@@ -7,6 +7,9 @@ import { CheckCircle2, FolderOpen, Home } from "lucide-react"
 import { ApplicationStepper } from "@/sections/application/application-stepper"
 import { PRODUCT_VISUAL } from "@/lib/product-visuals"
 import { insuranceTypeFromFormId } from "@/lib/local-applications"
+import { statusChipClass } from "@/lib/status-styles"
+import { CopyReferenceButton } from "@/components/copy-reference-button"
+import { ConfirmationEstimate } from "@/sections/application/confirmation-estimate"
 
 export default async function ConfirmationPage({
   params,
@@ -18,7 +21,8 @@ export default async function ConfirmationPage({
   const { lang, formId } = await params
   const { ref } = await searchParams
   const { page } = await getDictionary(lang)
-  const reference = ref || "PENDING"
+  const hasRef = Boolean(ref && ref !== "PENDING")
+  const reference = hasRef ? ref! : null
   const visual =
     PRODUCT_VISUAL[formId] ?? {
       src: "/images/product-home.jpg",
@@ -33,7 +37,12 @@ export default async function ConfirmationPage({
   ]
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <main className="relative mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+      <div
+        className="pointer-events-none absolute inset-x-0 -top-10 -z-10 h-56 bg-[radial-gradient(ellipse_at_top,_oklch(0.72_0.06_195_/_0.16),_transparent_70%)]"
+        aria-hidden
+      />
+
       <div className="mb-8 border border-border/80 bg-card/50 px-4 py-4 sm:px-6">
         <ApplicationStepper steps={steps} currentIndex={2} />
       </div>
@@ -57,20 +66,35 @@ export default async function ConfirmationPage({
           </p>
 
           <div className="mx-auto mt-8 max-w-md border border-border bg-background/90 text-start">
-            <div className="flex items-center justify-between border-b border-border px-5 py-3">
+            <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 {page.confirmation.receiptTitle}
               </p>
-              <span className="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold ${statusChipClass("Pending")}`}
+              >
                 {page.confirmation.statusPending}
               </span>
             </div>
-            <div className="space-y-3 px-5 py-4">
+            <div className="space-y-4 px-5 py-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
                   {page.confirmation.reference}
                 </p>
-                <p className="mt-1 font-mono text-lg font-semibold tracking-wide">{reference}</p>
+                {reference ? (
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <p className="font-mono text-lg font-semibold tracking-wide">{reference}</p>
+                    <CopyReferenceButton
+                      value={reference}
+                      copyLabel={page.confirmation.copyReference}
+                      copiedLabel={page.confirmation.copiedReference}
+                    />
+                  </div>
+                ) : (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {page.confirmation.missingReference}
+                  </p>
+                )}
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
@@ -78,6 +102,13 @@ export default async function ConfirmationPage({
                 </p>
                 <p className="mt-1 text-sm font-medium">{product}</p>
               </div>
+              {reference ? (
+                <ConfirmationEstimate
+                  applicationId={reference}
+                  label={page.confirmation.estimate}
+                  lang={lang}
+                />
+              ) : null}
             </div>
           </div>
 
@@ -92,7 +123,7 @@ export default async function ConfirmationPage({
             <Button asChild>
               <Link
                 href={
-                  ref
+                  reference
                     ? `/${lang}/purchased-insurances/${reference}`
                     : `/${lang}/purchased-insurances`
                 }

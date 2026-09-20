@@ -20,8 +20,10 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
     brand: string
     emptyProducts: string
     heroCaption: string
+    estimateHint?: string
     productMeta: Record<string, string>
     productTitles?: Record<string, string>
+    productHighlights?: Record<string, string[]>
   }
   const items = insuranceTypes?.data ?? []
 
@@ -101,6 +103,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
                   alt: insurance.title,
                 }
               const blurb = home.productMeta?.[insurance.formId]
+              const highlights = home.productHighlights?.[insurance.formId] ?? []
 
               return (
                 <li key={insurance.formId}>
@@ -127,14 +130,37 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
                         {blurb ? (
                           <p className="mt-1.5 text-sm text-muted-foreground">{blurb}</p>
                         ) : null}
+                        {highlights.length > 0 ? (
+                          <ul className="mt-3 space-y-1.5">
+                            {highlights.map((line) => (
+                              <li
+                                key={line}
+                                className="flex items-start gap-2 text-xs leading-snug text-muted-foreground"
+                              >
+                                <span
+                                  className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-primary"
+                                  aria-hidden
+                                />
+                                {line}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
                       </div>
-                      <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-                        {home.InsuranceLink}
-                        <ArrowUpRight
-                          className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                          aria-hidden
-                        />
-                      </span>
+                      <div className="mt-auto space-y-2">
+                        {home.estimateHint ? (
+                          <p className="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground">
+                            {home.estimateHint}
+                          </p>
+                        ) : null}
+                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                          {home.InsuranceLink}
+                          <ArrowUpRight
+                            className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                            aria-hidden
+                          />
+                        </span>
+                      </div>
                     </div>
                   </Link>
                 </li>

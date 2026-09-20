@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import styles from "./nav.module.css"
+import { signOutDemo } from "@/lib/auth-actions"
 
 type Props = {
   lang: string
@@ -12,6 +13,9 @@ type Props = {
   about: string
   menuLabel: string
   closeLabel: string
+  signedIn: boolean
+  signInLabel: string
+  signOutLabel: string
 }
 
 export function MobileNav({
@@ -21,6 +25,9 @@ export function MobileNav({
   about,
   menuLabel,
   closeLabel,
+  signedIn,
+  signInLabel,
+  signOutLabel,
 }: Props) {
   const [open, setOpen] = useState(false)
 
@@ -60,6 +67,22 @@ export function MobileNav({
           >
             {about}
           </Link>
+          <div className={styles.mobileDivider} />
+          {signedIn ? (
+            <form action={signOutDemo.bind(null, lang)}>
+              <button type="submit" className={styles.mobileLink}>
+                {signOutLabel}
+              </button>
+            </form>
+          ) : (
+            <Link
+              href={`/${lang}/login`}
+              className={styles.mobileLink}
+              onClick={() => setOpen(false)}
+            >
+              {signInLabel}
+            </Link>
+          )}
         </div>
       ) : null}
     </div>
