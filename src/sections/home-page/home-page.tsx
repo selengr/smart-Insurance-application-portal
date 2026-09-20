@@ -8,6 +8,12 @@ import { productVisual, productTitle } from "@/lib/product-visuals"
 import { ArrowUpRight, FolderOpen } from "lucide-react"
 import { HomeDraftsPanel, ProductDraftBadge } from "@/sections/home-page/home-drafts"
 import { RecentApplications } from "@/components/recent-applications"
+import {
+  HomeHeroCopyMotion,
+  HomeHeroItemMotion,
+  HomeHeroMediaMotion,
+  HomeProductCardMotion,
+} from "@/sections/home-page/home-motion"
 
 interface HomeProps {
   lang: Locale
@@ -41,17 +47,23 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-20 pt-10 sm:px-6 sm:pb-28 sm:pt-14">
       <section className="relative mb-16 grid items-center gap-10 lg:mb-24 lg:grid-cols-2 lg:gap-14">
-        <div>
-          <p className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-primary">
-            {home.brand}
-          </p>
-          <h1 className="font-[family-name:var(--font-display)] text-[2.35rem] font-extrabold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            {home.title}
-          </h1>
-          <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
-            {home.description}
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+        <HomeHeroCopyMotion>
+          <HomeHeroItemMotion>
+            <p className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-primary">
+              {home.brand}
+            </p>
+          </HomeHeroItemMotion>
+          <HomeHeroItemMotion>
+            <h1 className="font-[family-name:var(--font-display)] text-[2.35rem] font-extrabold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+              {home.title}
+            </h1>
+          </HomeHeroItemMotion>
+          <HomeHeroItemMotion>
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {home.description}
+            </p>
+          </HomeHeroItemMotion>
+          <HomeHeroItemMotion className="mt-8 flex flex-wrap items-center gap-3">
             <a
               href="#products"
               className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -66,10 +78,10 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
               <FolderOpen className="h-4 w-4" aria-hidden />
               {home.myInsurance}
             </Link>
-          </div>
-        </div>
+          </HomeHeroItemMotion>
+        </HomeHeroCopyMotion>
 
-        <div className="relative aspect-[16/10] overflow-hidden border border-border/70 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.35)] sm:aspect-[5/4] lg:aspect-[4/3]">
+        <HomeHeroMediaMotion className="relative aspect-[16/10] overflow-hidden border border-border/70 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.35)] sm:aspect-[5/4] lg:aspect-[4/3]">
           <Image
             src="/images/hero-living.jpg"
             alt={home.heroCaption}
@@ -82,7 +94,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
           <p className="absolute bottom-4 start-4 end-4 text-sm font-medium text-foreground">
             {home.heroCaption}
           </p>
-        </div>
+        </HomeHeroMediaMotion>
       </section>
 
       <HomeDraftsPanel
@@ -126,13 +138,13 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
           </div>
         ) : (
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-            {items.map((insurance) => {
+            {items.map((insurance, index) => {
               const visual = productVisual(insurance.formId, insurance.title)
               const blurb = home.productMeta?.[insurance.formId]
               const highlights = home.productHighlights?.[insurance.formId] ?? []
 
               return (
-                <li key={insurance.formId}>
+                <HomeProductCardMotion key={insurance.formId} index={index}>
                   <Link
                     href={`/${lang}/insurance/${insurance.formId}`}
                     className="group relative flex h-full flex-col overflow-hidden border border-border bg-card/80 transition duration-300 hover:-translate-y-1 hover:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -193,7 +205,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
                       </div>
                     </div>
                   </Link>
-                </li>
+                </HomeProductCardMotion>
               )
             })}
           </ul>
