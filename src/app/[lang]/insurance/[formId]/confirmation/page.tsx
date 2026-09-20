@@ -10,6 +10,7 @@ import { insuranceTypeFromFormId } from "@/lib/local-applications"
 import { statusChipClass } from "@/lib/status-styles"
 import { CopyReferenceButton } from "@/components/copy-reference-button"
 import { ConfirmationEstimate } from "@/sections/application/confirmation-estimate"
+import { ConfirmationMotion } from "@/sections/application/confirmation-motion"
 
 export default async function ConfirmationPage({
   params,
@@ -54,6 +55,7 @@ export default async function ConfirmationPage({
         </div>
 
         <div className="relative px-6 py-12 text-center sm:px-10 sm:py-14">
+          <ConfirmationMotion>
           <CheckCircle2 className="mx-auto h-12 w-12 text-primary" aria-hidden />
           <p className="mt-4 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-primary">
             {page.confirmation.stepLabel}
@@ -145,6 +147,7 @@ export default async function ConfirmationPage({
             <Home className="h-3.5 w-3.5" aria-hidden />
             {page.confirmation.backHome}
           </Link>
+          </ConfirmationMotion>
         </div>
       </div>
     </main>

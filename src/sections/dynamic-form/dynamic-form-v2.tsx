@@ -57,6 +57,11 @@ type FormCopy = {
   draftSavedBody: string
   draftRestoredTitle: string
   draftRestoredBody: string
+  continueDraft: string
+  startFresh: string
+  draftFound: string
+  discardCancel: string
+  editSection: string
   backProducts: string
   stepDetails: string
   stepReview: string
@@ -178,6 +183,8 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [agreed, setAgreed] = useState(false)
+  const [pendingDraft, setPendingDraft] = useState<FormValues | null>(null)
+  const [confirmDiscard, setConfirmDiscard] = useState(false)
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const prevDependsRef = useRef<Record<string, string>>({})
   const draftLoadedRef = useRef(false)
@@ -211,13 +218,7 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
       if (savedDraft) {
         const parsedDraft = JSON.parse(savedDraft) as FormValues
         const processedDraft = processDraftDates(parsedDraft)
-        form.reset(processedDraft)
-
-        toast(copy.draftRestoredTitle, {
-          description: copy.draftRestoredBody,
-          duration: 3000,
-        })
-
+        setPendingDraft(processedDraft)
         const savedAt = parsedDraft._lastSaved
         setLastSaved(new Date(typeof savedAt === "string" ? savedAt : Date.now()))
       }
@@ -427,7 +428,8 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
   }
 
   const discardDraft = () => {
-    if (typeof window !== "undefined" && !window.confirm(copy.discardDraftConfirm)) {
+    if (!confirmDiscard) {
+      setConfirmDiscard(true)
       return
     }
     clearDraft()
@@ -435,7 +437,28 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
     setSectionIndex(0)
     setFlowStep("details")
     setAgreed(false)
+    setPendingDraft(null)
+    setConfirmDiscard(false)
     toast.success(copy.discardDraftDone)
+  }
+
+  const continueDraft = () => {
+    if (!pendingDraft) return
+    form.reset(pendingDraft)
+    setPendingDraft(null)
+    toast.success(copy.draftRestoredTitle, {
+      description: copy.draftRestoredBody,
+      duration: 2800,
+    })
+  }
+
+  const startFresh = () => {
+    clearDraft()
+    form.reset({})
+    setPendingDraft(null)
+    setLastSaved(null)
+    setSectionIndex(0)
+    setConfirmDiscard(false)
   }
 
   const fillDemo = async () => {
@@ -470,6 +493,17 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
     no: copy.no,
     locale: lang === "fa" ? "fa-IR" : "en-US",
   })
+  const reviewSections = sections
+    .map((section, index) => ({
+      section,
+      index,
+      rows: buildReviewRows(section.fields, watched, {
+        yes: copy.yes,
+        no: copy.no,
+        locale: lang === "fa" ? "fa-IR" : "en-US",
+      }),
+    }))
+    .filter((entry) => entry.rows.length > 0)
   const quote = estimateMonthlyPremium(formId, watched)
   const quoteLabel = formatQuote(quote, lang)
   const currentSection = sections[sectionIndex]
@@ -490,8 +524,63 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
       />
 
       <div className="mb-8 border border-border/80 bg-card/50 px-4 py-4 sm:px-6">
-        <ApplicationStepper steps={steps} currentIndex={journeyIndex} />
+        <ApplicationStepper
+          steps={steps}
+          currentIndex={journeyIndex}
+          onStepSelect={(index) => {
+            if (index === 0 && flowStep === "review") {
+              setFlowStep("details")
+              window.scrollTo({ top: 0, behavior: "smooth" })
+            }
+          }}
+        />
       </div>
+
+      {pendingDraft ? (
+        <div
+          className="mb-6 border border-primary/30 bg-primary/5 px-4 py-4 sm:px-5"
+          role="region"
+          aria-label={copy.draftFound}
+        >
+          <p className="text-sm font-semibold text-foreground">{copy.draftFound}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{copy.draftRestoredBody}</p>
+          {lastSaved ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {copy.lastSaved}:{" "}
+              {format(lastSaved, lang === "fa" ? "HH:mm" : "h:mm a", {
+                locale: lang === "fa" ? faIR : undefined,
+              })}
+            </p>
+          ) : null}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button type="button" size="sm" onClick={continueDraft}>
+              {copy.continueDraft}
+            </Button>
+            <Button type="button" size="sm" variant="outline" onClick={startFresh}>
+              {copy.startFresh}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {confirmDiscard ? (
+        <div className="mb-6 border border-border bg-card/70 px-4 py-4 sm:px-5" role="alertdialog">
+          <p className="text-sm font-medium">{copy.discardDraftConfirm}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button type="button" size="sm" variant="destructive" onClick={discardDraft}>
+              {copy.discardDraft}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => setConfirmDiscard(false)}
+            >
+              {copy.discardCancel}
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       <Form {...form}>
         <form
@@ -695,19 +784,41 @@ const DynamicFormReady: React.FC<ReadyProps> = ({
                   {reviewRows.length === 0 ? (
                     <p className="p-6 text-sm text-muted-foreground">{copy.reviewEmpty}</p>
                   ) : (
-                    <dl className="divide-y divide-border">
-                      {reviewRows.map((row) => (
-                        <div
-                          key={row.path}
-                          className="grid gap-1 px-5 py-4 sm:grid-cols-[minmax(9rem,12rem)_1fr] sm:gap-6"
-                        >
-                          <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                            {row.label}
-                          </dt>
-                          <dd className="text-sm font-medium text-foreground">{row.value}</dd>
-                        </div>
+                    <div className="divide-y divide-border">
+                      {reviewSections.map(({ section, index, rows }) => (
+                        <section key={section.id} className="px-5 py-5">
+                          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                            <h3 className="font-[family-name:var(--font-display)] text-base font-bold">
+                              {section.label}
+                            </h3>
+                            <button
+                              type="button"
+                              className="text-xs font-semibold text-primary hover:underline"
+                              onClick={() => {
+                                setFlowStep("details")
+                                setSectionIndex(index)
+                                window.scrollTo({ top: 0, behavior: "smooth" })
+                              }}
+                            >
+                              {copy.editSection}
+                            </button>
+                          </div>
+                          <dl className="divide-y divide-border/70 border border-border/70">
+                            {rows.map((row) => (
+                              <div
+                                key={row.path}
+                                className="grid gap-1 px-4 py-3 sm:grid-cols-[minmax(9rem,12rem)_1fr] sm:gap-6"
+                              >
+                                <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                  {row.label}
+                                </dt>
+                                <dd className="text-sm font-medium text-foreground">{row.value}</dd>
+                              </div>
+                            ))}
+                          </dl>
+                        </section>
                       ))}
-                    </dl>
+                    </div>
                   )}
                 </div>
 

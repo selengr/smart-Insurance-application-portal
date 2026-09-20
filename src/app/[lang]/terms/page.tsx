@@ -9,20 +9,43 @@ export default async function TermsPage({
 }) {
   const { lang } = await params
   const { page } = await getDictionary(lang)
+  const legal = page.legal
+  const sections = [
+    { title: legal.aboutDemo, body: legal.termsAbout },
+    { title: legal.demoUse, body: legal.termsUse },
+    { title: legal.limitations, body: legal.termsLimits },
+  ]
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-16">
-      <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight">
-        {page.legal.termsTitle}
-      </h1>
-      <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-        {page.legal.termsBody}
+    <main className="relative mx-auto w-full max-w-2xl px-4 py-14 sm:px-6 sm:py-20">
+      <div
+        className="pointer-events-none absolute inset-x-0 -top-10 -z-10 h-56 bg-[radial-gradient(ellipse_at_top,_oklch(0.72_0.06_195_/_0.14),_transparent_70%)]"
+        aria-hidden
+      />
+      <p className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-primary">
+        {page.home.brand}
       </p>
+      <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-tight sm:text-4xl">
+        {legal.termsTitle}
+      </h1>
+      <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{legal.termsBody}</p>
+
+      <div className="mt-10 space-y-8">
+        {sections.map((section) => (
+          <section key={section.title} className="border-t border-border pt-6">
+            <h2 className="font-[family-name:var(--font-display)] text-lg font-bold">
+              {section.title}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{section.body}</p>
+          </section>
+        ))}
+      </div>
+
       <Link
         href={`/${lang}`}
-        className="mt-8 inline-block text-sm text-primary underline-offset-4 hover:underline"
+        className="mt-10 inline-block text-sm font-semibold text-primary underline-offset-4 hover:underline"
       >
-        {page.legal.backHome}
+        {legal.backHome}
       </Link>
     </main>
   )
