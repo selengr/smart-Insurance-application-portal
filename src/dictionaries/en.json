@@ -71,7 +71,15 @@
       "storageNote": "Reservations and drafts are stored in this browser only.",
       "exportLabel": "Export JSON",
       "exportEmpty": "No local applications to export yet.",
-      "exportDone": "Applications exported"
+      "exportDone": "Applications exported",
+      "importLabel": "Import JSON",
+      "importDone": "Imported {count} application(s)",
+      "importFailed": "Could not import that file. Use a SIP export JSON.",
+      "clearLabel": "Clear demo data",
+      "clearConfirm": "Clear local applications and drafts?",
+      "clearDone": "Demo data cleared",
+      "clearCancel": "Cancel",
+      "recentTitle": "Recently viewed"
     },
     "login": {
       "title": "Sign in to continue",

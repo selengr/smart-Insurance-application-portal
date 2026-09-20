@@ -11,6 +11,7 @@ import {
   isLocalOwnedApplication,
   nextStatus,
   resolveApplicationById,
+  trackRecentApplication,
   type LocalApplication,
   type StatusEvent,
 } from "@/lib/local-applications"
@@ -80,6 +81,7 @@ export default function PolicyDetailPage() {
     }
     setApp(resolveApplicationById(id) ?? null)
     setLocalOwned(isLocalOwnedApplication(id))
+    trackRecentApplication(id)
   }, [id])
 
   const rows = useMemo(

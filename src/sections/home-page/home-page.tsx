@@ -7,6 +7,7 @@ import { fetchInsuranceTypes } from "@/services/api/home"
 import { PRODUCT_VISUAL, productTitle } from "@/lib/product-visuals"
 import { ArrowUpRight, FolderOpen } from "lucide-react"
 import { HomeDraftsPanel, ProductDraftBadge } from "@/sections/home-page/home-drafts"
+import { RecentApplications } from "@/components/recent-applications"
 
 interface HomeProps {
   lang: Locale
@@ -94,6 +95,13 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
         }
         continueLabel={home.continueDraft ?? "Continue"}
         draftBadge={home.draftBadge ?? "Draft"}
+      />
+
+      <RecentApplications
+        lang={lang}
+        title={page.policies.recentTitle}
+        statusLabels={page.policiesList.status}
+        productTitles={home.productTitles}
       />
 
       <section id="products" aria-labelledby="products-heading" className="scroll-mt-28">
