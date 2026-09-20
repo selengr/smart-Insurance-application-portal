@@ -23,6 +23,7 @@ import { ShareLinkButton } from "@/components/share-link-button"
 import en from "@/dictionaries/en.json"
 import fa from "@/dictionaries/fa.json"
 import { toast } from "sonner"
+import { formatMonthlyEstimate } from "@/lib/format-money"
 
 function humanizeKey(key: string) {
   return key.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())
@@ -30,24 +31,28 @@ function humanizeKey(key: string) {
 
 function flattenAnswers(
   value: unknown,
+  labels: { yes: string; no: string; valueLabel: string },
   prefix = "",
 ): { label: string; value: string }[] {
   if (value === undefined || value === null || value === "") return []
   if (typeof value === "boolean") {
-    return [{ label: prefix || "Value", value: value ? "Yes" : "No" }]
+    return [
+      {
+        label: prefix || labels.valueLabel,
+        value: value ? labels.yes : labels.no,
+      },
+    ]
   }
   if (typeof value !== "object" || value instanceof Date || Array.isArray(value)) {
-    return [{ label: prefix || "Value", value: String(value) }]
+    return [{ label: prefix || labels.valueLabel, value: String(value) }]
   }
   return Object.entries(value as Record<string, unknown>).flatMap(([key, nested]) =>
-    flattenAnswers(nested, prefix ? `${prefix} · ${humanizeKey(key)}` : humanizeKey(key)),
+    flattenAnswers(
+      nested,
+      labels,
+      prefix ? `${prefix} · ${humanizeKey(key)}` : humanizeKey(key),
+    ),
   )
-}
-
-function formatEstimate(amount: number, lang: string) {
-  return lang === "fa"
-    ? `${amount.toLocaleString("fa-IR")} تومان`
-    : `$${amount.toLocaleString("en-US")}/mo`
 }
 
 function formatWhen(iso: string, lang: string) {
@@ -70,6 +75,10 @@ export default function PolicyDetailPage() {
   const copy = dict.page.policyDetail
   const statusLabels = dict.page.policiesList.status as Record<string, string>
   const productTitles = dict.page.home.productTitles as Record<string, string>
+  const currency = {
+    perMonth: dict.page.common.perMonthSuffix,
+    toman: dict.page.common.tomanSuffix,
+  }
   const [app, setApp] = useState<LocalApplication | null | undefined>(undefined)
   const [localOwned, setLocalOwned] = useState(false)
 
@@ -85,8 +94,15 @@ export default function PolicyDetailPage() {
   }, [id])
 
   const rows = useMemo(
-    () => (app?.answers ? flattenAnswers(app.answers) : []),
-    [app],
+    () =>
+      app?.answers
+        ? flattenAnswers(app.answers, {
+            yes: copy.yes,
+            no: copy.no,
+            valueLabel: copy.valueLabel,
+          })
+        : [],
+    [app, copy.yes, copy.no, copy.valueLabel],
   )
 
   const history: StatusEvent[] = app?.statusHistory?.length
@@ -149,7 +165,7 @@ export default function PolicyDetailPage() {
   const statusLabel = statusLabels[statusKey] ?? statusKey
   const estimate =
     typeof app.monthlyEstimate === "number"
-      ? formatEstimate(app.monthlyEstimate, lang)
+      ? formatMonthlyEstimate(app.monthlyEstimate, lang, currency)
       : null
   const applicant =
     app.Applicant === "Demo User"

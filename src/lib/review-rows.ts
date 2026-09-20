@@ -18,7 +18,7 @@ function formatValue(value: unknown, options?: ReviewOptions): string | null {
     return value.toLocaleDateString(options?.locale ?? undefined)
   }
   if (typeof value === "boolean") {
-    return value ? (options?.yes ?? "Yes") : (options?.no ?? "No")
+    return value ? (options?.yes ?? "") : (options?.no ?? "")
   }
   if (Array.isArray(value)) return value.filter(Boolean).join(", ") || null
   if (typeof value === "object") return null

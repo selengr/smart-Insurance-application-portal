@@ -127,7 +127,9 @@
       "errorRecover": "Retry this page, or head home and continue from products.",
       "notFoundRecover": "Check the link, or open products and My policies from here.",
       "offline": "You’re offline. Drafts stay on this device — reconnect to sync the list.",
-      "backOnline": "You’re back online. Refreshing local data…"
+      "backOnline": "You’re back online. Refreshing local data…",
+      "perMonthSuffix": "/mo",
+      "tomanSuffix": "تومان"
     },
     "form": {
       "saveDraft": "Save draft",
@@ -202,7 +204,49 @@
       "liveQuoteEmpty": "Complete a few fields to see an estimate.",
       "tipsHeading": "Helpful tips",
       "almostThere": "Almost there — reserve to lock this application in.",
-      "sectionReady": "Section looks good"
+      "sectionReady": "Section looks good",
+      "tips": {
+        "health_insurance_application": [
+          {
+            "title": "Pick the right network",
+            "body": "In-network plans usually cost less if your doctors are listed."
+          },
+          {
+            "title": "Be honest about smoking",
+            "body": "Accurate answers keep your reserved rate valid later."
+          }
+        ],
+        "home_insurance_application": [
+          {
+            "title": "City drives pricing",
+            "body": "Choose country first — cities load automatically."
+          },
+          {
+            "title": "Contents matter",
+            "body": "High-value contents cover is worth it if you own expensive items."
+          }
+        ],
+        "car_insurance_application": [
+          {
+            "title": "Brand unlocks models",
+            "body": "Select a brand to see matching model presets."
+          },
+          {
+            "title": "Usage changes risk",
+            "body": "Ride-share and business use typically raise the estimate."
+          }
+        ],
+        "life_insurance_application": [
+          {
+            "title": "Term vs amount",
+            "body": "Longer terms cost more — balance cover with what you can reserve."
+          },
+          {
+            "title": "Name a beneficiary",
+            "body": "A clear beneficiary speeds up any future claim review."
+          }
+        ]
+      }
     },
     "footer": {
       "tagline": "Schema-driven insurance applications for modern teams.",
@@ -501,7 +545,10 @@
       "advanceStatus": "Advance to {status}",
       "advanceHint": "Demo only — simulate underwriting progress for applications reserved in this browser.",
       "advancedTitle": "Status updated",
-      "advancedBody": "Moved to {status}."
+      "advancedBody": "Moved to {status}.",
+      "yes": "Yes",
+      "no": "No",
+      "valueLabel": "Value"
     },
     "aboutPage": {
       "title": "About this portal",

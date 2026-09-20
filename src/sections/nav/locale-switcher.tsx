@@ -10,7 +10,7 @@ const LOCALE_LABELS: Record<string, string> = {
   fa: 'FA',
 }
 
-export default function LocaleSwitcher({ label }: { label?: string }) {
+export default function LocaleSwitcher({ label }: { label: string }) {
   const pathName = usePathname()
   const activeLocale = pathName?.split('/')[1]
 
@@ -25,7 +25,7 @@ export default function LocaleSwitcher({ label }: { label?: string }) {
     <div
       className="inline-flex items-center rounded-md border border-border bg-background/70 p-0.5"
       role="navigation"
-      aria-label={label ?? 'Language'}
+      aria-label={label}
     >
       {i18n.locales.map((locale) => {
         const isActive = locale === activeLocale
