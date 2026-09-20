@@ -1,12 +1,32 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Locale } from "../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
+import { buildPageMetadata } from "@/lib/page-metadata"
 import { ArrowUpRight } from "lucide-react"
+
+type Params = Promise<{ lang: Locale }>
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params
+}): Promise<Metadata> {
+  const { lang } = await params
+  const { page } = await getDictionary(lang)
+
+  return buildPageMetadata({
+    title: page.aboutPage.title,
+    description: page.aboutPage.lead,
+    lang,
+    path: "/about",
+  })
+}
 
 export default async function AboutPage({
   params,
 }: {
-  params: Promise<{ lang: Locale }>
+  params: Params
 }) {
   const { lang } = await params
   const { page } = await getDictionary(lang)

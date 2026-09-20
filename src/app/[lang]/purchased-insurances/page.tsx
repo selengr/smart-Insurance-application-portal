@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { cookies } from "next/headers"
 import { Locale } from "../../../../i18n.config"
@@ -7,12 +8,31 @@ import { SessionContinuityBanner } from "@/components/session-continuity-banner"
 import { DemoDataTools } from "@/components/demo-data-tools"
 import { RecentApplications } from "@/components/recent-applications"
 import { DEMO_SESSION_COOKIE } from "@/lib/auth-session"
+import { buildPageMetadata } from "@/lib/page-metadata"
 import { ArrowUpRight } from "lucide-react"
+
+type Params = Promise<{ lang: Locale }>
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params
+}): Promise<Metadata> {
+  const { lang } = await params
+  const { page } = await getDictionary(lang)
+
+  return buildPageMetadata({
+    title: page.policies.title,
+    description: page.policies.subtitle,
+    lang,
+    path: "/purchased-insurances",
+  })
+}
 
 export default async function PurchasedInsurancesPage({
   params,
 }: {
-  params: Promise<{ lang: Locale }>
+  params: Params
 }) {
   const { lang } = await params
   const { page } = await getDictionary(lang)

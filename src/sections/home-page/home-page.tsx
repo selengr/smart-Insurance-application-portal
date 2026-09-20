@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Locale } from "../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import { fetchInsuranceTypes } from "@/services/api/home"
-import { PRODUCT_VISUAL, productTitle } from "@/lib/product-visuals"
+import { productVisual, productTitle } from "@/lib/product-visuals"
 import { ArrowUpRight, FolderOpen } from "lucide-react"
 import { HomeDraftsPanel, ProductDraftBadge } from "@/sections/home-page/home-drafts"
 import { RecentApplications } from "@/components/recent-applications"
@@ -127,11 +127,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
         ) : (
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
             {items.map((insurance) => {
-              const visual =
-                PRODUCT_VISUAL[insurance.formId] ?? {
-                  src: "/images/product-home.jpg",
-                  alt: insurance.title,
-                }
+              const visual = productVisual(insurance.formId, insurance.title)
               const blurb = home.productMeta?.[insurance.formId]
               const highlights = home.productHighlights?.[insurance.formId] ?? []
 

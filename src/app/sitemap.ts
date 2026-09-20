@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next"
 import { i18n } from "../../i18n.config"
-
-const base = "https://smart-insurance-application-portal.liara.run"
+import { SITE_URL } from "../../config-global"
 
 const PRODUCT_FORMS = [
   "health_insurance_application",
@@ -23,7 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return i18n.locales.flatMap((lang) =>
     paths.map((path) => ({
-      url: `${base}/${lang}${path}`,
+      url: `${SITE_URL}/${lang}${path}`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: path === "" ? 1 : path.startsWith("/insurance/") ? 0.8 : 0.7,

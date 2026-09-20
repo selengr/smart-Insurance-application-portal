@@ -11,10 +11,18 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { OfflineBanner } from "@/components/offline-banner";
 import { estedad, displayFont, bodyFont } from "@/tailwind/font";
 import { getDictionary } from "@/lib/dictionary";
-import { APP_DEFAULT_TITLE_EN, APP_DESCRIPTION_EN, APP_TITLE_TEMPLATE_EN, APP_DEFAULT_TITLE_FA, APP_DESCRIPTION_FA, APP_TITLE_TEMPLATE_FA, APP_KEYWORDS } from "../../../config-global";
+import { APP_DEFAULT_TITLE_EN, APP_DESCRIPTION_EN, APP_TITLE_TEMPLATE_EN, APP_DEFAULT_TITLE_FA, APP_DESCRIPTION_FA, APP_TITLE_TEMPLATE_FA, APP_KEYWORDS, SITE_URL, DEFAULT_OG_IMAGE } from "../../../config-global";
+
+const ogImage = {
+  url: `${SITE_URL}${DEFAULT_OG_IMAGE}`,
+  width: 1200,
+  height: 630,
+  alt: APP_DEFAULT_TITLE_EN,
+};
 
 const metadataTranslations: Record<Locale, Metadata> = {
   en: {
+    metadataBase: new URL(SITE_URL),
     title: {
       absolute: '',
       default: APP_DEFAULT_TITLE_EN,
@@ -27,14 +35,19 @@ const metadataTranslations: Record<Locale, Metadata> = {
       description: APP_DESCRIPTION_EN,
       type: "website",
       locale: "en_US",
+      url: `${SITE_URL}/en`,
+      siteName: APP_DEFAULT_TITLE_EN,
+      images: [{ ...ogImage, alt: APP_DEFAULT_TITLE_EN }],
     },
     twitter: {
       card: "summary_large_image",
       title: APP_DEFAULT_TITLE_EN,
       description: APP_DESCRIPTION_EN,
+      images: [`${SITE_URL}${DEFAULT_OG_IMAGE}`],
     },
   },
   fa: {
+    metadataBase: new URL(SITE_URL),
     title: {
       absolute: '',
       default: APP_DEFAULT_TITLE_FA,
@@ -47,11 +60,15 @@ const metadataTranslations: Record<Locale, Metadata> = {
       description: APP_DESCRIPTION_FA,
       type: "website",
       locale: "fa_IR",
+      url: `${SITE_URL}/fa`,
+      siteName: APP_DEFAULT_TITLE_FA,
+      images: [{ ...ogImage, alt: APP_DEFAULT_TITLE_FA }],
     },
     twitter: {
       card: "summary_large_image",
       title: APP_DEFAULT_TITLE_FA,
       description: APP_DESCRIPTION_FA,
+      images: [`${SITE_URL}${DEFAULT_OG_IMAGE}`],
     },
   },
 };
@@ -110,7 +127,7 @@ export default function RootLayout(props: {
             </div>
             <SiteFooter lang={lang} />
           </div>
-          <Toaster />
+          <Toaster dir={lang === "fa" ? "rtl" : "ltr"} />
         </ThemeProvider>
       </body>
     </html>

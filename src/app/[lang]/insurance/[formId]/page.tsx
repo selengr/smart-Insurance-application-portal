@@ -4,6 +4,8 @@ import { getDictionary } from "@/lib/dictionary"
 import DynamicFormV2 from "@/sections/dynamic-form/dynamic-form-v2"
 import { insuranceTypeFromFormId } from "@/lib/local-applications"
 import { mockInsuranceForms } from "@/mocks/fixtures"
+import { PRODUCT_IMAGE_SRC } from "@/lib/product-visuals"
+import { buildPageMetadata } from "@/lib/page-metadata"
 
 type Params = Promise<{ formId: string; lang: Locale }>
 
@@ -27,14 +29,14 @@ export async function generateMetadata({
   const description =
     page.home.productMeta?.[formId] ?? page.home.description
 
-  return {
+  return buildPageMetadata({
     title,
     description,
-    openGraph: {
-      title: `${title} · ${page.home.brand}`,
-      description,
-    },
-  }
+    lang,
+    path: `/insurance/${formId}`,
+    image: PRODUCT_IMAGE_SRC[formId] ?? "/images/hero-living.jpg",
+    imageAlt: title,
+  })
 }
 
 export default async function Page({ params }: { params: Params }) {

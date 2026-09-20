@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
@@ -5,13 +6,32 @@ import { Locale } from "../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import { signInDemo } from "@/lib/auth-actions"
 import { DEMO_SESSION_COOKIE } from "@/lib/auth-session"
+import { buildPageMetadata } from "@/lib/page-metadata"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
+
+type Params = Promise<{ lang: Locale }>
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params
+}): Promise<Metadata> {
+  const { lang } = await params
+  const { page } = await getDictionary(lang)
+
+  return buildPageMetadata({
+    title: page.login.title,
+    description: page.login.subtitle,
+    lang,
+    path: "/login",
+  })
+}
 
 export default async function LoginPage({
   params,
 }: {
-  params: Promise<{ lang: Locale }>
+  params: Params
 }) {
   const { lang } = await params
   const jar = await cookies()

@@ -24,7 +24,7 @@ import {
   insuranceTypeFromFormId,
   summarizeStatuses,
 } from "@/lib/local-applications";
-import { PRODUCT_VISUAL } from "@/lib/product-visuals";
+import { productVisual } from "@/lib/product-visuals";
 import { statusChipClass } from "@/lib/status-styles";
 import { PoliciesSummary, type StatusFilterKey } from "@/components/policies-summary";
 import Image from "next/image";
@@ -530,11 +530,11 @@ export function DynamicApplicationsList({
           ) : paginatedData.length > 0 ? (
             paginatedData.map((row) => {
               const formId = typeof row.formId === "string" ? row.formId : ""
-              const visual =
-                PRODUCT_VISUAL[formId] ?? {
-                  src: "/images/product-home.jpg",
-                  alt: String(row["Insurance Type"]),
-                }
+              const typeLabel = String(row["Insurance Type"] ?? "")
+              const visual = productVisual(
+                formId,
+                (formId && productTitles?.[formId]) || typeLabel,
+              )
               const statusKey = String(row._statusKey ?? row.Status)
               return (
                 <Link
