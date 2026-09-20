@@ -27,6 +27,7 @@ import {
 import { productVisual } from "@/lib/product-visuals";
 import { statusChipClass } from "@/lib/status-styles";
 import { PoliciesSummary, type StatusFilterKey } from "@/components/policies-summary";
+import { FocusTrapDialog } from "@/components/focus-trap-dialog";
 import Image from "next/image";
 
 export function DynamicApplicationsList({
@@ -134,18 +135,6 @@ export function DynamicApplicationsList({
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const pageSizeOptions = [5, 10, 20, 50];
-
-  useEffect(() => {
-    if (!showColumnCustomizer && !showFilterModal) return
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setShowColumnCustomizer(false)
-        setShowFilterModal(false)
-      }
-    }
-    window.addEventListener("keydown", onKeyDown)
-    return () => window.removeEventListener("keydown", onKeyDown)
-  }, [showColumnCustomizer, showFilterModal])
 
   useEffect(() => {
     if (apiResponse) {
@@ -796,157 +785,139 @@ export function DynamicApplicationsList({
         )}
       </div>
 
-      {showColumnCustomizer && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
-          role="presentation"
-          onClick={() => setShowColumnCustomizer(false)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="column-customizer-title"
-            className="w-full max-w-md rounded-lg border border-border bg-card p-6 text-card-foreground shadow-lg"
-            onClick={(e) => e.stopPropagation()}
+      <FocusTrapDialog
+        open={showColumnCustomizer}
+        onClose={() => setShowColumnCustomizer(false)}
+        labelledBy="column-customizer-title"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h3 id="column-customizer-title" className="text-lg font-medium">
+            {labels.customize}
+          </h3>
+          <button
+            type="button"
+            onClick={() => setShowColumnCustomizer(false)}
+            className="text-muted-foreground hover:text-foreground"
           >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 id="column-customizer-title" className="text-lg font-medium">
-                {labels.customize}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowColumnCustomizer(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-5 w-5" />
-                <span className="sr-only">{labels.close}</span>
-              </button>
-            </div>
-            <div className="space-y-2">
-              {columns
-                .filter((column) => column.id !== "_actions")
-                .map((column) => (
-                <div key={column.id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`column-${column.id}`}
-                    checked={visibleColumns.includes(column.id)}
-                    onChange={() => handleToggleColumn(column.id)}
-                    className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
-                  />
-                  <label
-                    htmlFor={`column-${column.id}`}
-                    className="ms-2 text-sm"
-                  >
-                    {column.header}
-                  </label>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setShowColumnCustomizer(false)}
-                className="rounded-md bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                {labels.done}
-              </button>
-            </div>
-          </div>
+            <X className="h-5 w-5" />
+            <span className="sr-only">{labels.close}</span>
+          </button>
         </div>
-      )}
-
-      {showFilterModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
-          role="presentation"
-          onClick={() => setShowFilterModal(false)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="filter-modal-title"
-            className="w-full max-w-md rounded-lg border border-border bg-card p-6 text-card-foreground shadow-lg"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 id="filter-modal-title" className="text-lg font-medium">
-                {labels.filter}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowFilterModal(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-5 w-5" />
-                <span className="sr-only">{labels.close}</span>
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="filter-column"
-                  className="mb-1 block text-sm font-medium"
-                >
-                  {labels.column}
-                </label>
-                <select
-                  id="filter-column"
-                  value={activeFilterColumn || ""}
-                  onChange={(e) => setActiveFilterColumn(e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="">{labels.selectColumn}</option>
-                  {columns
-                    .filter((col) => col.filterable)
-                    .map((column) => (
-                      <option key={column.id} value={column.id}>
-                        {column.header}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="filter-value"
-                  className="mb-1 block text-sm font-medium"
-                >
-                  {labels.value}
-                </label>
+        <div className="space-y-2">
+          {columns
+            .filter((column) => column.id !== "_actions")
+            .map((column, index) => (
+              <div key={column.id} className="flex items-center">
                 <input
-                  id="filter-value"
-                  type="text"
-                  value={filterValue}
-                  onChange={(e) => setFilterValue(e.target.value)}
-                  placeholder={labels.filterValue}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                  type="checkbox"
+                  id={`column-${column.id}`}
+                  checked={visibleColumns.includes(column.id)}
+                  onChange={() => handleToggleColumn(column.id)}
+                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                  data-autofocus={index === 0 ? true : undefined}
                 />
+                <label
+                  htmlFor={`column-${column.id}`}
+                  className="ms-2 text-sm"
+                >
+                  {column.header}
+                </label>
               </div>
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowFilterModal(false)}
-                className="rounded-md border border-input bg-background px-4 py-2 transition-colors hover:bg-muted"
-              >
-                {labels.cancel}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (activeFilterColumn && filterValue) {
-                    handleFilter(activeFilterColumn, filterValue);
-                  }
-                }}
-                disabled={!activeFilterColumn || !filterValue}
-                className="rounded-md bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {labels.applyFilter}
-              </button>
-            </div>
+            ))}
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setShowColumnCustomizer(false)}
+            className="rounded-md bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            {labels.done}
+          </button>
+        </div>
+      </FocusTrapDialog>
+
+      <FocusTrapDialog
+        open={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        labelledBy="filter-modal-title"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h3 id="filter-modal-title" className="text-lg font-medium">
+            {labels.filter}
+          </h3>
+          <button
+            type="button"
+            onClick={() => setShowFilterModal(false)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-5 w-5" />
+            <span className="sr-only">{labels.close}</span>
+          </button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="filter-column"
+              className="mb-1 block text-sm font-medium"
+            >
+              {labels.column}
+            </label>
+            <select
+              id="filter-column"
+              value={activeFilterColumn || ""}
+              onChange={(e) => setActiveFilterColumn(e.target.value)}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              data-autofocus
+            >
+              <option value="">{labels.selectColumn}</option>
+              {columns
+                .filter((col) => col.filterable)
+                .map((column) => (
+                  <option key={column.id} value={column.id}>
+                    {column.header}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="filter-value"
+              className="mb-1 block text-sm font-medium"
+            >
+              {labels.value}
+            </label>
+            <input
+              id="filter-value"
+              type="text"
+              value={filterValue}
+              onChange={(e) => setFilterValue(e.target.value)}
+              placeholder={labels.filterValue}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            />
           </div>
         </div>
-      )}
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setShowFilterModal(false)}
+            className="rounded-md border border-input bg-background px-4 py-2 transition-colors hover:bg-muted"
+          >
+            {labels.cancel}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (activeFilterColumn && filterValue) {
+                handleFilter(activeFilterColumn, filterValue);
+              }
+            }}
+            disabled={!activeFilterColumn || !filterValue}
+            className="rounded-md bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {labels.applyFilter}
+          </button>
+        </div>
+      </FocusTrapDialog>
     </div>
   );
 }
