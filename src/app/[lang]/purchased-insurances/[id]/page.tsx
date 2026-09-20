@@ -4,10 +4,15 @@ import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { ArrowLeft, FolderOpen } from "lucide-react"
+import { useQueryClient } from "@tanstack/react-query"
+import { ArrowLeft, FolderOpen, Sparkles } from "lucide-react"
 import {
+  advanceApplicationStatus,
+  isLocalOwnedApplication,
+  nextStatus,
   resolveApplicationById,
   type LocalApplication,
+  type StatusEvent,
 } from "@/lib/local-applications"
 import { PRODUCT_VISUAL } from "@/lib/product-visuals"
 import { statusChipClass } from "@/lib/status-styles"
@@ -15,6 +20,7 @@ import { Button } from "@/components/ui/button"
 import { CopyReferenceButton } from "@/components/copy-reference-button"
 import en from "@/dictionaries/en.json"
 import fa from "@/dictionaries/fa.json"
+import { toast } from "sonner"
 
 function humanizeKey(key: string) {
   return key.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())
@@ -42,8 +48,20 @@ function formatEstimate(amount: number, lang: string) {
     : `$${amount.toLocaleString("en-US")}/mo`
 }
 
+function formatWhen(iso: string, lang: string) {
+  try {
+    return new Date(iso).toLocaleString(lang === "fa" ? "fa-IR" : "en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    })
+  } catch {
+    return iso
+  }
+}
+
 export default function PolicyDetailPage() {
   const params = useParams()
+  const queryClient = useQueryClient()
   const lang = typeof params?.lang === "string" ? params.lang : "en"
   const id = typeof params?.id === "string" ? params.id : ""
   const dict = lang === "fa" ? fa : en
@@ -51,19 +69,44 @@ export default function PolicyDetailPage() {
   const statusLabels = dict.page.policiesList.status as Record<string, string>
   const productTitles = dict.page.home.productTitles as Record<string, string>
   const [app, setApp] = useState<LocalApplication | null | undefined>(undefined)
+  const [localOwned, setLocalOwned] = useState(false)
 
   useEffect(() => {
     if (!id) {
       setApp(null)
+      setLocalOwned(false)
       return
     }
     setApp(resolveApplicationById(id) ?? null)
+    setLocalOwned(isLocalOwnedApplication(id))
   }, [id])
 
   const rows = useMemo(
     () => (app?.answers ? flattenAnswers(app.answers) : []),
     [app],
   )
+
+  const history: StatusEvent[] = app?.statusHistory?.length
+    ? app.statusHistory
+    : app
+      ? [{ status: app.Status as StatusEvent["status"], at: app.reservedAt ?? `${app["Submitted At"]}T12:00:00.000Z` }]
+      : []
+
+  const upcoming = app ? nextStatus(app.Status) : null
+
+  const onAdvance = () => {
+    if (!id || !upcoming) return
+    const updated = advanceApplicationStatus(id)
+    if (!updated) return
+    setApp(updated)
+    void queryClient.invalidateQueries({ queryKey: ["purchased-insurances"] })
+    toast.success(copy.advancedTitle, {
+      description: copy.advancedBody.replace(
+        "{status}",
+        statusLabels[updated.Status] ?? updated.Status,
+      ),
+    })
+  }
 
   if (app === undefined) {
     return (
@@ -80,9 +123,17 @@ export default function PolicyDetailPage() {
           {copy.notFound}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">{copy.notFoundBody}</p>
-        <Button asChild className="mt-6">
-          <Link href={`/${lang}/purchased-insurances`}>{copy.backToList}</Link>
-        </Button>
+        <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
+          {copy.notFoundRecover}
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Button asChild>
+            <Link href={`/${lang}/purchased-insurances`}>{copy.backToList}</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={`/${lang}#products`}>{copy.applyAgain}</Link>
+          </Button>
+        </div>
       </main>
     )
   }
@@ -165,6 +216,50 @@ export default function PolicyDetailPage() {
           ) : null}
         </div>
       </header>
+
+      <section className="mt-6 border border-border bg-card/60 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-[family-name:var(--font-display)] text-lg font-bold">
+            {copy.timelineTitle}
+          </h2>
+          {localOwned && upcoming ? (
+            <Button type="button" size="sm" variant="outline" className="gap-1.5" onClick={onAdvance}>
+              <Sparkles className="h-3.5 w-3.5" aria-hidden />
+              {copy.advanceStatus.replace(
+                "{status}",
+                statusLabels[upcoming] ?? upcoming,
+              )}
+            </Button>
+          ) : null}
+        </div>
+        <ol className="mt-5 space-y-4">
+          {history.map((event, index) => (
+            <li key={`${event.status}-${event.at}`} className="flex gap-3">
+              <div className="flex flex-col items-center">
+                <span
+                  className={`mt-1 h-2.5 w-2.5 rounded-full ${
+                    index === history.length - 1 ? "bg-primary" : "bg-muted-foreground/50"
+                  }`}
+                />
+                {index < history.length - 1 ? (
+                  <span className="mt-1 w-px flex-1 bg-border" aria-hidden />
+                ) : null}
+              </div>
+              <div className="pb-1">
+                <p className="text-sm font-semibold">
+                  {statusLabels[event.status] ?? event.status}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {formatWhen(event.at, lang)}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        {localOwned && upcoming ? (
+          <p className="mt-4 text-xs text-muted-foreground">{copy.advanceHint}</p>
+        ) : null}
+      </section>
 
       <dl className="mt-6 divide-y divide-border border border-border bg-card/60">
         <div className="grid gap-1 px-5 py-4 sm:grid-cols-[10rem_1fr]">
