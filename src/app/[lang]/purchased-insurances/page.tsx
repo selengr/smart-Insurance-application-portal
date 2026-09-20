@@ -4,7 +4,8 @@ import { Locale } from "../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import { DynamicApplicationsList } from "@/sections/application-list/dynamic-applications-list"
 import { SessionContinuityBanner } from "@/components/session-continuity-banner"
-import { ExportApplicationsButton } from "@/components/export-applications-button"
+import { DemoDataTools } from "@/components/demo-data-tools"
+import { RecentApplications } from "@/components/recent-applications"
 import { DEMO_SESSION_COOKIE } from "@/lib/auth-session"
 import { ArrowUpRight } from "lucide-react"
 
@@ -34,15 +35,22 @@ export default async function PurchasedInsurancesPage({
           </h1>
           <p className="mt-2 max-w-xl text-muted-foreground">{page.policies.subtitle}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <ExportApplicationsButton
-            label={page.policies.exportLabel}
-            emptyLabel={page.policies.exportEmpty}
-            doneLabel={page.policies.exportDone}
+        <div className="flex flex-col items-stretch gap-3 sm:items-end">
+          <DemoDataTools
+            exportLabel={page.policies.exportLabel}
+            exportEmpty={page.policies.exportEmpty}
+            exportDone={page.policies.exportDone}
+            importLabel={page.policies.importLabel}
+            importDone={page.policies.importDone}
+            importFailed={page.policies.importFailed}
+            clearLabel={page.policies.clearLabel}
+            clearConfirm={page.policies.clearConfirm}
+            clearDone={page.policies.clearDone}
+            clearCancel={page.policies.clearCancel}
           />
           <Link
             href={`/${lang}#products`}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+            className="inline-flex items-center gap-1.5 self-start text-sm font-semibold text-primary hover:underline sm:self-end"
           >
             {page.home.InsuranceTypes}
             <ArrowUpRight className="h-4 w-4" aria-hidden />
@@ -58,6 +66,13 @@ export default async function PurchasedInsurancesPage({
         cta={page.policies.guestCta}
         signedInLabel={page.policies.signedInLabel}
         storageNote={page.policies.storageNote}
+      />
+
+      <RecentApplications
+        lang={lang}
+        title={page.policies.recentTitle}
+        statusLabels={page.policiesList.status}
+        productTitles={page.home.productTitles}
       />
 
       <DynamicApplicationsList

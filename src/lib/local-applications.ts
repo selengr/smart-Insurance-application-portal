@@ -265,6 +265,7 @@ export function recordMockSubmission(
     updatedAt: reservedAt,
     statusHistory: [{ status: "Pending", at: reservedAt }],
   })
+  trackRecentApplication(applicationId)
 }
 
 export function summarizeStatuses(apps: { Status?: string }[]) {
@@ -280,6 +281,94 @@ export function summarizeStatuses(apps: { Status?: string }[]) {
     },
     { pending: 0, inReview: 0, approved: 0, rejected: 0, other: 0, total: apps.length },
   )
+}
+
+export const LOCAL_RECENTS_KEY = "sip_recent_applications"
+
+export function clearLocalApplications() {
+  writeStorage([])
+}
+
+export function clearFormDrafts() {
+  if (typeof window === "undefined") return 0
+  const keys: string[] = []
+  for (let i = 0; i < localStorage.length; i += 1) {
+    const key = localStorage.key(i)
+    if (key?.startsWith("form_draft_")) keys.push(key)
+  }
+  keys.forEach((key) => localStorage.removeItem(key))
+  return keys.length
+}
+
+export function clearDemoBrowserData() {
+  clearLocalApplications()
+  const drafts = clearFormDrafts()
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(LOCAL_RECENTS_KEY)
+  }
+  return { drafts }
+}
+
+export function importLocalApplications(
+  incoming: unknown,
+  mode: "merge" | "replace" = "merge",
+): { imported: number; skipped: number } {
+  if (!Array.isArray(incoming)) {
+    throw new Error("Invalid import payload")
+  }
+
+  const normalized = incoming
+    .filter((row): row is LocalApplication => {
+      if (!row || typeof row !== "object") return false
+      const candidate = row as Partial<LocalApplication>
+      return typeof candidate.id === "string" && candidate.id.length > 0
+    })
+    .map((row) => normalizeApp(row))
+
+  if (mode === "replace") {
+    writeStorage(normalized)
+    return { imported: normalized.length, skipped: incoming.length - normalized.length }
+  }
+
+  const existing = readStorage()
+  const byId = new Map(existing.map((row) => [row.id, row]))
+  let imported = 0
+  normalized.forEach((row) => {
+    byId.set(row.id, row)
+    imported += 1
+  })
+  writeStorage(Array.from(byId.values()))
+  return { imported, skipped: incoming.length - normalized.length }
+}
+
+export function trackRecentApplication(id: string) {
+  if (typeof window === "undefined" || !id) return
+  try {
+    const raw = localStorage.getItem(LOCAL_RECENTS_KEY)
+    const parsed = raw ? (JSON.parse(raw) as string[]) : []
+    const next = [id, ...parsed.filter((value) => value !== id)].slice(0, 8)
+    localStorage.setItem(LOCAL_RECENTS_KEY, JSON.stringify(next))
+  } catch {
+    // ignore quota / parse issues
+  }
+}
+
+export function getRecentApplicationIds(): string[] {
+  if (typeof window === "undefined") return []
+  try {
+    const raw = localStorage.getItem(LOCAL_RECENTS_KEY)
+    const parsed = raw ? (JSON.parse(raw) as string[]) : []
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === "string") : []
+  } catch {
+    return []
+  }
+}
+
+export function getRecentApplications(limit = 4): LocalApplication[] {
+  const ids = getRecentApplicationIds().slice(0, limit)
+  return ids
+    .map((id) => resolveApplicationById(id))
+    .filter((row): row is LocalApplication => Boolean(row))
 }
 
 // Keep version marker available for future migrations / docs
