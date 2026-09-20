@@ -18,6 +18,10 @@
       "emptyProducts": "No insurance products available right now.",
       "heroCaption": "Protection designed for real life",
       "estimateHint": "See a live estimate as you answer",
+      "draftsTitle": "Continue a draft",
+      "draftsBody": "Pick up where you left off — drafts stay in this browser until you reserve.",
+      "continueDraft": "Continue",
+      "draftBadge": "Draft",
       "productMeta": {
         "health_insurance_application": "Medical & wellness cover",
         "home_insurance_application": "Property & belongings",
@@ -64,7 +68,10 @@
       "guestBody": "You can still view and reserve applications. Sign in to keep a demo session cookie across visits.",
       "guestCta": "Continue as demo user",
       "signedInLabel": "Demo session active",
-      "storageNote": "Reservations and drafts are stored in this browser only."
+      "storageNote": "Reservations and drafts are stored in this browser only.",
+      "exportLabel": "Export JSON",
+      "exportEmpty": "No local applications to export yet.",
+      "exportDone": "Applications exported"
     },
     "login": {
       "title": "Sign in to continue",

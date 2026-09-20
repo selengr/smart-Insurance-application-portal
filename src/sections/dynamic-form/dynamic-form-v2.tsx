@@ -942,11 +942,24 @@ export default function DynamicForm({
 
   if (isLoading && !formData) {
     return (
-      <div className="space-y-6 animate-pulse" role="status" aria-live="polite">
-        <div className="h-40 w-full rounded bg-muted" />
-        <div className="h-8 w-1/2 rounded bg-muted" />
-        <div className="h-12 w-full rounded bg-muted" />
-        <div className="h-12 w-full rounded bg-muted" />
+      <div className="relative space-y-6" role="status" aria-live="polite">
+        <div
+          className="pointer-events-none absolute inset-x-0 -top-8 -z-10 h-48 bg-[radial-gradient(ellipse_at_top,_oklch(0.72_0.06_195_/_0.14),_transparent_70%)]"
+          aria-hidden
+        />
+        <div className="animate-pulse space-y-4">
+          <div className="h-36 w-full border border-border/60 bg-card/40" />
+          <div className="h-3 w-24 rounded bg-primary/20" />
+          <div className="h-8 w-1/2 rounded bg-muted" />
+          <div className="grid gap-4 lg:grid-cols-[1.45fr_0.85fr]">
+            <div className="space-y-3">
+              <div className="h-12 w-full rounded bg-muted" />
+              <div className="h-12 w-full rounded bg-muted" />
+              <div className="h-12 w-3/4 rounded bg-muted" />
+            </div>
+            <div className="h-40 border border-primary/20 bg-primary/5" />
+          </div>
+        </div>
         <span className="sr-only">{copy.loadingForm}</span>
       </div>
     )

@@ -1,12 +1,34 @@
+import type { Metadata } from "next"
 import { Locale } from "../../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import DynamicFormV2 from "@/sections/dynamic-form/dynamic-form-v2"
+import { insuranceTypeFromFormId } from "@/lib/local-applications"
 
-export default async function Page({
+type Params = Promise<{ formId: string; lang: Locale }>
+
+export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ formId: string; lang: Locale }>
-}) {
+  params: Params
+}): Promise<Metadata> {
+  const { formId, lang } = await params
+  const { page } = await getDictionary(lang)
+  const title =
+    page.home.productTitles?.[formId] ?? insuranceTypeFromFormId(formId)
+  const description =
+    page.home.productMeta?.[formId] ?? page.home.description
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: `${title} · ${page.home.brand}`,
+      description,
+    },
+  }
+}
+
+export default async function Page({ params }: { params: Params }) {
   const { formId, lang } = await params
   const { page } = await getDictionary(lang)
   const productBlurb = page.home.productMeta?.[formId]
