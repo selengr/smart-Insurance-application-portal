@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
-import { PRODUCT_VISUAL, productTitle } from "@/lib/product-visuals"
+import { productVisual, productTitle } from "@/lib/product-visuals"
 
 type Props = {
   lang: string
@@ -20,11 +20,7 @@ export function ApplicationHero({
   backLabel,
   stepLabel,
 }: Props) {
-  const visual =
-    PRODUCT_VISUAL[formId] ?? {
-      src: "/images/product-home.jpg",
-      alt: title,
-    }
+  const visual = productVisual(formId, title)
   const heading = productTitle(title)
 
   return (

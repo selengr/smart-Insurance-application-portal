@@ -1,11 +1,31 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Locale } from "../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
+import { buildPageMetadata } from "@/lib/page-metadata"
+
+type Params = Promise<{ lang: Locale }>
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params
+}): Promise<Metadata> {
+  const { lang } = await params
+  const { page } = await getDictionary(lang)
+
+  return buildPageMetadata({
+    title: page.legal.privacyTitle,
+    description: page.legal.privacyBody,
+    lang,
+    path: "/privacy",
+  })
+}
 
 export default async function PrivacyPage({
   params,
 }: {
-  params: Promise<{ lang: Locale }>
+  params: Params
 }) {
   const { lang } = await params
   const { page } = await getDictionary(lang)

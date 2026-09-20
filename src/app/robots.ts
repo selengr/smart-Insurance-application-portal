@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next"
+import { SITE_URL } from "../../config-global"
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -6,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://smart-insurance-application-portal.liara.run/sitemap.xml",
+    sitemap: `${SITE_URL}/sitemap.xml`,
   }
 }

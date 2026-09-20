@@ -15,7 +15,7 @@ import {
   type LocalApplication,
   type StatusEvent,
 } from "@/lib/local-applications"
-import { PRODUCT_VISUAL } from "@/lib/product-visuals"
+import { productVisual } from "@/lib/product-visuals"
 import { statusChipClass } from "@/lib/status-styles"
 import { Button } from "@/components/ui/button"
 import { CopyReferenceButton } from "@/components/copy-reference-button"
@@ -142,13 +142,9 @@ export default function PolicyDetailPage() {
   }
 
   const formId = app.formId ?? ""
-  const visual =
-    PRODUCT_VISUAL[formId] ?? {
-      src: "/images/product-home.jpg",
-      alt: app["Insurance Type"],
-    }
   const title =
     (formId && productTitles?.[formId]) || app["Insurance Type"]
+  const visual = productVisual(formId, title)
   const statusKey = app.Status
   const statusLabel = statusLabels[statusKey] ?? statusKey
   const estimate =

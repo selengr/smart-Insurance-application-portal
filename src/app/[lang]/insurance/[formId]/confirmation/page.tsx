@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { Locale } from "../../../../../../i18n.config"
@@ -5,7 +6,7 @@ import { getDictionary } from "@/lib/dictionary"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, FolderOpen, Home } from "lucide-react"
 import { ApplicationStepper } from "@/sections/application/application-stepper"
-import { PRODUCT_VISUAL } from "@/lib/product-visuals"
+import { productVisual, PRODUCT_IMAGE_SRC } from "@/lib/product-visuals"
 import { insuranceTypeFromFormId } from "@/lib/local-applications"
 import { statusChipClass } from "@/lib/status-styles"
 import { CopyReferenceButton } from "@/components/copy-reference-button"
@@ -13,12 +14,35 @@ import { ConfirmationEstimate } from "@/sections/application/confirmation-estima
 import { ConfirmationMotion } from "@/sections/application/confirmation-motion"
 import { PrintReceiptButton } from "@/components/print-receipt-button"
 import { ConfirmationRecentTracker } from "@/components/confirmation-recent-tracker"
+import { buildPageMetadata } from "@/lib/page-metadata"
+
+type Params = Promise<{ lang: Locale; formId: string }>
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params
+}): Promise<Metadata> {
+  const { lang, formId } = await params
+  const { page } = await getDictionary(lang)
+  const product =
+    page.home.productTitles?.[formId] ?? insuranceTypeFromFormId(formId)
+
+  return buildPageMetadata({
+    title: page.confirmation.title,
+    description: `${page.confirmation.subtitle} · ${product}`,
+    lang,
+    path: `/insurance/${formId}/confirmation`,
+    image: PRODUCT_IMAGE_SRC[formId] ?? "/images/hero-living.jpg",
+    imageAlt: product,
+  })
+}
 
 export default async function ConfirmationPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ lang: Locale; formId: string }>
+  params: Params
   searchParams: Promise<{ ref?: string }>
 }) {
   const { lang, formId } = await params
@@ -26,13 +50,9 @@ export default async function ConfirmationPage({
   const { page } = await getDictionary(lang)
   const hasRef = Boolean(ref && ref !== "PENDING")
   const reference = hasRef ? ref! : null
-  const visual =
-    PRODUCT_VISUAL[formId] ?? {
-      src: "/images/product-home.jpg",
-      alt: formId,
-    }
   const product =
     page.home.productTitles?.[formId] ?? insuranceTypeFromFormId(formId)
+  const visual = productVisual(formId, product)
   const steps = [
     { id: "details", label: page.form.stepDetails },
     { id: "review", label: page.form.stepReview },

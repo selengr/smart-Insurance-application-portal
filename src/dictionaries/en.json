@@ -480,6 +480,8 @@
     },
     "policyDetail": {
       "eyebrow": "Policy application",
+      "metaTitle": "Policy details",
+      "metaDescription": "Review status, estimate, answers, and timeline for a reserved application.",
       "applicant": "Applicant",
       "submitted": "Submitted",
       "status": "Status",

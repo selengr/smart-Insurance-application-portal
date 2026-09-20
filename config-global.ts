@@ -9,6 +9,12 @@ export const APP_TITLE_TEMPLATE_FA = "%s - پورتال هوشمند بیمه";
 export const APP_DESCRIPTION_FA = "پورتال هوشمند بیمه — درخواست بیمه سلامت، خانه، خودرو و زندگی از طریق فرم‌های پویا.";
 export const APP_KEYWORDS = ['هوشمند', 'بیمه', 'هوشمند بیمه', 'smart', 'Insurance', 'smart Insurance', 'insurance portal']
 
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://smart-insurance-application-portal.liara.run"
+
+export const DEFAULT_OG_IMAGE = "/images/hero-living.jpg"
+
 // API
 // ----------------------------------------------------------------------
 
