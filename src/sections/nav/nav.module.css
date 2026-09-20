@@ -76,3 +76,57 @@
   align-items: center;
   gap: 0.5rem;
 }
+
+.mobileNav {
+  display: block;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .mobileNav {
+    display: none;
+  }
+}
+
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem;
+  border-radius: 0.35rem;
+  color: var(--muted-foreground);
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.menuButton:hover {
+  color: var(--foreground);
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+
+.mobilePanel {
+  position: absolute;
+  top: calc(100% + 0.65rem);
+  inset-inline-end: 0;
+  min-width: 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 16px 40px -24px rgba(0, 0, 0, 0.45);
+}
+
+.mobileLink {
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.mobileLink:hover {
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+}
