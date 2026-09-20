@@ -24,36 +24,8 @@ import en from "@/dictionaries/en.json"
 import fa from "@/dictionaries/fa.json"
 import { toast } from "sonner"
 import { formatMonthlyEstimate } from "@/lib/format-money"
-
-function humanizeKey(key: string) {
-  return key.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())
-}
-
-function flattenAnswers(
-  value: unknown,
-  labels: { yes: string; no: string; valueLabel: string },
-  prefix = "",
-): { label: string; value: string }[] {
-  if (value === undefined || value === null || value === "") return []
-  if (typeof value === "boolean") {
-    return [
-      {
-        label: prefix || labels.valueLabel,
-        value: value ? labels.yes : labels.no,
-      },
-    ]
-  }
-  if (typeof value !== "object" || value instanceof Date || Array.isArray(value)) {
-    return [{ label: prefix || labels.valueLabel, value: String(value) }]
-  }
-  return Object.entries(value as Record<string, unknown>).flatMap(([key, nested]) =>
-    flattenAnswers(
-      nested,
-      labels,
-      prefix ? `${prefix} · ${humanizeKey(key)}` : humanizeKey(key),
-    ),
-  )
-}
+import { answersForApplication } from "@/lib/answer-display"
+import type { FormsCatalog } from "@/lib/form-i18n"
 
 function formatWhen(iso: string, lang: string) {
   try {
@@ -75,6 +47,7 @@ export default function PolicyDetailPage() {
   const copy = dict.page.policyDetail
   const statusLabels = dict.page.policiesList.status as Record<string, string>
   const productTitles = dict.page.home.productTitles as Record<string, string>
+  const formsCatalog = dict.page.forms as FormsCatalog
   const currency = {
     perMonth: dict.page.common.perMonthSuffix,
     toman: dict.page.common.tomanSuffix,
@@ -96,13 +69,19 @@ export default function PolicyDetailPage() {
   const rows = useMemo(
     () =>
       app?.answers
-        ? flattenAnswers(app.answers, {
-            yes: copy.yes,
-            no: copy.no,
-            valueLabel: copy.valueLabel,
-          })
+        ? answersForApplication(
+            app.answers,
+            app.formId,
+            formsCatalog,
+            {
+              yes: copy.yes,
+              no: copy.no,
+              valueLabel: copy.valueLabel,
+            },
+            lang,
+          )
         : [],
-    [app, copy.yes, copy.no, copy.valueLabel],
+    [app, formsCatalog, copy.yes, copy.no, copy.valueLabel, lang],
   )
 
   const history: StatusEvent[] = app?.statusHistory?.length

@@ -59,6 +59,61 @@ export function localizeProductTitle(
   return titles?.[formId] ?? fallback
 }
 
+export type FieldLabelEntry = {
+  label: string
+  options?: Record<string, string>
+}
+
+/** Flat id → label/options index from page.forms for a product. */
+export function buildFormFieldLabelIndex(
+  catalog: FormsCatalog | undefined,
+  formId: string,
+): Record<string, FieldLabelEntry> {
+  const index: Record<string, FieldLabelEntry> = {}
+
+  const walk = (fields?: Record<string, FieldOverride>) => {
+    if (!fields) return
+    for (const [id, override] of Object.entries(fields)) {
+      if (override.label || override.options) {
+        index[id] = {
+          label: override.label ?? id,
+          options: override.options,
+        }
+      }
+      if (override.fields) walk(override.fields)
+    }
+  }
+
+  walk(catalog?.[formId]?.fields)
+  return index
+}
+
+export function labelForFieldKey(
+  key: string,
+  index: Record<string, FieldLabelEntry>,
+) {
+  return index[key]?.label ?? key.replaceAll("_", " ")
+}
+
+export function localizeStoredAnswerValue(
+  value: string,
+  fieldKey: string,
+  index: Record<string, FieldLabelEntry>,
+  lang: string,
+) {
+  const fromField = index[fieldKey]?.options?.[value]
+  if (fromField) return fromField
+
+  const pack = DYNAMIC_OPTION_I18N[lang]
+  if (!pack) return value
+  if (pack.countries[value]) return pack.countries[value]
+  if (pack.carModels[value]) return pack.carModels[value]
+  for (const cityMap of Object.values(pack.cities)) {
+    if (cityMap[value]) return cityMap[value]
+  }
+  return value
+}
+
 /** Map known English option/status values back for display when catalog has translations */
 export function translateKnownValue(
   value: string,
