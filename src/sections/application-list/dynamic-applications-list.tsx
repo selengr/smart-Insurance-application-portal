@@ -520,7 +520,7 @@ export function DynamicApplicationsList({
                       {column.sortable && (
                         <button
                           onClick={() => handleSort(column.accessorKey)}
-                          className="ml-1 focus:outline-none"
+                          className="ml-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           {sorting.column === column.accessorKey ? (
                             sorting.direction === "asc" ? (

@@ -1,6 +1,6 @@
 # Smart Insurance Application Portal
 
-A multilingual insurance application portal built with **Next.js 15**. Users can browse insurance products (Health, Home, Car, Life, etc.), fill out schema-driven dynamic forms, save drafts locally, and review purchased policies.
+A multilingual insurance application portal built with **Next.js 15**. Users browse Health / Home / Car / Life products, complete schema-driven forms, reserve applications with a live estimate, and track status in My policies.
 
 **Live demo:** [smart-insurance-application-portal.liara.run](https://smart-insurance-application-portal.liara.run)
 
@@ -8,16 +8,14 @@ A multilingual insurance application portal built with **Next.js 15**. Users can
 
 ## Features
 
-- Dynamic forms generated from API field schemas (text, select, radio, checkbox, date)
-- Runtime validation with Zod + React Hook Form
-- Auto-save drafts to `localStorage`
-- English / Persian (FA) localization with route-based locales
-- Dark / light theme
-- Demo sign-in gate for policies
-- Application confirmation with reference id
-- Purchased insurance list with filtering
-- React Query for server state
-- Security headers + robots/sitemap
+- Schema-driven dynamic forms (text, select, radio, checkbox, date, groups)
+- Sectioned apply → review → reserve journey with live monthly estimate
+- Draft autosave + continue/start-fresh restore banner
+- EN / FA localization (route-based) and dark / light theme
+- Demo session cookie (soft gate on My policies)
+- Local reservations with status timeline (Pending → In Review → Approved)
+- Policy detail, confirmation receipt (copy + print), mobile nav
+- React Query data layer + optional remote API or offline mocks
 
 ## Tech stack
 
@@ -26,7 +24,7 @@ A multilingual insurance application portal built with **Next.js 15**. Users can
 | Framework | Next.js 15 (App Router), React 19, TypeScript |
 | Styling | Tailwind CSS 4, Radix UI, Motion |
 | Forms | React Hook Form, Zod |
-| Data | TanStack Query, Axios |
+| Data | TanStack Query, Axios, `localStorage` demo store |
 | i18n | Custom dictionaries + negotiator middleware |
 
 ## Getting started
@@ -39,16 +37,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-In development, mock API is on by default. Force modes:
+### Mock vs real API
 
-```bash
-NEXT_PUBLIC_USE_MOCK_API=true
-NEXT_PUBLIC_HOST_API_KEY=https://assignment.devotel.io
-```
+| Mode | How |
+| --- | --- |
+| Mock (default in development) | `NEXT_PUBLIC_USE_MOCK_API=true` or omit in `NODE_ENV=development` |
+| Remote Devotel API | `NEXT_PUBLIC_USE_MOCK_API=false` + `NEXT_PUBLIC_HOST_API_KEY=https://…` |
 
-## Screenshots
-
-> Tip: drop screenshots into `docs/screenshots/` and link them here (home, dynamic form, applications table).
+Fixtures and local reservations merge in mock mode so the policies list works offline.
 
 ## Scripts
 
@@ -58,36 +54,48 @@ NEXT_PUBLIC_HOST_API_KEY=https://assignment.devotel.io
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
 | `npm run lint` | ESLint |
-| `npm test` | Schema builder smoke tests |
+| `npm run typecheck` | TypeScript (`tsc --noEmit`) |
+| `npm test` | Schema, status, and quote unit tests |
+| `npm run ci` | test + typecheck + lint |
 
 ## Project structure
 
 ```
 src/
   app/[lang]/          # Locale-aware routes
-  components/          # UI + form field components
+  components/          # UI primitives + shared widgets
   sections/            # Page-level feature modules
   hooks/               # Data & form hooks
   services/            # HTTP + API clients
+  lib/                 # Quotes, drafts, status, i18n helpers
   dictionaries/        # en / fa translations
+  mocks/               # Offline fixtures
 ```
 
 ## Architecture
 
 ```
-Browser (EN/FA routes)
+Browser (EN/FA)
    │
-   ├─ Home → fetch insurance product list
-   ├─ /insurance/[formId] → schema-driven dynamic form
-   │     ├─ Zod schema built from API field definitions
-   │     ├─ React Hook Form + draft autosave (localStorage)
-   │     └─ Submit → purchased list
-   └─ /purchased-insurances → filterable applications table
+   ├─ Home → product catalog
+   ├─ /insurance/[formId]
+   │     ├─ API/mock schema → Zod → sectioned RHF form
+   │     ├─ Drafts: form_draft_* (localStorage)
+   │     ├─ Live estimate (demo quote)
+   │     └─ Reserve → recordMockSubmission → confirmation?ref=
+   ├─ /confirmation → receipt (copy / print)
+   └─ /purchased-insurances
+         ├─ Demo session banner (sip_demo_session cookie)
+         ├─ List + summary chips
+         └─ /[id] detail + status timeline
 
-API: NEXT_PUBLIC_HOST_API_KEY (Devotel assignment API)
+Data
+   ├─ Mock fixtures (src/mocks) when USE_MOCK_API
+   ├─ Local apps: sip_local_applications (browser only)
+   └─ Optional remote: NEXT_PUBLIC_HOST_API_KEY
 ```
 
-Recruiters can skim this as: **API schema → Zod → dynamic UI → validated submit**.
+Recruiters can skim this as: **API schema → Zod → guided UI → reserve → track status**.
 
 ## Author
 

@@ -90,7 +90,8 @@
       "estimate": "Estimated monthly",
       "copyReference": "Copy",
       "copiedReference": "Copied",
-      "missingReference": "No reference was returned. Open My policies to find your latest application."
+      "missingReference": "No reference was returned. Open My policies to find your latest application.",
+      "printReceipt": "Print receipt"
     },
     "common": {
       "loading": "Loading…",
