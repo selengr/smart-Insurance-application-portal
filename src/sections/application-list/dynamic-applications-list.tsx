@@ -328,10 +328,10 @@ export function DynamicApplicationsList({
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">
-          {labels.applications} ({filteredData.length})
-        </h2>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          {labels.applications} · {filteredData.length}
+        </p>
         <div className="flex space-x-2">
           <button
             onClick={() => setShowFilterModal(true)}

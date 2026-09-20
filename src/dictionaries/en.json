@@ -129,6 +129,11 @@
       "draftSavedBody": "Your progress has been saved.",
       "draftRestoredTitle": "Draft restored",
       "draftRestoredBody": "Your previous progress has been restored.",
+      "continueDraft": "Continue draft",
+      "startFresh": "Start fresh",
+      "draftFound": "Saved draft found",
+      "discardCancel": "Keep editing",
+      "editSection": "Edit section",
       "leaveConfirm": "You have unsaved changes. Leave this page?",
       "backProducts": "All products",
       "stepDetails": "Details",
@@ -175,14 +180,28 @@
       "tagline": "Schema-driven insurance applications for modern teams.",
       "privacy": "Privacy",
       "terms": "Terms",
-      "rights": "All rights reserved."
+      "rights": "All rights reserved.",
+      "explore": "Explore",
+      "legalLabel": "Legal",
+      "demoNote": "Demo data stays in this browser only — nothing is billed or sent to a production insurer."
     },
     "legal": {
       "privacyTitle": "Privacy",
-      "privacyBody": "This demo portal stores draft forms and demo session data in your browser only. No production personal data is collected or sold. Connect a real backend before handling genuine applicant information.",
+      "privacyBody": "This demo portal stores draft forms and demo session data in your browser only. No production personal data is collected or sold.",
       "termsTitle": "Terms of use",
-      "termsBody": "This project is a portfolio demonstration. Demo sign-in is not real authentication. Do not submit sensitive personal or financial information. Features and fixtures may change without notice.",
-      "backHome": "Back to home"
+      "termsBody": "This project is a portfolio demonstration. Demo sign-in is not real authentication.",
+      "backHome": "Back to home",
+      "aboutDemo": "About this demo",
+      "whatWeStore": "What we store",
+      "whatWeDont": "What we don’t",
+      "demoUse": "How you may use it",
+      "limitations": "Limitations",
+      "privacyAbout": "The portal is a bilingual insurance application demo for portfolio and product-flow evaluation.",
+      "privacyStore": "Draft answers, reserved applications, and a demo session cookie stay in your browser’s local storage.",
+      "privacyDont": "We don’t sell data, run production underwriting, or send personal information to a live insurer API.",
+      "termsAbout": "Features and fixtures may change without notice. Treat everything here as sample content.",
+      "termsUse": "You may explore products, reserve demo applications, and share the project as a portfolio piece.",
+      "termsLimits": "Do not submit sensitive personal or financial information. Demo sign-in is not real authentication."
     },
     "forms": {
       "health_insurance_application": {
