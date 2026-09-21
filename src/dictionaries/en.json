@@ -67,7 +67,8 @@
       "compareClear": "Clear",
       "compareVs": "vs",
       "compareCopyLink": "Copy compare link",
-      "compareCopiedLink": "Link copied"
+      "compareCopiedLink": "Link copied",
+      "compareCopyHint": "Pick two different products to copy a shareable link."
     },
     "about": {
       "title": "About",
