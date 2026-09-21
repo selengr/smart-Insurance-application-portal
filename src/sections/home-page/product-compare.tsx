@@ -63,6 +63,7 @@ export function ProductCompare({ lang, products, copy }: Props) {
     undefined,
   )
   const [linkCopied, setLinkCopied] = useState(false)
+  const [copyLiveMessage, setCopyLiveMessage] = useState("")
 
   useLayoutEffect(() => {
     if (hasCompareParam) {
@@ -156,8 +157,12 @@ export function ProductCompare({ lang, products, copy }: Props) {
     try {
       await navigator.clipboard.writeText(url)
       setLinkCopied(true)
+      setCopyLiveMessage(copy.copiedLink)
       toast.success(copy.copiedLink)
-      window.setTimeout(() => setLinkCopied(false), 1800)
+      window.setTimeout(() => {
+        setLinkCopied(false)
+        setCopyLiveMessage("")
+      }, 1800)
     } catch {
       toast.error(copy.copyLink)
     }
@@ -259,6 +264,9 @@ export function ProductCompare({ lang, products, copy }: Props) {
               {copy.copyHint}
             </p>
           ) : null}
+          <div role="status" aria-live="polite" className="sr-only">
+            {copyLiveMessage}
+          </div>
         </div>
       </div>
 
