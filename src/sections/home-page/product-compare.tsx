@@ -3,8 +3,9 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useId, useMemo, useRef, useState } from "react"
-import { ArrowLeftRight, ArrowUpRight } from "lucide-react"
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react"
+import { ArrowLeftRight, ArrowUpRight, Check, Link2 } from "lucide-react"
+import { toast } from "sonner"
 import {
   readCompareSession,
   resolveComparePair,
@@ -32,6 +33,8 @@ type Copy = {
   swap: string
   clear: string
   vs: string
+  copyLink: string
+  copiedLink: string
 }
 
 type Props = {
@@ -57,8 +60,9 @@ export function ProductCompare({ lang, products, copy }: Props) {
   const [sessionRaw, setSessionRaw] = useState<string | null | undefined>(
     undefined,
   )
+  const [linkCopied, setLinkCopied] = useState(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (hasCompareParam) {
       const raw = compareRaw || ","
       writeCompareSession(raw)
@@ -133,6 +137,28 @@ export function ProductCompare({ lang, products, copy }: Props) {
   const swap = () => writeCompare(rightId, leftId)
   const clear = () => writeCompare("", "")
 
+  const sharePath =
+    ready && leftId && rightId
+      ? `${pathname}?compare=${serializeCompareParam(leftId, rightId)}`
+      : null
+
+  const copyCompareLink = async () => {
+    if (!sharePath) return
+    // Ensure the address bar matches what we put on the clipboard.
+    if (!hasCompareParam || compareRaw !== serializeCompareParam(leftId, rightId)) {
+      writeCompare(leftId, rightId)
+    }
+    const url = `${window.location.origin}${sharePath}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setLinkCopied(true)
+      toast.success(copy.copiedLink)
+      window.setTimeout(() => setLinkCopied(false), 1800)
+    } catch {
+      toast.error(copy.copyLink)
+    }
+  }
+
   return (
     <section
       id="compare"
@@ -182,7 +208,7 @@ export function ProductCompare({ lang, products, copy }: Props) {
             </select>
           </label>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={swap}
@@ -199,6 +225,19 @@ export function ProductCompare({ lang, products, copy }: Props) {
             className="inline-flex h-11 items-center border border-input bg-background px-3 text-sm font-medium transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
           >
             {copy.clear}
+          </button>
+          <button
+            type="button"
+            onClick={copyCompareLink}
+            disabled={!sharePath}
+            className="inline-flex h-11 items-center gap-2 border border-input bg-background px-3 text-sm font-medium transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+          >
+            {linkCopied ? (
+              <Check className="h-4 w-4 text-primary" aria-hidden />
+            ) : (
+              <Link2 className="h-4 w-4" aria-hidden />
+            )}
+            {linkCopied ? copy.copiedLink : copy.copyLink}
           </button>
         </div>
       </div>

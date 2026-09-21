@@ -65,7 +65,9 @@
       "compareApply": "Apply for {product}",
       "compareSwap": "Swap",
       "compareClear": "Clear",
-      "compareVs": "vs"
+      "compareVs": "vs",
+      "compareCopyLink": "Copy compare link",
+      "compareCopiedLink": "Link copied"
     },
     "about": {
       "title": "About",
