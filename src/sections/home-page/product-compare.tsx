@@ -3,11 +3,13 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useId, useMemo, useRef } from "react"
+import { useEffect, useId, useMemo, useRef, useState } from "react"
 import { ArrowLeftRight, ArrowUpRight } from "lucide-react"
 import {
-  parseCompareParam,
+  readCompareSession,
+  resolveComparePair,
   serializeCompareParam,
+  writeCompareSession,
 } from "@/lib/compare-url"
 
 export type CompareProduct = {
@@ -51,18 +53,24 @@ export function ProductCompare({ lang, products, copy }: Props) {
 
   const compareRaw = searchParams.get("compare")
   const hasCompareParam = searchParams.has("compare")
-  const fromUrl = useMemo(
-    () => parseCompareParam(compareRaw, knownIds),
-    [compareRaw, knownIds],
+  // undefined = not hydrated yet (treat as no session → defaults)
+  const [sessionRaw, setSessionRaw] = useState<string | null | undefined>(
+    undefined,
   )
 
-  // URL is source of truth when ?compare= is present; otherwise show defaults.
-  const [leftId, rightId] = hasCompareParam ? fromUrl : defaults
+  useEffect(() => {
+    if (hasCompareParam) {
+      const raw = compareRaw || ","
+      writeCompareSession(raw)
+      setSessionRaw(raw)
+      return
+    }
+    setSessionRaw(readCompareSession())
+  }, [hasCompareParam, compareRaw])
 
   const scrolledFor = useRef<string | null>(null)
   useEffect(() => {
     if (!hasCompareParam || compareRaw == null) return
-    // Skip scroll for explicit empty clear (?,compare=,)
     if (compareRaw === "," || !compareRaw.trim()) return
     if (scrolledFor.current === compareRaw) return
     scrolledFor.current = compareRaw
@@ -74,10 +82,26 @@ export function ProductCompare({ lang, products, copy }: Props) {
     })
   }, [hasCompareParam, compareRaw])
 
+  const [leftId, rightId] = resolveComparePair(
+    hasCompareParam,
+    compareRaw,
+    sessionRaw === undefined ? null : sessionRaw,
+    defaults,
+    knownIds,
+  )
+
   const writeCompare = (nextLeft: string, nextRight: string) => {
     const next = serializeCompareParam(nextLeft, nextRight)
+    writeCompareSession(next)
+    setSessionRaw(next)
+
     const params = new URLSearchParams(searchParams.toString())
-    params.set("compare", next)
+    if (!nextLeft && !nextRight) {
+      // Clear drops the query so sessionStorage is the fallback on return.
+      params.delete("compare")
+    } else {
+      params.set("compare", next)
+    }
     const query = params.toString()
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
@@ -89,7 +113,7 @@ export function ProductCompare({ lang, products, copy }: Props) {
   const ready = Boolean(left && right && left.formId !== right.formId)
 
   const onPickLeft = (formId: string) => {
-    let nextRight = hasCompareParam ? rightId : defaults[1]
+    let nextRight = rightId
     if (formId && formId === nextRight) {
       const other = products.find((p) => p.formId !== formId)
       if (other) nextRight = other.formId
@@ -98,7 +122,7 @@ export function ProductCompare({ lang, products, copy }: Props) {
   }
 
   const onPickRight = (formId: string) => {
-    let nextLeft = hasCompareParam ? leftId : defaults[0]
+    let nextLeft = leftId
     if (formId && formId === nextLeft) {
       const other = products.find((p) => p.formId !== formId)
       if (other) nextLeft = other.formId
@@ -171,7 +195,7 @@ export function ProductCompare({ lang, products, copy }: Props) {
           <button
             type="button"
             onClick={clear}
-            disabled={hasCompareParam ? !leftId && !rightId : false}
+            disabled={!leftId && !rightId}
             className="inline-flex h-11 items-center border border-input bg-background px-3 text-sm font-medium transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
           >
             {copy.clear}

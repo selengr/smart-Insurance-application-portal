@@ -1,5 +1,7 @@
 /** Short shareable slugs: health_insurance_application → health */
 
+export const COMPARE_SESSION_KEY = "smart-insurance.compare"
+
 export function formIdToCompareSlug(formId: string) {
   return formId.replace(/_insurance_application$/i, "").toLowerCase()
 }
@@ -32,4 +34,35 @@ export function serializeCompareParam(leftId: string, rightId: string) {
   return [leftId, rightId]
     .map((id) => (id ? formIdToCompareSlug(id) : ""))
     .join(",")
+}
+
+/** URL wins; else session (including explicit clear ","); else defaults. */
+export function resolveComparePair(
+  hasUrlParam: boolean,
+  urlRaw: string | null | undefined,
+  sessionRaw: string | null | undefined,
+  defaults: [string, string],
+  knownFormIds: string[],
+): [string, string] {
+  if (hasUrlParam) return parseCompareParam(urlRaw, knownFormIds)
+  if (sessionRaw != null) return parseCompareParam(sessionRaw, knownFormIds)
+  return defaults
+}
+
+export function readCompareSession(): string | null {
+  if (typeof window === "undefined") return null
+  try {
+    return sessionStorage.getItem(COMPARE_SESSION_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function writeCompareSession(value: string) {
+  if (typeof window === "undefined") return
+  try {
+    sessionStorage.setItem(COMPARE_SESSION_KEY, value)
+  } catch {
+    // private mode / quota
+  }
 }
