@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test scripts/test-schema.mjs scripts/test-status.mjs scripts/test-quote.mjs scripts/test-import.mjs scripts/test-answer-labels.mjs",
+    "test": "node --test scripts/test-schema.mjs scripts/test-status.mjs scripts/test-quote.mjs scripts/test-import.mjs scripts/test-answer-labels.mjs scripts/test-compare-url.mjs",
     "test:e2e": "playwright test",
     "ci": "npm test && npm run typecheck && npm run lint && npm run build && npm run test:e2e"
   },

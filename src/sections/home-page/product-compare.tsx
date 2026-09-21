@@ -2,8 +2,13 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useId, useMemo, useState } from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useId, useMemo, useRef } from "react"
 import { ArrowLeftRight, ArrowUpRight } from "lucide-react"
+import {
+  parseCompareParam,
+  serializeCompareParam,
+} from "@/lib/compare-url"
 
 export type CompareProduct = {
   formId: string
@@ -35,13 +40,47 @@ type Props = {
 
 export function ProductCompare({ lang, products, copy }: Props) {
   const baseId = useId()
-  const defaults = useMemo(() => {
-    if (products.length < 2) return ["", ""] as [string, string]
-    return [products[0].formId, products[1].formId] as [string, string]
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const knownIds = useMemo(() => products.map((p) => p.formId), [products])
+  const defaults = useMemo((): [string, string] => {
+    if (products.length < 2) return ["", ""]
+    return [products[0].formId, products[1].formId]
   }, [products])
 
-  const [leftId, setLeftId] = useState(defaults[0])
-  const [rightId, setRightId] = useState(defaults[1])
+  const compareRaw = searchParams.get("compare")
+  const hasCompareParam = searchParams.has("compare")
+  const fromUrl = useMemo(
+    () => parseCompareParam(compareRaw, knownIds),
+    [compareRaw, knownIds],
+  )
+
+  // URL is source of truth when ?compare= is present; otherwise show defaults.
+  const [leftId, rightId] = hasCompareParam ? fromUrl : defaults
+
+  const scrolledFor = useRef<string | null>(null)
+  useEffect(() => {
+    if (!hasCompareParam || compareRaw == null) return
+    // Skip scroll for explicit empty clear (?,compare=,)
+    if (compareRaw === "," || !compareRaw.trim()) return
+    if (scrolledFor.current === compareRaw) return
+    scrolledFor.current = compareRaw
+    requestAnimationFrame(() => {
+      document.getElementById("compare")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    })
+  }, [hasCompareParam, compareRaw])
+
+  const writeCompare = (nextLeft: string, nextRight: string) => {
+    const next = serializeCompareParam(nextLeft, nextRight)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("compare", next)
+    const query = params.toString()
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+  }
 
   if (products.length < 2) return null
 
@@ -50,30 +89,25 @@ export function ProductCompare({ lang, products, copy }: Props) {
   const ready = Boolean(left && right && left.formId !== right.formId)
 
   const onPickLeft = (formId: string) => {
-    setLeftId(formId)
-    if (formId && formId === rightId) {
+    let nextRight = hasCompareParam ? rightId : defaults[1]
+    if (formId && formId === nextRight) {
       const other = products.find((p) => p.formId !== formId)
-      if (other) setRightId(other.formId)
+      if (other) nextRight = other.formId
     }
+    writeCompare(formId, nextRight)
   }
 
   const onPickRight = (formId: string) => {
-    setRightId(formId)
-    if (formId && formId === leftId) {
+    let nextLeft = hasCompareParam ? leftId : defaults[0]
+    if (formId && formId === nextLeft) {
       const other = products.find((p) => p.formId !== formId)
-      if (other) setLeftId(other.formId)
+      if (other) nextLeft = other.formId
     }
+    writeCompare(nextLeft, formId)
   }
 
-  const swap = () => {
-    setLeftId(rightId)
-    setRightId(leftId)
-  }
-
-  const clear = () => {
-    setLeftId("")
-    setRightId("")
-  }
+  const swap = () => writeCompare(rightId, leftId)
+  const clear = () => writeCompare("", "")
 
   return (
     <section
@@ -137,7 +171,7 @@ export function ProductCompare({ lang, products, copy }: Props) {
           <button
             type="button"
             onClick={clear}
-            disabled={!leftId && !rightId}
+            disabled={hasCompareParam ? !leftId && !rightId : false}
             className="inline-flex h-11 items-center border border-input bg-background px-3 text-sm font-medium transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
           >
             {copy.clear}

@@ -1,6 +1,7 @@
 import { NextPage } from "next"
 import Image from "next/image"
 import Link from "next/link"
+import { Suspense } from "react"
 import { Locale } from "../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import { fetchInsuranceTypes } from "@/services/api/home"
@@ -233,22 +234,24 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
         )}
       </section>
 
-      <ProductCompare
-        lang={lang}
-        products={compareProducts}
-        copy={{
-          title: home.compareTitle,
-          body: home.compareBody,
-          pickA: home.comparePickA,
-          pickB: home.comparePickB,
-          selectPlaceholder: home.compareSelect,
-          empty: home.compareEmpty,
-          apply: home.compareApply,
-          swap: home.compareSwap,
-          clear: home.compareClear,
-          vs: home.compareVs,
-        }}
-      />
+      <Suspense fallback={null}>
+        <ProductCompare
+          lang={lang}
+          products={compareProducts}
+          copy={{
+            title: home.compareTitle,
+            body: home.compareBody,
+            pickA: home.comparePickA,
+            pickB: home.comparePickB,
+            selectPlaceholder: home.compareSelect,
+            empty: home.compareEmpty,
+            apply: home.compareApply,
+            swap: home.compareSwap,
+            clear: home.compareClear,
+            vs: home.compareVs,
+          }}
+        />
+      </Suspense>
     </div>
   )
 }
