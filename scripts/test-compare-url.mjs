@@ -30,11 +30,28 @@ function serializeCompareParam(leftId, rightId) {
     .join(",")
 }
 
+function resolveComparePair(
+  hasUrlParam,
+  urlRaw,
+  sessionRaw,
+  defaults,
+  knownFormIds,
+) {
+  if (hasUrlParam) return parseCompareParam(urlRaw, knownFormIds)
+  if (sessionRaw != null) return parseCompareParam(sessionRaw, knownFormIds)
+  return defaults
+}
+
 const IDS = [
   "health_insurance_application",
   "home_insurance_application",
   "car_insurance_application",
   "life_insurance_application",
+]
+
+const DEFAULTS = [
+  "health_insurance_application",
+  "home_insurance_application",
 ]
 
 test("slug round-trip for compare pairs", () => {
@@ -63,5 +80,24 @@ test("slug round-trip for compare pairs", () => {
   assert.equal(
     serializeCompareParam("health_insurance_application", ""),
     "health,",
+  )
+})
+
+test("resolveComparePair prefers URL, then session, then defaults", () => {
+  assert.deepEqual(
+    resolveComparePair(true, "car,life", "health,home", DEFAULTS, IDS),
+    ["car_insurance_application", "life_insurance_application"],
+  )
+  assert.deepEqual(
+    resolveComparePair(false, null, "health,car", DEFAULTS, IDS),
+    ["health_insurance_application", "car_insurance_application"],
+  )
+  assert.deepEqual(
+    resolveComparePair(false, null, ",", DEFAULTS, IDS),
+    ["", ""],
+  )
+  assert.deepEqual(
+    resolveComparePair(false, null, null, DEFAULTS, IDS),
+    DEFAULTS,
   )
 })
