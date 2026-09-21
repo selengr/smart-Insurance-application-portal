@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import {
   buildCompareShareUrl,
+  parseCompareParam,
   readCompareSession,
   resolveComparePair,
   serializeCompareParam,
@@ -59,22 +60,50 @@ export function ProductCompare({ lang, products, copy }: Props) {
 
   const compareRaw = searchParams.get("compare")
   const hasCompareParam = searchParams.has("compare")
-  // undefined = not hydrated yet (treat as no session → defaults)
-  const [sessionRaw, setSessionRaw] = useState<string | null | undefined>(
-    undefined,
-  )
+  const [leftId, setLeftId] = useState("")
+  const [rightId, setRightId] = useState("")
+  const [hydrated, setHydrated] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
   const [copyLiveMessage, setCopyLiveMessage] = useState("")
+  const skipUrlSync = useRef(false)
 
   useLayoutEffect(() => {
+    const [a, b] = resolveComparePair(
+      hasCompareParam,
+      compareRaw,
+      readCompareSession(),
+      defaults,
+      knownIds,
+    )
+    setLeftId(a)
+    setRightId(b)
     if (hasCompareParam) {
-      const raw = compareRaw || ","
-      writeCompareSession(raw)
-      setSessionRaw(raw)
+      writeCompareSession(compareRaw || ",")
+    }
+    setHydrated(true)
+  }, [])
+
+  // Browser back/forward or external ?compare= changes
+  useEffect(() => {
+    if (!hydrated) return
+    if (skipUrlSync.current) {
+      skipUrlSync.current = false
       return
     }
-    setSessionRaw(readCompareSession())
-  }, [hasCompareParam, compareRaw])
+    if (!hasCompareParam) {
+      const stored = readCompareSession()
+      if (stored != null) {
+        const [a, b] = parseCompareParam(stored, knownIds)
+        setLeftId(a)
+        setRightId(b)
+      }
+      return
+    }
+    const [a, b] = parseCompareParam(compareRaw, knownIds)
+    setLeftId(a)
+    setRightId(b)
+    writeCompareSession(compareRaw || ",")
+  }, [hydrated, hasCompareParam, compareRaw, knownIds])
 
   const scrolledFor = useRef<string | null>(null)
   useEffect(() => {
@@ -90,28 +119,23 @@ export function ProductCompare({ lang, products, copy }: Props) {
     })
   }, [hasCompareParam, compareRaw])
 
-  const [leftId, rightId] = resolveComparePair(
-    hasCompareParam,
-    compareRaw,
-    sessionRaw === undefined ? null : sessionRaw,
-    defaults,
-    knownIds,
-  )
-
   const writeCompare = (nextLeft: string, nextRight: string) => {
     const next = serializeCompareParam(nextLeft, nextRight)
+    setLeftId(nextLeft)
+    setRightId(nextRight)
     writeCompareSession(next)
-    setSessionRaw(next)
 
     const params = new URLSearchParams(searchParams.toString())
     if (!nextLeft && !nextRight) {
-      // Clear drops the query so sessionStorage is the fallback on return.
       params.delete("compare")
     } else {
       params.set("compare", next)
     }
     const query = params.toString()
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    const href = query ? `${pathname}?${query}` : pathname
+    skipUrlSync.current = true
+    window.history.replaceState(window.history.state, "", href)
+    router.replace(href, { scroll: false })
   }
 
   if (products.length < 2) return null
@@ -151,7 +175,6 @@ export function ProductCompare({ lang, products, copy }: Props) {
   const copyCompareLink = async () => {
     if (!shareUrl) return
     const pair = serializeCompareParam(leftId, rightId)
-    // Ensure the address bar matches what we put on the clipboard.
     if (!hasCompareParam || compareRaw !== pair) {
       writeCompare(leftId, rightId)
     }
