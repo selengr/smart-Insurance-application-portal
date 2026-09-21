@@ -40,6 +40,12 @@ test("compare session keeps clear after navigate away and back", async ({
   await expect(page).not.toHaveURL(/compare=/)
   await expect(section.getByLabel("First cover")).toHaveValue("")
   await expect(section.getByLabel("Second cover")).toHaveValue("")
+  await expect(
+    section.getByText("Pick two different products to copy a shareable link."),
+  ).toBeVisible()
+  await expect(
+    section.getByRole("button", { name: "Copy compare link" }),
+  ).toHaveAttribute("aria-disabled", "true")
 
   await page.goto("/en/login")
   await page.goto("/en")
@@ -77,7 +83,12 @@ test("copy compare link writes clipboard and confirms", async ({
   await page.goto("/en?compare=health,home")
 
   const section = page.locator("#compare")
-  await section.getByRole("button", { name: "Copy compare link" }).click()
+  const copyBtn = section.getByRole("button", { name: "Copy compare link" })
+  await expect(copyBtn).not.toHaveAttribute("aria-disabled", "true")
+  await expect(
+    section.getByText("Pick two different products to copy a shareable link."),
+  ).toHaveCount(0)
+  await copyBtn.click()
   await expect(
     section.getByRole("button", { name: "Link copied" }),
   ).toBeVisible()

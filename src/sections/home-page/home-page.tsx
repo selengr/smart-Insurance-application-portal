@@ -50,6 +50,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
     compareVs: string
     compareCopyLink: string
     compareCopiedLink: string
+    compareCopyHint: string
   }
   const items = insuranceTypes?.data ?? []
   const draftProducts = items.map((insurance) => ({
@@ -253,6 +254,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
             vs: home.compareVs,
             copyLink: home.compareCopyLink,
             copiedLink: home.compareCopiedLink,
+            copyHint: home.compareCopyHint,
           }}
         />
       </Suspense>

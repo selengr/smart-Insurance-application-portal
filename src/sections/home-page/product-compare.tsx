@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { ArrowLeftRight, ArrowUpRight, Check, Link2 } from "lucide-react"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 import {
   readCompareSession,
   resolveComparePair,
@@ -35,6 +36,7 @@ type Copy = {
   vs: string
   copyLink: string
   copiedLink: string
+  copyHint: string
 }
 
 type Props = {
@@ -141,6 +143,8 @@ export function ProductCompare({ lang, products, copy }: Props) {
     ready && leftId && rightId
       ? `${pathname}?compare=${serializeCompareParam(leftId, rightId)}`
       : null
+  const canShare = Boolean(sharePath)
+  const copyHintId = `${baseId}-copy-hint`
 
   const copyCompareLink = async () => {
     if (!sharePath) return
@@ -208,37 +212,53 @@ export function ProductCompare({ lang, products, copy }: Props) {
             </select>
           </label>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={swap}
-            disabled={!leftId || !rightId}
-            className="inline-flex h-11 items-center gap-2 border border-input bg-background px-3 text-sm font-medium transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
-          >
-            <ArrowLeftRight className="h-4 w-4" aria-hidden />
-            {copy.swap}
-          </button>
-          <button
-            type="button"
-            onClick={clear}
-            disabled={!leftId && !rightId}
-            className="inline-flex h-11 items-center border border-input bg-background px-3 text-sm font-medium transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
-          >
-            {copy.clear}
-          </button>
-          <button
-            type="button"
-            onClick={copyCompareLink}
-            disabled={!sharePath}
-            className="inline-flex h-11 items-center gap-2 border border-input bg-background px-3 text-sm font-medium transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
-          >
-            {linkCopied ? (
-              <Check className="h-4 w-4 text-primary" aria-hidden />
-            ) : (
-              <Link2 className="h-4 w-4" aria-hidden />
-            )}
-            {linkCopied ? copy.copiedLink : copy.copyLink}
-          </button>
+        <div className="flex flex-col items-stretch gap-2 sm:items-end">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={swap}
+              disabled={!leftId || !rightId}
+              className="inline-flex h-11 items-center gap-2 border border-input bg-background px-3 text-sm font-medium transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+            >
+              <ArrowLeftRight className="h-4 w-4" aria-hidden />
+              {copy.swap}
+            </button>
+            <button
+              type="button"
+              onClick={clear}
+              disabled={!leftId && !rightId}
+              className="inline-flex h-11 items-center border border-input bg-background px-3 text-sm font-medium transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+            >
+              {copy.clear}
+            </button>
+            <button
+              type="button"
+              onClick={copyCompareLink}
+              aria-disabled={canShare ? undefined : true}
+              aria-describedby={canShare ? undefined : copyHintId}
+              className={cn(
+                "inline-flex h-11 items-center gap-2 border border-input bg-background px-3 text-sm font-medium transition",
+                canShare
+                  ? "hover:bg-muted"
+                  : "cursor-not-allowed opacity-40",
+              )}
+            >
+              {linkCopied ? (
+                <Check className="h-4 w-4 text-primary" aria-hidden />
+              ) : (
+                <Link2 className="h-4 w-4" aria-hidden />
+              )}
+              {linkCopied ? copy.copiedLink : copy.copyLink}
+            </button>
+          </div>
+          {!canShare ? (
+            <p
+              id={copyHintId}
+              className="max-w-xs text-xs leading-snug text-muted-foreground sm:text-end"
+            >
+              {copy.copyHint}
+            </p>
+          ) : null}
         </div>
       </div>
 
