@@ -92,6 +92,7 @@ test("copy compare link writes clipboard and confirms", async ({
   await expect(
     section.getByRole("button", { name: "Link copied" }),
   ).toBeVisible()
+  await expect(section.getByRole("status")).toHaveText("Link copied")
 
   const text = await page.evaluate(() => navigator.clipboard.readText())
   expect(text).toMatch(/\/en\?compare=health(,|%2C)home/)
