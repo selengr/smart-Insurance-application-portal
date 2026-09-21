@@ -8,6 +8,7 @@ import { ArrowLeftRight, ArrowUpRight, Check, Link2 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import {
+  buildCompareShareUrl,
   readCompareSession,
   resolveComparePair,
   serializeCompareParam,
@@ -140,22 +141,22 @@ export function ProductCompare({ lang, products, copy }: Props) {
   const swap = () => writeCompare(rightId, leftId)
   const clear = () => writeCompare("", "")
 
-  const sharePath =
-    ready && leftId && rightId
-      ? `${pathname}?compare=${serializeCompareParam(leftId, rightId)}`
+  const shareUrl =
+    typeof window !== "undefined"
+      ? buildCompareShareUrl(window.location.origin, pathname, leftId, rightId)
       : null
-  const canShare = Boolean(sharePath)
+  const canShare = Boolean(shareUrl)
   const copyHintId = `${baseId}-copy-hint`
 
   const copyCompareLink = async () => {
-    if (!sharePath) return
+    if (!shareUrl) return
+    const pair = serializeCompareParam(leftId, rightId)
     // Ensure the address bar matches what we put on the clipboard.
-    if (!hasCompareParam || compareRaw !== serializeCompareParam(leftId, rightId)) {
+    if (!hasCompareParam || compareRaw !== pair) {
       writeCompare(leftId, rightId)
     }
-    const url = `${window.location.origin}${sharePath}`
     try {
-      await navigator.clipboard.writeText(url)
+      await navigator.clipboard.writeText(shareUrl)
       setLinkCopied(true)
       setCopyLiveMessage(copy.copiedLink)
       toast.success(copy.copiedLink)
