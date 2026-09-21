@@ -7,14 +7,28 @@ import { isDemoAuthenticated } from "@/lib/auth-session"
 import { match as matchLocale } from "@formatjs/intl-localematcher"
 import Negotiator from "negotiator"
 
-function getLocale(request: NextRequest): string | undefined {
-  const negotiatorHeaders: Record<string, string> = {}
-  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value))
+function getLocale(request: NextRequest): string {
+  try {
+    const negotiatorHeaders: Record<string, string> = {}
+    request.headers.forEach((value, key) => (negotiatorHeaders[key] = value))
 
-  const locales = [...i18n.locales]
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages()
+    const locales = [...i18n.locales]
+    const languages = new Negotiator({ headers: negotiatorHeaders })
+      .languages()
+      .filter((language) => {
+        try {
+          Intl.getCanonicalLocales(language)
+          return true
+        } catch {
+          return false
+        }
+      })
 
-  return matchLocale(languages, locales, i18n.defaultLocale)
+    if (!languages.length) return i18n.defaultLocale
+    return matchLocale(languages, locales, i18n.defaultLocale)
+  } catch {
+    return i18n.defaultLocale
+  }
 }
 
 export function middleware(request: NextRequest) {
