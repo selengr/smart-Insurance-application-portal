@@ -1,7 +1,14 @@
 import { expect, test } from "@playwright/test"
 
-test("compare URL restores pair and updates after swap", async ({ page }) => {
+const COMPARE_SESSION_KEY = "smart-insurance.compare"
+
+test.beforeEach(async ({ page }) => {
   await page.setExtraHTTPHeaders({ "Accept-Language": "en" })
+  await page.goto("/en")
+  await page.evaluate((key) => sessionStorage.removeItem(key), COMPARE_SESSION_KEY)
+})
+
+test("compare URL restores pair and updates after swap", async ({ page }) => {
   await page.goto("/?compare=health,home")
 
   await expect(page).toHaveURL(/\/en\/?\?.*compare=health(,|%2C)home/)
@@ -26,7 +33,6 @@ test("compare URL restores pair and updates after swap", async ({ page }) => {
 test("compare session keeps clear after navigate away and back", async ({
   page,
 }) => {
-  await page.setExtraHTTPHeaders({ "Accept-Language": "en" })
   await page.goto("/en?compare=health,home")
 
   const section = page.locator("#compare")
@@ -46,11 +52,12 @@ test("compare session keeps clear after navigate away and back", async ({
 test("compare session restores pair when URL has no compare", async ({
   page,
 }) => {
-  await page.setExtraHTTPHeaders({ "Accept-Language": "en" })
   await page.goto("/en?compare=health,car")
-  await expect(page.locator("#compare").getByLabel("First cover")).toHaveValue(
-    "health_insurance_application",
-  )
+  await expect
+    .poll(() =>
+      page.evaluate((key) => sessionStorage.getItem(key), COMPARE_SESSION_KEY),
+    )
+    .toBe("health,car")
 
   await page.goto("/en")
   const section = page.locator("#compare")
@@ -60,4 +67,21 @@ test("compare session restores pair when URL has no compare", async ({
   await expect(section.getByLabel("Second cover")).toHaveValue(
     "car_insurance_application",
   )
+})
+
+test("copy compare link writes clipboard and confirms", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"])
+  await page.goto("/en?compare=health,home")
+
+  const section = page.locator("#compare")
+  await section.getByRole("button", { name: "Copy compare link" }).click()
+  await expect(
+    section.getByRole("button", { name: "Link copied" }),
+  ).toBeVisible()
+
+  const text = await page.evaluate(() => navigator.clipboard.readText())
+  expect(text).toMatch(/\/en\?compare=health(,|%2C)home/)
 })

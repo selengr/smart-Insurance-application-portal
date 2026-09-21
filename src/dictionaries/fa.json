@@ -65,7 +65,9 @@
       "compareApply": "درخواست {product}",
       "compareSwap": "جابه‌جایی",
       "compareClear": "پاک کردن",
-      "compareVs": "در برابر"
+      "compareVs": "در برابر",
+      "compareCopyLink": "کپی لینک مقایسه",
+      "compareCopiedLink": "لینک کپی شد"
     },
     "about": {
       "title": "درباره ما",
