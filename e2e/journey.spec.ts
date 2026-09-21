@@ -1,57 +1,117 @@
-import { expect, test } from "@playwright/test"
+import { expect, type Page, test } from "@playwright/test"
 
-/**
- * Smoke: demo sign-in → health apply → fill demo → reserve → policy detail.
- * Uses EN copy for stable accessible names.
- */
-test("health apply reserves and opens policy detail", async ({ page }) => {
-  await page.goto("/en/login")
-  await page.getByRole("button", { name: "Continue as demo user" }).click()
-  await expect(page).toHaveURL(/\/en\/purchased-insurances/)
+type JourneyCopy = {
+  lang: "en" | "fa"
+  loginCta: string
+  startFresh: string
+  fillDemo: string
+  nextSection: string
+  continueReview: string
+  reviewTitle: string
+  agreeLabel: RegExp
+  reserve: string
+  confirmationTitle: string
+  viewPolicies: string
+  firstName: string
+  lastName: string
+  coverage: string
+}
 
-  await page.goto("/en/insurance/health_insurance_application")
+const EN: JourneyCopy = {
+  lang: "en",
+  loginCta: "Continue as demo user",
+  startFresh: "Start fresh",
+  fillDemo: "Fill demo answers",
+  nextSection: "Next section",
+  continueReview: "Continue to reserve",
+  reviewTitle: "Reserve your cover",
+  agreeLabel: /I confirm these details are correct/i,
+  reserve: "Reserve application",
+  confirmationTitle: "Reservation confirmed",
+  viewPolicies: "View my policies",
+  firstName: "Sara",
+  lastName: "Karimi",
+  coverage: "Standard",
+}
 
-  const startFresh = page.getByRole("button", { name: "Start fresh" })
+const FA: JourneyCopy = {
+  lang: "fa",
+  loginCta: "ادامه به‌عنوان کاربر دمو",
+  startFresh: "شروع از نو",
+  fillDemo: "پر کردن نمونه",
+  nextSection: "بخش بعد",
+  continueReview: "ادامه برای رزرو",
+  reviewTitle: "رزرو پوشش",
+  agreeLabel: /جزئیات را درست می‌دانم/,
+  reserve: "رزرو درخواست",
+  confirmationTitle: "رزرو تأیید شد",
+  viewPolicies: "مشاهده بیمه‌های من",
+  firstName: "سارا",
+  lastName: "کریمی",
+  coverage: "استاندارد",
+}
+
+async function runHealthJourney(page: Page, copy: JourneyCopy) {
+  const { lang } = copy
+
+  await page.goto(`/${lang}/login`)
+  await page.getByRole("button", { name: copy.loginCta }).click()
+  await expect(page).toHaveURL(new RegExp(`/${lang}/purchased-insurances`))
+
+  await page.goto(`/${lang}/insurance/health_insurance_application`)
+
+  const startFresh = page.getByRole("button", { name: copy.startFresh })
   if (await startFresh.isVisible().catch(() => false)) {
     await startFresh.click()
   }
 
-  await expect(
-    page.getByRole("button", { name: "Fill demo answers" }),
-  ).toBeVisible({ timeout: 30_000 })
-
-  await page.getByRole("button", { name: "Fill demo answers" }).click()
+  await expect(page.getByRole("button", { name: copy.fillDemo })).toBeVisible({
+    timeout: 30_000,
+  })
+  await page.getByRole("button", { name: copy.fillDemo }).click()
 
   // Health form has four top-level sections
   for (let i = 0; i < 3; i += 1) {
-    await page.getByRole("button", { name: "Next section" }).click()
+    await page.getByRole("button", { name: copy.nextSection }).click()
   }
-  await page.getByRole("button", { name: "Continue to reserve" }).click()
+  await page.getByRole("button", { name: copy.continueReview }).click()
 
   await expect(
-    page.getByRole("heading", { name: "Reserve your cover" }),
+    page.getByRole("heading", { name: copy.reviewTitle }),
   ).toBeVisible()
 
   await page
     .locator("label")
-    .filter({ hasText: /I confirm these details are correct/i })
+    .filter({ hasText: copy.agreeLabel })
     .locator('input[type="checkbox"]')
     .check()
 
-  await page.getByRole("button", { name: "Reserve application" }).click()
+  await page.getByRole("button", { name: copy.reserve }).click()
 
   await expect(page).toHaveURL(
-    /\/en\/insurance\/health_insurance_application\/confirmation/,
+    new RegExp(`/${lang}/insurance/health_insurance_application/confirmation`),
   )
   await expect(
-    page.getByRole("heading", { name: "Reservation confirmed" }),
+    page.getByRole("heading", { name: copy.confirmationTitle }),
   ).toBeVisible()
   await expect(page.getByText(/APP-/i).first()).toBeVisible()
 
-  await page.getByRole("link", { name: "View my policies" }).click()
-  await expect(page).toHaveURL(/\/en\/purchased-insurances\/APP-/)
+  await page.getByRole("link", { name: copy.viewPolicies }).click()
+  await expect(page).toHaveURL(
+    new RegExp(`/${lang}/purchased-insurances/APP-`),
+  )
 
-  await expect(page.getByText("Sara", { exact: true })).toBeVisible()
-  await expect(page.getByText("Karimi", { exact: true })).toBeVisible()
-  await expect(page.getByText("Standard", { exact: true }).first()).toBeVisible()
+  await expect(page.getByText(copy.firstName, { exact: true })).toBeVisible()
+  await expect(page.getByText(copy.lastName, { exact: true })).toBeVisible()
+  await expect(
+    page.getByText(copy.coverage, { exact: true }).first(),
+  ).toBeVisible()
+}
+
+test("EN health apply reserves and opens policy detail", async ({ page }) => {
+  await runHealthJourney(page, EN)
+})
+
+test("FA health apply reserves and opens policy detail", async ({ page }) => {
+  await runHealthJourney(page, FA)
 })
