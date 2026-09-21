@@ -55,7 +55,17 @@
         "home_insurance_application": "Home",
         "car_insurance_application": "Car",
         "life_insurance_application": "Life"
-      }
+      },
+      "compareTitle": "Compare covers",
+      "compareBody": "Pick two products and scan highlights side by side before you apply.",
+      "comparePickA": "First cover",
+      "comparePickB": "Second cover",
+      "compareSelect": "Choose a product",
+      "compareEmpty": "Select two different products to compare.",
+      "compareApply": "Apply for {product}",
+      "compareSwap": "Swap",
+      "compareClear": "Clear",
+      "compareVs": "vs"
     },
     "about": {
       "title": "About",

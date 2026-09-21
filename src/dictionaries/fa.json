@@ -55,7 +55,17 @@
         "home_insurance_application": "منزل",
         "car_insurance_application": "خودرو",
         "life_insurance_application": "عمر"
-      }
+      },
+      "compareTitle": "مقایسه پوشش‌ها",
+      "compareBody": "دو محصول را انتخاب کنید و قبل از درخواست، نکات را کنار هم ببینید.",
+      "comparePickA": "پوشش اول",
+      "comparePickB": "پوشش دوم",
+      "compareSelect": "یک محصول انتخاب کنید",
+      "compareEmpty": "دو محصول متفاوت را برای مقایسه انتخاب کنید.",
+      "compareApply": "درخواست {product}",
+      "compareSwap": "جابه‌جایی",
+      "compareClear": "پاک کردن",
+      "compareVs": "در برابر"
     },
     "about": {
       "title": "درباره ما",
