@@ -8,6 +8,7 @@ import { productVisual, productTitle } from "@/lib/product-visuals"
 import { ArrowUpRight, FolderOpen } from "lucide-react"
 import { HomeDraftsPanel, ProductDraftBadge } from "@/sections/home-page/home-drafts"
 import { RecentApplications } from "@/components/recent-applications"
+import { ProductCompare } from "@/sections/home-page/product-compare"
 import {
   HomeHeroCopyMotion,
   HomeHeroItemMotion,
@@ -36,6 +37,16 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
     productMeta: Record<string, string>
     productTitles?: Record<string, string>
     productHighlights?: Record<string, string[]>
+    compareTitle: string
+    compareBody: string
+    comparePickA: string
+    comparePickB: string
+    compareSelect: string
+    compareEmpty: string
+    compareApply: string
+    compareSwap: string
+    compareClear: string
+    compareVs: string
   }
   const items = insuranceTypes?.data ?? []
   const draftProducts = items.map((insurance) => ({
@@ -43,6 +54,19 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
     title:
       home.productTitles?.[insurance.formId] ?? productTitle(insurance.title),
   }))
+  const compareProducts = items.map((insurance) => {
+    const title =
+      home.productTitles?.[insurance.formId] ?? productTitle(insurance.title)
+    const visual = productVisual(insurance.formId, title)
+    return {
+      formId: insurance.formId,
+      title,
+      blurb: home.productMeta?.[insurance.formId] ?? "",
+      highlights: home.productHighlights?.[insurance.formId] ?? [],
+      imageSrc: visual.src,
+      imageAlt: visual.alt,
+    }
+  })
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-20 pt-10 sm:px-6 sm:pb-28 sm:pt-14">
@@ -208,6 +232,23 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
           </ul>
         )}
       </section>
+
+      <ProductCompare
+        lang={lang}
+        products={compareProducts}
+        copy={{
+          title: home.compareTitle,
+          body: home.compareBody,
+          pickA: home.comparePickA,
+          pickB: home.comparePickB,
+          selectPlaceholder: home.compareSelect,
+          empty: home.compareEmpty,
+          apply: home.compareApply,
+          swap: home.compareSwap,
+          clear: home.compareClear,
+          vs: home.compareVs,
+        }}
+      />
     </div>
   )
 }
