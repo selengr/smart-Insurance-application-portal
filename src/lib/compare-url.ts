@@ -36,6 +36,21 @@ export function serializeCompareParam(leftId: string, rightId: string) {
     .join(",")
 }
 
+/** Absolute share URL, or null when the pair is not shareable. */
+export function buildCompareShareUrl(
+  origin: string,
+  pathname: string,
+  leftId: string,
+  rightId: string,
+): string | null {
+  if (!origin || !leftId || !rightId || leftId === rightId) return null
+  const pair = serializeCompareParam(leftId, rightId)
+  if (!pair || pair === ",") return null
+  const base = origin.replace(/\/$/, "")
+  const path = pathname.startsWith("/") ? pathname : `/${pathname}`
+  return `${base}${path}?compare=${pair}`
+}
+
 /** URL wins; else session (including explicit clear ","); else defaults. */
 export function resolveComparePair(
   hasUrlParam: boolean,

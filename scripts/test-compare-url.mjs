@@ -42,6 +42,15 @@ function resolveComparePair(
   return defaults
 }
 
+function buildCompareShareUrl(origin, pathname, leftId, rightId) {
+  if (!origin || !leftId || !rightId || leftId === rightId) return null
+  const pair = serializeCompareParam(leftId, rightId)
+  if (!pair || pair === ",") return null
+  const base = origin.replace(/\/$/, "")
+  const path = pathname.startsWith("/") ? pathname : `/${pathname}`
+  return `${base}${path}?compare=${pair}`
+}
+
 const IDS = [
   "health_insurance_application",
   "home_insurance_application",
@@ -100,4 +109,39 @@ test("resolveComparePair prefers URL, then session, then defaults", () => {
     resolveComparePair(false, null, null, DEFAULTS, IDS),
     DEFAULTS,
   )
+})
+
+test("buildCompareShareUrl joins origin, pathname, and pair", () => {
+  assert.equal(
+    buildCompareShareUrl(
+      "https://example.com",
+      "/en",
+      "health_insurance_application",
+      "home_insurance_application",
+    ),
+    "https://example.com/en?compare=health,home",
+  )
+  assert.equal(
+    buildCompareShareUrl(
+      "https://example.com/",
+      "en",
+      "car_insurance_application",
+      "life_insurance_application",
+    ),
+    "https://example.com/en?compare=car,life",
+  )
+  assert.equal(
+    buildCompareShareUrl(
+      "https://example.com",
+      "/en",
+      "health_insurance_application",
+      "health_insurance_application",
+    ),
+    null,
+  )
+  assert.equal(
+    buildCompareShareUrl("https://example.com", "/en", "health_insurance_application", ""),
+    null,
+  )
+  assert.equal(buildCompareShareUrl("", "/en", "health_insurance_application", "home_insurance_application"), null)
 })
