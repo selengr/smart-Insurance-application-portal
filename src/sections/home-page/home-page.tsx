@@ -149,6 +149,9 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
         title={page.policies.recentTitle}
         statusLabels={page.policiesList.status}
         productTitles={home.productTitles}
+        emptyBody={page.policies.recentEmpty}
+        emptyCta={page.policies.recentEmptyCta}
+        emptyHref="#products"
       />
 
       <section id="products" aria-labelledby="products-heading" className="scroll-mt-28">
