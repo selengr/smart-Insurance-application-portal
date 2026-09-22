@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { GitCompareArrows } from "lucide-react"
 import {
   parseCompareParam,
   readCompareSession,
   serializeCompareParam,
+  subscribeCompareSession,
 } from "@/lib/compare-url"
 
 type Props = {
@@ -16,23 +17,26 @@ type Props = {
   vs: string
 }
 
+function pairFromSession(knownIds: string[]): [string, string] | null {
+  const raw = readCompareSession()
+  if (raw == null || raw === ",") return null
+  const [left, right] = parseCompareParam(raw, knownIds)
+  if (!left || !right || left === right) return null
+  return [left, right]
+}
+
 export function LastComparedChip({ lang, titles, label, vs }: Props) {
   const knownIds = useMemo(() => Object.keys(titles), [titles])
   const [pair, setPair] = useState<[string, string] | null>(null)
 
-  useEffect(() => {
-    const raw = readCompareSession()
-    if (raw == null || raw === ",") {
-      setPair(null)
-      return
-    }
-    const [left, right] = parseCompareParam(raw, knownIds)
-    if (!left || !right || left === right) {
-      setPair(null)
-      return
-    }
-    setPair([left, right])
+  const refresh = useCallback(() => {
+    setPair(pairFromSession(knownIds))
   }, [knownIds])
+
+  useEffect(() => {
+    refresh()
+    return subscribeCompareSession(refresh)
+  }, [refresh])
 
   if (!pair) return null
 

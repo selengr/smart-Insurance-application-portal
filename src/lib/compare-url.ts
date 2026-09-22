@@ -1,6 +1,7 @@
 /** Short shareable slugs: health_insurance_application → health */
 
 export const COMPARE_SESSION_KEY = "smart-insurance.compare"
+export const COMPARE_SESSION_EVENT = "smart-insurance:compare-session"
 
 export function formIdToCompareSlug(formId: string) {
   return formId.replace(/_insurance_application$/i, "").toLowerCase()
@@ -80,4 +81,13 @@ export function writeCompareSession(value: string) {
   } catch {
     // private mode / quota
   }
+  window.dispatchEvent(
+    new CustomEvent(COMPARE_SESSION_EVENT, { detail: value }),
+  )
+}
+
+export function subscribeCompareSession(onChange: () => void) {
+  if (typeof window === "undefined") return () => {}
+  window.addEventListener(COMPARE_SESSION_EVENT, onChange)
+  return () => window.removeEventListener(COMPARE_SESSION_EVENT, onChange)
 }

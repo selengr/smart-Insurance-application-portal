@@ -155,3 +155,26 @@ test("last compared chip deep-links to stored pair", async ({ page }) => {
     "car_insurance_application",
   )
 })
+
+test("last compared chip hides after clear until compare again", async ({
+  page,
+}) => {
+  await page.goto("/en?compare=health,car")
+  const chip = page.getByRole("link", { name: /Last compared/i })
+  await expect(chip).toBeVisible()
+
+  await page.locator("#compare").getByRole("button", { name: "Clear" }).click()
+  await expect(chip).toHaveCount(0)
+  await expect
+    .poll(() =>
+      page.evaluate((key) => sessionStorage.getItem(key), COMPARE_SESSION_KEY),
+    )
+    .toBe(",")
+
+  const section = page.locator("#compare")
+  await section.getByLabel("First cover").selectOption("health_insurance_application")
+  await section.getByLabel("Second cover").selectOption("home_insurance_application")
+  await expect(
+    page.getByRole("link", { name: /Last compared.*Health vs Home/i }),
+  ).toBeVisible()
+})
