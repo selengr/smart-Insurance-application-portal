@@ -7,6 +7,8 @@ type CopyFlowCopy = {
   copyLink: string
   copiedLink: string
   copyHint: string
+  chipName: RegExp
+  chipDir: "ltr" | "rtl"
 }
 
 const EN_COPY: CopyFlowCopy = {
@@ -14,6 +16,8 @@ const EN_COPY: CopyFlowCopy = {
   copyLink: "Copy compare link",
   copiedLink: "Link copied",
   copyHint: "Pick two different products to copy a shareable link.",
+  chipName: /Last compared.*Health vs Home/i,
+  chipDir: "ltr",
 }
 
 const FA_COPY: CopyFlowCopy = {
@@ -21,6 +25,8 @@ const FA_COPY: CopyFlowCopy = {
   copyLink: "کپی لینک مقایسه",
   copiedLink: "لینک کپی شد",
   copyHint: "برای کپی لینک قابل اشتراک، دو محصول متفاوت انتخاب کنید.",
+  chipName: /آخرین مقایسه.*درمان در برابر منزل/,
+  chipDir: "rtl",
 }
 
 test.beforeEach(async ({ page }) => {
@@ -116,6 +122,10 @@ async function runCopyCompareFlow(
   expect(text).toMatch(
     new RegExp(`/${copy.lang}\\?compare=health(,|%2C)home`),
   )
+
+  const chip = page.getByRole("link", { name: copy.chipName })
+  await expect(chip).toBeVisible()
+  await expect(chip).toHaveAttribute("dir", copy.chipDir)
 }
 
 test("EN copy compare link writes clipboard and confirms", async ({

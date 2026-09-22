@@ -28,6 +28,7 @@ function pairFromSession(knownIds: string[]): [string, string] | null {
 export function LastComparedChip({ lang, titles, label, vs }: Props) {
   const knownIds = useMemo(() => Object.keys(titles), [titles])
   const [pair, setPair] = useState<[string, string] | null>(null)
+  const dir = lang === "fa" ? "rtl" : "ltr"
 
   const refresh = useCallback(() => {
     setPair(pairFromSession(knownIds))
@@ -49,10 +50,14 @@ export function LastComparedChip({ lang, titles, label, vs }: Props) {
   return (
     <Link
       href={href}
-      className="inline-flex max-w-full items-center gap-2 border border-border/80 bg-background/70 px-3 py-2 text-xs font-semibold text-foreground backdrop-blur-sm transition hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      dir={dir}
+      className="inline-flex max-w-full min-w-0 items-center gap-2 border border-border/80 bg-background/70 px-3 py-2 text-xs font-semibold text-foreground backdrop-blur-sm transition hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <GitCompareArrows className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
-      <span className="truncate">
+      <GitCompareArrows
+        className="h-3.5 w-3.5 shrink-0 text-primary"
+        aria-hidden
+      />
+      <span className="min-w-0 truncate text-start">
         <span className="text-muted-foreground">{label}</span>
         <span className="mx-1.5 text-muted-foreground/70" aria-hidden>
           ·
