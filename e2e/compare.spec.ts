@@ -9,6 +9,7 @@ type CopyFlowCopy = {
   copyHint: string
   chipName: RegExp
   chipDir: "ltr" | "rtl"
+  chipTitle: string
 }
 
 const EN_COPY: CopyFlowCopy = {
@@ -18,6 +19,7 @@ const EN_COPY: CopyFlowCopy = {
   copyHint: "Pick two different products to copy a shareable link.",
   chipName: /Last compared.*Health vs Home/i,
   chipDir: "ltr",
+  chipTitle: "Health vs Home",
 }
 
 const FA_COPY: CopyFlowCopy = {
@@ -27,6 +29,7 @@ const FA_COPY: CopyFlowCopy = {
   copyHint: "برای کپی لینک قابل اشتراک، دو محصول متفاوت انتخاب کنید.",
   chipName: /آخرین مقایسه.*درمان در برابر منزل/,
   chipDir: "rtl",
+  chipTitle: "درمان در برابر منزل",
 }
 
 test.beforeEach(async ({ page }) => {
@@ -126,6 +129,7 @@ async function runCopyCompareFlow(
   const chip = page.getByRole("link", { name: copy.chipName })
   await expect(chip).toBeVisible()
   await expect(chip).toHaveAttribute("dir", copy.chipDir)
+  await expect(chip).toHaveAttribute("title", copy.chipTitle)
 
   const chipBox = await chip.boundingBox()
   const iconBox = await chip.locator("[data-compare-chip-icon]").boundingBox()
