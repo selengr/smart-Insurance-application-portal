@@ -131,3 +131,27 @@ test("FA copy compare link writes clipboard and confirms", async ({
 }) => {
   await runCopyCompareFlow(page, context, FA_COPY)
 })
+
+test("last compared chip deep-links to stored pair", async ({ page }) => {
+  await page.goto("/en?compare=health,car")
+  await expect
+    .poll(() =>
+      page.evaluate((key) => sessionStorage.getItem(key), COMPARE_SESSION_KEY),
+    )
+    .toBe("health,car")
+
+  await page.goto("/en")
+  const chip = page.getByRole("link", { name: /Last compared.*Health vs Car/i })
+  await expect(chip).toBeVisible()
+  await chip.click()
+
+  await expect(page).toHaveURL(/compare=health(,|%2C)car/)
+  await expect(page).toHaveURL(/#compare/)
+  const section = page.locator("#compare")
+  await expect(section.getByLabel("First cover")).toHaveValue(
+    "health_insurance_application",
+  )
+  await expect(section.getByLabel("Second cover")).toHaveValue(
+    "car_insurance_application",
+  )
+})
