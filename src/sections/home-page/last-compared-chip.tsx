@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { GitCompareArrows } from "lucide-react"
 import {
@@ -28,6 +28,9 @@ function pairFromSession(knownIds: string[]): [string, string] | null {
 export function LastComparedChip({ lang, titles, label, vs }: Props) {
   const knownIds = useMemo(() => Object.keys(titles), [titles])
   const [pair, setPair] = useState<[string, string] | null>(null)
+  const [truncated, setTruncated] = useState(false)
+  const [keyboardFocus, setKeyboardFocus] = useState(false)
+  const labelRef = useRef<HTMLSpanElement>(null)
   const dir = lang === "fa" ? "rtl" : "ltr"
 
   const refresh = useCallback(() => {
@@ -39,6 +42,24 @@ export function LastComparedChip({ lang, titles, label, vs }: Props) {
     return subscribeCompareSession(refresh)
   }, [refresh])
 
+  const measureTruncation = useCallback(() => {
+    const el = labelRef.current
+    if (!el) {
+      setTruncated(false)
+      return
+    }
+    setTruncated(el.scrollWidth > el.clientWidth + 1)
+  }, [])
+
+  useEffect(() => {
+    measureTruncation()
+    const el = labelRef.current
+    if (!el || typeof ResizeObserver === "undefined") return
+    const observer = new ResizeObserver(() => measureTruncation())
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [measureTruncation, pair, label, vs, titles])
+
   if (!pair) return null
 
   const [leftId, rightId] = pair
@@ -48,13 +69,20 @@ export function LastComparedChip({ lang, titles, label, vs }: Props) {
   const href = `/${lang}?compare=${query}#compare`
   const pairLabel = `${leftTitle} ${vs} ${rightTitle}`
   const fullLabel = `${label} · ${pairLabel}`
+  // Native title only when truncated and not keyboard-focused (avoids doubling).
+  const title = truncated && !keyboardFocus ? pairLabel : undefined
+  const ariaLabel = truncated ? fullLabel : undefined
 
   return (
     <Link
       href={href}
       dir={dir}
-      title={pairLabel}
-      aria-label={fullLabel}
+      title={title}
+      aria-label={ariaLabel}
+      onFocus={(event) => {
+        setKeyboardFocus(event.currentTarget.matches(":focus-visible"))
+      }}
+      onBlur={() => setKeyboardFocus(false)}
       className="relative inline-flex min-w-0 max-w-[13rem] basis-full items-center border border-border/80 bg-background/70 py-2 pe-3 ps-8 text-xs font-semibold text-foreground backdrop-blur-sm transition hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:max-w-xs sm:basis-auto"
     >
       <GitCompareArrows
@@ -62,7 +90,11 @@ export function LastComparedChip({ lang, titles, label, vs }: Props) {
         className="pointer-events-none absolute start-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-primary"
         aria-hidden
       />
-      <span className="min-w-0 truncate text-start">
+      <span
+        ref={labelRef}
+        data-compare-chip-label
+        className="min-w-0 truncate text-start"
+      >
         <span className="text-muted-foreground">{label}</span>
         <span className="mx-1.5 text-muted-foreground/70" aria-hidden>
           ·
