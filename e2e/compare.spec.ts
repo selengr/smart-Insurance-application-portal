@@ -126,6 +126,18 @@ async function runCopyCompareFlow(
   const chip = page.getByRole("link", { name: copy.chipName })
   await expect(chip).toBeVisible()
   await expect(chip).toHaveAttribute("dir", copy.chipDir)
+
+  const chipBox = await chip.boundingBox()
+  const iconBox = await chip.locator("[data-compare-chip-icon]").boundingBox()
+  expect(chipBox).toBeTruthy()
+  expect(iconBox).toBeTruthy()
+  const chipMidX = chipBox!.x + chipBox!.width / 2
+  const iconMidX = iconBox!.x + iconBox!.width / 2
+  if (copy.chipDir === "rtl") {
+    expect(iconMidX).toBeGreaterThan(chipMidX)
+  } else {
+    expect(iconMidX).toBeLessThan(chipMidX)
+  }
 }
 
 test("EN copy compare link writes clipboard and confirms", async ({
