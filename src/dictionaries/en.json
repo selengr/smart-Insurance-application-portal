@@ -68,7 +68,8 @@
       "compareVs": "vs",
       "compareCopyLink": "Copy compare link",
       "compareCopiedLink": "Link copied",
-      "compareCopyHint": "Pick two different products to copy a shareable link."
+      "compareCopyHint": "Pick two different products to copy a shareable link.",
+      "compareLastLabel": "Last compared"
     },
     "about": {
       "title": "About",

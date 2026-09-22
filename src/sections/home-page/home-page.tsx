@@ -10,6 +10,7 @@ import { ArrowUpRight, FolderOpen } from "lucide-react"
 import { HomeDraftsPanel, ProductDraftBadge } from "@/sections/home-page/home-drafts"
 import { RecentApplications } from "@/components/recent-applications"
 import { ProductCompare } from "@/sections/home-page/product-compare"
+import { LastComparedChip } from "@/sections/home-page/last-compared-chip"
 import {
   HomeHeroCopyMotion,
   HomeHeroItemMotion,
@@ -51,6 +52,7 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
     compareCopyLink: string
     compareCopiedLink: string
     compareCopyHint: string
+    compareLastLabel: string
   }
   const items = insuranceTypes?.data ?? []
   const draftProducts = items.map((insurance) => ({
@@ -106,6 +108,14 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
               <FolderOpen className="h-4 w-4" aria-hidden />
               {home.myInsurance}
             </Link>
+            <LastComparedChip
+              lang={lang}
+              titles={Object.fromEntries(
+                draftProducts.map((product) => [product.formId, product.title]),
+              )}
+              label={home.compareLastLabel}
+              vs={home.compareVs}
+            />
           </HomeHeroItemMotion>
         </HomeHeroCopyMotion>
 

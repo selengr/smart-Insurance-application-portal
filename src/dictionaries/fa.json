@@ -68,7 +68,8 @@
       "compareVs": "در برابر",
       "compareCopyLink": "کپی لینک مقایسه",
       "compareCopiedLink": "لینک کپی شد",
-      "compareCopyHint": "برای کپی لینک قابل اشتراک، دو محصول متفاوت انتخاب کنید."
+      "compareCopyHint": "برای کپی لینک قابل اشتراک، دو محصول متفاوت انتخاب کنید.",
+      "compareLastLabel": "آخرین مقایسه"
     },
     "about": {
       "title": "درباره ما",
