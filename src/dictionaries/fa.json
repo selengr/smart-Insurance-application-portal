@@ -93,7 +93,9 @@
       "clearConfirm": "درخواست‌ها و پیش‌نویس‌های محلی پاک شود؟",
       "clearDone": "داده دمو پاک شد",
       "clearCancel": "انصراف",
-      "recentTitle": "بازدیدهای اخیر"
+      "recentTitle": "بازدیدهای اخیر",
+      "recentEmpty": "هنوز درخواست اخیری نیست.",
+      "recentEmptyCta": "مشاهده محصولات"
     },
     "login": {
       "title": "برای ادامه وارد شوید",

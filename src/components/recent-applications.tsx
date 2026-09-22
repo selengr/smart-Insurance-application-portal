@@ -14,6 +14,9 @@ type Props = {
   title: string
   statusLabels: Record<string, string>
   productTitles?: Record<string, string>
+  emptyBody?: string
+  emptyCta?: string
+  emptyHref?: string
 }
 
 export function RecentApplications({
@@ -21,8 +24,11 @@ export function RecentApplications({
   title,
   statusLabels,
   productTitles,
+  emptyBody,
+  emptyCta,
+  emptyHref,
 }: Props) {
-  const [items, setItems] = useState<LocalApplication[]>([])
+  const [items, setItems] = useState<LocalApplication[] | null>(null)
 
   useEffect(() => {
     setItems(getRecentApplications(4))
@@ -35,7 +41,30 @@ export function RecentApplications({
     }
   }, [])
 
-  if (items.length === 0) return null
+  if (items === null) return null
+
+  if (items.length === 0) {
+    if (!emptyBody || !emptyCta || !emptyHref) return null
+    return (
+      <section className="mb-6" aria-label={title}>
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <h2 className="font-[family-name:var(--font-display)] text-lg font-bold">
+            {title}
+          </h2>
+        </div>
+        <div className="flex flex-col items-start gap-3 border border-dashed border-border bg-card/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">{emptyBody}</p>
+          <a
+            href={emptyHref}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {emptyCta}
+            <ArrowUpRight className="h-4 w-4" aria-hidden />
+          </a>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="mb-6" aria-label={title}>

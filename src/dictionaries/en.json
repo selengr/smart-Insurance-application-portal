@@ -93,7 +93,9 @@
       "clearConfirm": "Clear local applications and drafts?",
       "clearDone": "Demo data cleared",
       "clearCancel": "Cancel",
-      "recentTitle": "Recently viewed"
+      "recentTitle": "Recently viewed",
+      "recentEmpty": "No recent applications yet.",
+      "recentEmptyCta": "Browse products"
     },
     "login": {
       "title": "Sign in to continue",
