@@ -93,6 +93,9 @@ export default async function PurchasedInsurancesPage({
         title={page.policies.recentTitle}
         statusLabels={page.policiesList.status}
         productTitles={page.home.productTitles}
+        emptyBody={page.policies.recentEmpty}
+        emptyCta={page.policies.recentEmptyCta}
+        emptyHref={`/${lang}#products`}
       />
 
       <DynamicApplicationsList
