@@ -140,6 +140,17 @@ async function runCopyCompareFlow(
   }
 }
 
+test("last compared chip caps width on narrow viewports", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 })
+  await page.goto("/en?compare=health,home")
+  const chip = page.getByRole("link", { name: /Last compared/i })
+  await expect(chip).toBeVisible()
+  const box = await chip.boundingBox()
+  expect(box).toBeTruthy()
+  // max-w-[13rem] on narrow viewports
+  expect(box!.width).toBeLessThanOrEqual(13 * 16 + 1)
+})
+
 test("EN copy compare link writes clipboard and confirms", async ({
   page,
   context,

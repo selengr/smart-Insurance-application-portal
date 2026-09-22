@@ -51,7 +51,7 @@ export function LastComparedChip({ lang, titles, label, vs }: Props) {
     <Link
       href={href}
       dir={dir}
-      className="relative inline-flex max-w-full min-w-0 items-center border border-border/80 bg-background/70 py-2 pe-3 ps-8 text-xs font-semibold text-foreground backdrop-blur-sm transition hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="relative inline-flex min-w-0 max-w-[13rem] basis-full items-center border border-border/80 bg-background/70 py-2 pe-3 ps-8 text-xs font-semibold text-foreground backdrop-blur-sm transition hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:max-w-xs sm:basis-auto"
     >
       <GitCompareArrows
         data-compare-chip-icon
