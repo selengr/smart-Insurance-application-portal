@@ -46,11 +46,15 @@ export function LastComparedChip({ lang, titles, label, vs }: Props) {
   const rightTitle = titles[rightId] ?? rightId
   const query = serializeCompareParam(leftId, rightId)
   const href = `/${lang}?compare=${query}#compare`
+  const pairLabel = `${leftTitle} ${vs} ${rightTitle}`
+  const fullLabel = `${label} · ${pairLabel}`
 
   return (
     <Link
       href={href}
       dir={dir}
+      title={pairLabel}
+      aria-label={fullLabel}
       className="relative inline-flex min-w-0 max-w-[13rem] basis-full items-center border border-border/80 bg-background/70 py-2 pe-3 ps-8 text-xs font-semibold text-foreground backdrop-blur-sm transition hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:max-w-xs sm:basis-auto"
     >
       <GitCompareArrows
