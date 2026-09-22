@@ -129,7 +129,21 @@ async function runCopyCompareFlow(
   const chip = page.getByRole("link", { name: copy.chipName })
   await expect(chip).toBeVisible()
   await expect(chip).toHaveAttribute("dir", copy.chipDir)
-  await expect(chip).toHaveAttribute("title", copy.chipTitle)
+
+  const truncated = await chip.evaluate((el) => {
+    const label = el.querySelector("[data-compare-chip-label]")
+    if (!(label instanceof HTMLElement)) return false
+    return label.scrollWidth > label.clientWidth + 1
+  })
+  if (truncated) {
+    await expect(chip).toHaveAttribute("title", copy.chipTitle)
+  } else {
+    await expect(chip).not.toHaveAttribute("title")
+  }
+
+  // Keyboard focus should not expose a duplicate native title.
+  await chip.focus()
+  await expect(chip).not.toHaveAttribute("title")
 
   const chipBox = await chip.boundingBox()
   const iconBox = await chip.locator("[data-compare-chip-icon]").boundingBox()
@@ -153,6 +167,7 @@ test("last compared chip caps width on narrow viewports", async ({ page }) => {
   expect(box).toBeTruthy()
   // max-w-[13rem] on narrow viewports
   expect(box!.width).toBeLessThanOrEqual(13 * 16 + 1)
+  await expect(chip).toHaveAttribute("title", "Health vs Home")
 })
 
 test("EN copy compare link writes clipboard and confirms", async ({
