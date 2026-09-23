@@ -36,6 +36,8 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
     draftsBody?: string
     continueDraft?: string
     draftBadge?: string
+    draftsEmpty?: string
+    draftsEmptyCta?: string
     productMeta: Record<string, string>
     productTitles?: Record<string, string>
     productHighlights?: Record<string, string[]>
@@ -142,6 +144,9 @@ const InsurancePage: NextPage<HomeProps> = async ({ lang }) => {
         body={home.draftsBody}
         continueLabel={home.continueDraft}
         draftBadge={home.draftBadge}
+        emptyHint={home.draftsEmpty}
+        emptyCta={home.draftsEmptyCta}
+        emptyHref="#products"
       />
 
       <RecentApplications
