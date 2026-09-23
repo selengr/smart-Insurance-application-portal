@@ -22,6 +22,8 @@
       "draftsBody": "از جایی که ماندید ادامه دهید — پیش‌نویس‌ها تا زمان رزرو در همین مرورگر می‌مانند.",
       "continueDraft": "ادامه",
       "draftBadge": "پیش‌نویس",
+      "draftsEmpty": "هنوز پیش‌نویسی نیست — از محصولات زیر شروع کنید.",
+      "draftsEmptyCta": "انتخاب محصول",
       "productMeta": {
         "health_insurance_application": "پوشش درمان و سلامت",
         "home_insurance_application": "اموال و دارایی‌ها",

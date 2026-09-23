@@ -16,6 +16,9 @@ type Props = {
   body: string
   continueLabel: string
   draftBadge: string
+  emptyHint?: string
+  emptyCta?: string
+  emptyHref?: string
 }
 
 function readDrafts(products: { formId: string; title: string }[]): DraftItem[] {
@@ -36,14 +39,32 @@ export function HomeDraftsPanel({
   body,
   continueLabel,
   draftBadge,
+  emptyHint,
+  emptyCta,
+  emptyHref = "#products",
 }: Props) {
-  const [drafts, setDrafts] = useState<DraftItem[]>([])
+  const [drafts, setDrafts] = useState<DraftItem[] | null>(null)
 
   useEffect(() => {
     setDrafts(readDrafts(products))
   }, [products])
 
-  if (drafts.length === 0) return null
+  if (drafts === null) return null
+
+  if (drafts.length === 0) {
+    if (!emptyHint || !emptyCta) return null
+    return (
+      <p className="mb-8 text-sm text-muted-foreground" role="status">
+        {emptyHint}{" "}
+        <a
+          href={emptyHref}
+          className="font-semibold text-primary underline-offset-4 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {emptyCta}
+        </a>
+      </p>
+    )
+  }
 
   return (
     <section

@@ -22,6 +22,8 @@
       "draftsBody": "Pick up where you left off — drafts stay in this browser until you reserve.",
       "continueDraft": "Continue",
       "draftBadge": "Draft",
+      "draftsEmpty": "No drafts yet — start an application below.",
+      "draftsEmptyCta": "Choose a product",
       "productMeta": {
         "health_insurance_application": "Medical & wellness cover",
         "home_insurance_application": "Property & belongings",
