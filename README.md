@@ -57,7 +57,8 @@ Fixtures and local reservations merge in mock mode so the policies list works of
 | `npm run typecheck` | TypeScript (`tsc --noEmit`) |
 | `npm test` | Schema, status, quote, import, and answer-label unit tests |
 | `npm run test:e2e` | Playwright smoke: demo login → apply → reserve → policy detail (EN + FA) |
-| `npm run ci` | unit tests + typecheck + lint + build + e2e |
+| `npm run test:e2e:prod` | Production build (mock API) + the same Playwright smoke against `next start`, like CI |
+| `npm run ci` | unit tests + typecheck + lint + production build + e2e |
 
 ## Project structure
 
