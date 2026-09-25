@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test scripts/test-schema.mjs scripts/test-status.mjs scripts/test-quote.mjs scripts/test-import.mjs scripts/test-answer-labels.mjs scripts/test-compare-url.mjs",
     "test:e2e": "playwright test",
-    "ci": "npm test && npm run typecheck && npm run lint && npm run build && npm run test:e2e"
+    "test:e2e:prod": "NEXT_PUBLIC_USE_MOCK_API=true NEXT_PUBLIC_HOST_API_KEY=https://assignment.devotel.io next build && E2E_PROD=1 playwright test",
+    "ci": "npm test && npm run typecheck && npm run lint && npm run test:e2e:prod"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.6.0",
