@@ -12,7 +12,7 @@ A multilingual insurance application portal built with **Next.js 15**. Users bro
 - Sectioned apply → review → reserve journey with live monthly estimate
 - Draft autosave + continue/start-fresh restore banner
 - EN / FA localization (route-based) and dark / light theme
-- Demo session cookie (soft gate on My policies)
+- Real sign-in (NextAuth credentials, backed by SQLite/Prisma) gating My policies — sign up, or continue as a seeded demo user
 - Local reservations with status timeline (Pending → In Review → Approved)
 - Policy detail, confirmation receipt (copy + print), mobile nav
 - React Query data layer + optional remote API or offline mocks
@@ -25,17 +25,29 @@ A multilingual insurance application portal built with **Next.js 15**. Users bro
 | Styling | Tailwind CSS 4, Radix UI, Motion |
 | Forms | React Hook Form, Zod |
 | Data | TanStack Query, Axios, `localStorage` demo store |
+| Auth & DB | NextAuth v5 (Credentials), Prisma + SQLite |
 | i18n | Custom dictionaries + negotiator middleware |
 
 ## Getting started
 
 ```bash
 npm install
-cp .env.example .env.local
+cp .env.example .env      # Prisma reads .env, not .env.local
+npx prisma db push        # create prisma/dev.db from schema.prisma
+npm run db:seed           # seed the demo@sip.dev account
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+### Auth & database
+
+Reservations still live in the browser (see below), but signing in is now real: `/api/auth/[...nextauth]` (NextAuth, Credentials provider) checks a `User` row in a local SQLite database via Prisma (`prisma/schema.prisma`).
+
+- **Demo login** — the "Continue as demo user" button on `/login` signs in as `demo@sip.dev`, seeded by `npm run db:seed` (see `prisma/seed.mjs`).
+- **Real accounts** — the "Need an account? Create one" link on `/login` registers a new user (`POST /api/auth/register`, password hashed with bcrypt) and signs them in immediately.
+- **Env vars** — `DATABASE_URL` (SQLite file path) and `AUTH_SECRET` (session JWT signing key, e.g. `openssl rand -base64 32`) — see `.env.example`.
+- `/purchased-insurances` is gated by a real session (checked in `src/middleware.ts` for routing, `src/lib/auth.ts` for pages), not a `sip_demo_session` cookie.
 
 ### Mock vs real API
 
@@ -59,6 +71,8 @@ Fixtures and local reservations merge in mock mode so the policies list works of
 | `npm run test:e2e` | Playwright smoke: demo login → apply → reserve → policy detail (EN + FA) |
 | `npm run test:e2e:prod` | Production build (mock API) + the same Playwright smoke against `next start`, like CI |
 | `npm run ci` | unit tests + typecheck + lint + production build + e2e |
+| `npm run db:push` | Push `prisma/schema.prisma` to the SQLite file at `DATABASE_URL` |
+| `npm run db:seed` | Seed the `demo@sip.dev` account (see `prisma/seed.mjs`) |
 
 ## Project structure
 
@@ -86,10 +100,14 @@ Browser (EN/FA)
    │     ├─ Live estimate (demo quote)
    │     └─ Reserve → recordMockSubmission → confirmation?ref=
    ├─ /confirmation → receipt (copy / print)
-   └─ /purchased-insurances
-         ├─ Demo session banner (sip_demo_session cookie)
+   └─ /purchased-insurances (session-gated: NextAuth + Prisma/SQLite)
+         ├─ Session continuity banner
          ├─ List + summary chips
          └─ /[id] detail + status timeline
+
+Auth
+   ├─ /api/auth/[...nextauth] → Credentials provider → Prisma User (bcrypt)
+   └─ /api/auth/register → sign-up, then auto sign-in
 
 Data
    ├─ Mock fixtures (src/mocks) when USE_MOCK_API

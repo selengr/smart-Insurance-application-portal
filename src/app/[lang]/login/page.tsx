@@ -1,13 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { Locale } from "../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
-import { signInDemo } from "@/lib/auth-actions"
-import { DEMO_SESSION_COOKIE } from "@/lib/auth-session"
+import { auth } from "@/lib/auth"
 import { buildPageMetadata } from "@/lib/page-metadata"
-import { Button } from "@/components/ui/button"
+import { LoginForm } from "./login-form"
 import { ChevronLeft } from "lucide-react"
 
 type Params = Promise<{ lang: Locale }>
@@ -34,8 +32,8 @@ export default async function LoginPage({
   params: Params
 }) {
   const { lang } = await params
-  const jar = await cookies()
-  if (jar.get(DEMO_SESSION_COOKIE)?.value === "1") {
+  const session = await auth()
+  if (session) {
     redirect(`/${lang}/purchased-insurances`)
   }
 
@@ -64,12 +62,27 @@ export default async function LoginPage({
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           {page.login.subtitle}
         </p>
-        <form action={signInDemo.bind(null, lang)} className="mt-8 space-y-3">
-          <Button type="submit" className="w-full">
-            {page.login.cta}
-          </Button>
-          <p className="text-xs text-muted-foreground">{page.login.hint}</p>
-        </form>
+
+        <LoginForm
+          lang={lang}
+          copy={{
+            cta: page.login.cta,
+            hint: page.login.hint,
+            orDivider: page.login.orDivider,
+            emailLabel: page.login.emailLabel,
+            passwordLabel: page.login.passwordLabel,
+            nameLabel: page.login.nameLabel,
+            signInCta: page.login.signInCta,
+            registerCta: page.login.registerCta,
+            toggleToRegister: page.login.toggleToRegister,
+            toggleToSignIn: page.login.toggleToSignIn,
+            errorInvalid: page.login.errorInvalid,
+            errorExists: page.login.errorExists,
+            errorWeakPassword: page.login.errorWeakPassword,
+            errorGeneric: page.login.errorGeneric,
+          }}
+        />
+
         <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
           {page.login.trust}
         </p>
