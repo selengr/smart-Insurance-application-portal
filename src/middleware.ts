@@ -1,11 +1,17 @@
+import NextAuth from "next-auth"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 import { i18n } from "../i18n.config"
-import { isDemoAuthenticated } from "@/lib/auth-session"
+import { authConfig } from "@/lib/auth.config"
 
 import { match as matchLocale } from "@formatjs/intl-localematcher"
 import Negotiator from "negotiator"
+
+// Edge-safe session check only (JWT verification, no Prisma/bcrypt) — see
+// the comment in auth.config.ts for why this is a separate NextAuth() call
+// from the one in auth.ts.
+const { auth } = NextAuth(authConfig)
 
 function getLocale(request: NextRequest): string {
   try {
@@ -31,7 +37,7 @@ function getLocale(request: NextRequest): string {
   }
 }
 
-export function middleware(request: NextRequest) {
+export default auth((request) => {
   const pathname = request.nextUrl.pathname
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
@@ -48,7 +54,7 @@ export function middleware(request: NextRequest) {
     (l) => pathname.startsWith(`/${l}/`) || pathname === `/${l}`,
   )
   const isPoliciesRoute = locale && pathname.includes(`/${locale}/purchased-insurances`)
-  if (isPoliciesRoute && !isDemoAuthenticated(request.headers.get("cookie"))) {
+  if (isPoliciesRoute && !request.auth) {
     return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
   }
 
@@ -56,7 +62,7 @@ export function middleware(request: NextRequest) {
   response.headers.set("X-Content-Type-Options", "nosniff")
   response.headers.set("X-Frame-Options", "DENY")
   return response
-}
+})
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|fonts|icons|images|.*\\..*).*)"],

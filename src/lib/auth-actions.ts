@@ -1,22 +1,11 @@
 "use server"
 
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
-import { DEMO_SESSION_COOKIE } from "@/lib/auth-session"
+import { signOut } from "@/lib/auth"
 
-export async function signInDemo(lang: string) {
-  const jar = await cookies()
-  jar.set(DEMO_SESSION_COOKIE, "1", {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  })
-  redirect(`/${lang}/purchased-insurances`)
-}
-
+// Signing in happens client-side (see login-form.tsx) via next-auth/react's
+// signIn(), which redirects reliably for the Credentials provider. Signing
+// out has no such issue, so a plain server action (bound to a <form>, no
+// client JS required) still works fine here.
 export async function signOutDemo(lang: string) {
-  const jar = await cookies()
-  jar.delete(DEMO_SESSION_COOKIE)
-  redirect(`/${lang}`)
+  await signOut({ redirectTo: `/${lang}` })
 }

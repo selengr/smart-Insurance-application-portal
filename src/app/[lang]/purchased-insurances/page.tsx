@@ -1,13 +1,12 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { cookies } from "next/headers"
 import { Locale } from "../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import { DynamicApplicationsList } from "@/sections/application-list/dynamic-applications-list"
 import { SessionContinuityBanner } from "@/components/session-continuity-banner"
 import { DemoDataTools } from "@/components/demo-data-tools"
 import { RecentApplications } from "@/components/recent-applications"
-import { DEMO_SESSION_COOKIE } from "@/lib/auth-session"
+import { auth } from "@/lib/auth"
 import { buildPageMetadata } from "@/lib/page-metadata"
 import { ArrowUpRight } from "lucide-react"
 
@@ -36,8 +35,8 @@ export default async function PurchasedInsurancesPage({
 }) {
   const { lang } = await params
   const { page } = await getDictionary(lang)
-  const jar = await cookies()
-  const signedIn = jar.get(DEMO_SESSION_COOKIE)?.value === "1"
+  const session = await auth()
+  const signedIn = Boolean(session)
 
   return (
     <div className="relative mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
