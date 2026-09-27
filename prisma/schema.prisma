@@ -13,4 +13,29 @@ model User {
   passwordHash String
   name         String?
   createdAt    DateTime @default(now())
+
+  applications Application[]
+}
+
+// A reserved insurance application, persisted for a signed-in user. Mirrors
+// the shape of the browser-local `LocalApplication` type (src/lib/local-
+// applications.ts) closely on purpose, so the API layer and the local
+// fallback can share the same downstream UI code.
+model Application {
+  id              String   @id
+  userId          String
+  insuranceType   String
+  applicant       String
+  formId          String?
+  status          String   @default("Pending")
+  monthlyEstimate Float?
+  answers         Json
+  statusHistory   Json
+  submittedAt     DateTime @default(now())
+  reservedAt      DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

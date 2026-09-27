@@ -42,21 +42,28 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Auth & database
 
-Reservations still live in the browser (see below), but signing in is now real: `/api/auth/[...nextauth]` (NextAuth, Credentials provider) checks a `User` row in a local SQLite database via Prisma (`prisma/schema.prisma`).
+Signing in is real: `/api/auth/[...nextauth]` (NextAuth, Credentials provider) checks a `User` row in a local SQLite database via Prisma (`prisma/schema.prisma`).
 
 - **Demo login** — the "Continue as demo user" button on `/login` signs in as `demo@sip.dev`, seeded by `npm run db:seed` (see `prisma/seed.mjs`).
 - **Real accounts** — the "Need an account? Create one" link on `/login` registers a new user (`POST /api/auth/register`, password hashed with bcrypt) and signs them in immediately.
 - **Env vars** — `DATABASE_URL` (SQLite file path) and `AUTH_SECRET` (session JWT signing key, e.g. `openssl rand -base64 32`) — see `.env.example`.
 - `/purchased-insurances` is gated by a real session (checked in `src/middleware.ts` for routing, `src/lib/auth.ts` for pages), not a `sip_demo_session` cookie.
 
-### Mock vs real API
+### Mock vs real API vs local backend
 
 | Mode | How |
 | --- | --- |
-| Mock (default in development) | `NEXT_PUBLIC_USE_MOCK_API=true` or omit in `NODE_ENV=development` |
+| Mock (default in development) | `NEXT_PUBLIC_USE_MOCK_API=true` or omit in `NODE_ENV=development` — fixtures + `localStorage` |
 | Remote Devotel API | `NEXT_PUBLIC_USE_MOCK_API=false` + `NEXT_PUBLIC_HOST_API_KEY=https://…` |
+| **Local backend (this repo's own API + database)** | `NEXT_PUBLIC_USE_MOCK_API=false` with `NEXT_PUBLIC_HOST_API_KEY` unset |
 
 Fixtures and local reservations merge in mock mode so the policies list works offline.
+
+**Local backend mode** points the existing `submitFormApi`/`purchasedInsurancesApi` calls (in `src/services/api/`) at this app's own `/api/insurance/forms/*` routes instead of an external API — no component changes needed, since it reuses the same mock/remote seam. When a form is reserved:
+- **Signed in** → the application is written to the `Application` table (Prisma/SQLite), tied to that user, and the policies list reads it back from there.
+- **Not signed in** → the reserve flow still succeeds (same response shape), but nothing is persisted server-side — matches today's guest experience.
+
+**Known gap, by design (a follow-up, not an oversight):** the policy **detail** page and its "advance status" control (`src/app/[lang]/purchased-insurances/[id]/page.tsx`) still read and mutate `localStorage` only, even for a database-backed application. `GET`/`PATCH /api/insurance/forms/submissions/[id]` already exist and work (see `src/lib/server-applications.ts`) so that page can be migrated without new backend work — it just hasn't been wired up yet. Drafts (`form_draft_*`) are unaffected either way and stay browser-local.
 
 ## Scripts
 
@@ -112,6 +119,7 @@ Auth
 Data
    ├─ Mock fixtures (src/mocks) when USE_MOCK_API
    ├─ Local apps: sip_local_applications (browser only)
+   ├─ Local backend: /api/insurance/forms/* → Prisma Application (per user)
    └─ Optional remote: NEXT_PUBLIC_HOST_API_KEY
 ```
 
