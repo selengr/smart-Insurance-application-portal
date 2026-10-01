@@ -36,7 +36,7 @@ function isApplicationStatus(value: string): value is ApplicationStatus {
   return ["Pending", "In Review", "Approved", "Rejected"].includes(value)
 }
 
-function normalizeApp(row: LocalApplication): LocalApplication {
+export function normalizeApp(row: LocalApplication): LocalApplication {
   const status = isApplicationStatus(row.Status) ? row.Status : "Pending"
   const reservedAt = row.reservedAt ?? `${row["Submitted At"]}T12:00:00.000Z`
   const history =
@@ -90,6 +90,42 @@ export function resolveApplicationById(id: string): LocalApplication | undefined
 
 export function isLocalOwnedApplication(id: string): boolean {
   return Boolean(getLocalApplicationById(id))
+}
+
+/**
+ * Convert a row from GET /api/insurance/forms/submissions/[id] (a Prisma
+ * `Application`, see src/lib/server-applications.ts) into the same shape
+ * the rest of the UI already reads from localStorage, so the policy detail
+ * page can render a database-backed application without any other changes.
+ */
+export function applicationFromApiResponse(row: {
+  id: string
+  insuranceType: string
+  applicant: string
+  formId?: string | null
+  status: string
+  monthlyEstimate?: number | null
+  answers?: unknown
+  statusHistory?: unknown
+  submittedAt: string
+  reservedAt: string
+  updatedAt: string
+}): LocalApplication {
+  return normalizeApp({
+    id: row.id,
+    "Insurance Type": row.insuranceType,
+    Applicant: row.applicant,
+    "Submitted At": row.submittedAt.slice(0, 10),
+    Status: row.status,
+    formId: row.formId ?? undefined,
+    monthlyEstimate: typeof row.monthlyEstimate === "number" ? row.monthlyEstimate : undefined,
+    answers: (row.answers as Record<string, unknown> | undefined) ?? undefined,
+    reservedAt: row.reservedAt,
+    updatedAt: row.updatedAt,
+    statusHistory: Array.isArray(row.statusHistory)
+      ? (row.statusHistory as StatusEvent[])
+      : undefined,
+  })
 }
 
 export const DEMO_APPLICATIONS: LocalApplication[] = [
