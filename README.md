@@ -63,7 +63,7 @@ Fixtures and local reservations merge in mock mode so the policies list works of
 - **Signed in** → the application is written to the `Application` table (Prisma/SQLite), tied to that user, and the policies list reads it back from there.
 - **Not signed in** → the reserve flow still succeeds (same response shape), but nothing is persisted server-side — matches today's guest experience.
 
-**Known gap, by design (a follow-up, not an oversight):** the policy **detail** page and its "advance status" control (`src/app/[lang]/purchased-insurances/[id]/page.tsx`) still read and mutate `localStorage` only, even for a database-backed application. `GET`/`PATCH /api/insurance/forms/submissions/[id]` already exist and work (see `src/lib/server-applications.ts`) so that page can be migrated without new backend work — it just hasn't been wired up yet. Drafts (`form_draft_*`) are unaffected either way and stay browser-local.
+The policy **detail** page (`src/app/[lang]/purchased-insurances/[id]/page.tsx`) and its "advance status" control work for both kinds of reservation: a locally-reserved or seeded-demo application resolves from `localStorage` as before (unchanged, synchronous), and anything not found there falls back to `GET`/`PATCH /api/insurance/forms/submissions/[id]` for a database-backed one. Drafts (`form_draft_*`) are unaffected either way and stay browser-local.
 
 ## Scripts
 

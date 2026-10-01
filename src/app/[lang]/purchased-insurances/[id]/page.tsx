@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, FolderOpen, Sparkles } from "lucide-react"
 import {
   advanceApplicationStatus,
+  applicationFromApiResponse,
   isLocalOwnedApplication,
   nextStatus,
   resolveApplicationById,
@@ -54,16 +55,58 @@ export default function PolicyDetailPage() {
   }
   const [app, setApp] = useState<LocalApplication | null | undefined>(undefined)
   const [localOwned, setLocalOwned] = useState(false)
+  const [serverOwned, setServerOwned] = useState(false)
 
   useEffect(() => {
-    if (!id) {
+    let cancelled = false
+
+    async function load() {
+      if (!id) {
+        setApp(null)
+        setLocalOwned(false)
+        setServerOwned(false)
+        return
+      }
+
+      // Fast path, unchanged: locally reserved apps and seeded demo
+      // fixtures resolve synchronously from localStorage.
+      const local = resolveApplicationById(id)
+      if (local) {
+        if (cancelled) return
+        setApp(local)
+        setLocalOwned(isLocalOwnedApplication(id))
+        setServerOwned(false)
+        trackRecentApplication(id)
+        return
+      }
+
+      // Not in localStorage: it may be a database-backed reservation for
+      // the signed-in user (see src/app/api/insurance/forms/submissions/[id]).
+      try {
+        const response = await fetch(`/api/insurance/forms/submissions/${id}`)
+        if (response.ok) {
+          const row = await response.json()
+          if (cancelled) return
+          setApp(applicationFromApiResponse(row))
+          setLocalOwned(false)
+          setServerOwned(true)
+          trackRecentApplication(id)
+          return
+        }
+      } catch {
+        // Offline or the request failed — fall through to "not found".
+      }
+
+      if (cancelled) return
       setApp(null)
       setLocalOwned(false)
-      return
+      setServerOwned(false)
     }
-    setApp(resolveApplicationById(id) ?? null)
-    setLocalOwned(isLocalOwnedApplication(id))
-    trackRecentApplication(id)
+
+    void load()
+    return () => {
+      cancelled = true
+    }
   }, [id])
 
   const rows = useMemo(
@@ -92,10 +135,7 @@ export default function PolicyDetailPage() {
 
   const upcoming = app ? nextStatus(app.Status) : null
 
-  const onAdvance = () => {
-    if (!id || !upcoming) return
-    const updated = advanceApplicationStatus(id)
-    if (!updated) return
+  const announceAdvance = (updated: LocalApplication) => {
     setApp(updated)
     void queryClient.invalidateQueries({ queryKey: ["purchased-insurances"] })
     toast.success(copy.advancedTitle, {
@@ -104,6 +144,31 @@ export default function PolicyDetailPage() {
         statusLabels[updated.Status] ?? updated.Status,
       ),
     })
+  }
+
+  const onAdvance = () => {
+    if (!id || !upcoming) return
+
+    if (localOwned) {
+      const updated = advanceApplicationStatus(id)
+      if (updated) announceAdvance(updated)
+      return
+    }
+
+    if (serverOwned) {
+      void (async () => {
+        try {
+          const response = await fetch(`/api/insurance/forms/submissions/${id}`, {
+            method: "PATCH",
+          })
+          if (!response.ok) throw new Error("advance failed")
+          const row = await response.json()
+          announceAdvance(applicationFromApiResponse(row))
+        } catch {
+          toast.error(copy.advanceFailed)
+        }
+      })()
+    }
   }
 
   if (app === undefined) {
@@ -221,7 +286,7 @@ export default function PolicyDetailPage() {
           <h2 className="font-[family-name:var(--font-display)] text-lg font-bold">
             {copy.timelineTitle}
           </h2>
-          {localOwned && upcoming ? (
+          {(localOwned || serverOwned) && upcoming ? (
             <Button type="button" size="sm" variant="outline" className="gap-1.5" onClick={onAdvance}>
               <Sparkles className="h-3.5 w-3.5" aria-hidden />
               {copy.advanceStatus.replace(
@@ -255,7 +320,7 @@ export default function PolicyDetailPage() {
             </li>
           ))}
         </ol>
-        {localOwned && upcoming ? (
+        {(localOwned || serverOwned) && upcoming ? (
           <p className="mt-4 text-xs text-muted-foreground">{copy.advanceHint}</p>
         ) : null}
       </section>

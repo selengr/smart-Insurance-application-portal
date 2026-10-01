@@ -573,9 +573,10 @@
       "applyAgain": "Apply again",
       "timelineTitle": "Status timeline",
       "advanceStatus": "Advance to {status}",
-      "advanceHint": "Demo only — simulate underwriting progress for applications reserved in this browser.",
+      "advanceHint": "Demo only — simulate underwriting progress for applications you reserved.",
       "advancedTitle": "Status updated",
       "advancedBody": "Moved to {status}.",
+      "advanceFailed": "Couldn't update status. Try again.",
       "yes": "Yes",
       "no": "No",
       "valueLabel": "Value"
