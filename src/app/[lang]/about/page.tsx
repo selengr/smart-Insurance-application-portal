@@ -4,7 +4,7 @@ import { Locale } from "../../../../i18n.config"
 import { getDictionary } from "@/lib/dictionary"
 import { buildPageMetadata } from "@/lib/page-metadata"
 import { ArrowUpRight } from "lucide-react"
-
+// test
 type Params = Promise<{ lang: Locale }>
 
 export async function generateMetadata({
